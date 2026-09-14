@@ -1,0 +1,28 @@
+[project]
+name = "ds-modeling-pipeline"
+version = "0.1.0"
+description = "Coffee quality modeling pipeline with MLflow tracking"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "statsmodels",
+    "mlflow",
+    "parsenvy",
+]
+
+[dependency-groups]
+dev = [
+    "jupyterlab",
+    "seaborn",
+    "pytest",
+    "testbook",
+    "black",
+    "nbdime",
+]
+
+[tool.uv]
+package = false
