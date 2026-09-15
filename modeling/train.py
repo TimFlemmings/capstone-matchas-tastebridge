@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 import pickle
 import warnings
 import mlflow
-from mlflow.sklearn import save_model  # , log_model
+from mlflow.sklearn import save_model, log_model
 
 from modeling.feature_engineering import (
     fill_missing_values,
@@ -23,6 +23,10 @@ from modeling.config import TRACKING_URI, EXPERIMENT_NAME
 
 warnings.filterwarnings("ignore")
 logger = getLogger(__name__)
+
+# split settings, kept here so they can be logged alongside the model params
+RANDOM_STATE = 42
+TEST_SIZE = 0.30
 
 
 def __get_data():
@@ -42,7 +46,7 @@ def __get_data():
 
     # splittin into train and test
     X_train, X_test, y_train, y_test = train_test_split(
-        X, Y, test_size=0.30, random_state=42
+        X, Y, test_size=TEST_SIZE, random_state=RANDOM_STATE
     )
     ## in order to exemplify how the predict will work.. we will save the y_train
     logger.info("Saving test data in the data folder .. wo feat eng")
@@ -99,9 +103,12 @@ def run_training():
             "altitude_high_meters_mean": altitude_high_meters_mean,
             "altitude_mean_log_mean": altitude_mean_log_mean,
             "fit_intercept": True,
+            "random_state": RANDOM_STATE,
+            "test_size": TEST_SIZE,
+            "n_features": X_train.shape[1],
         }
         mlflow.log_params(params)
-        mlflow.set_tag("worst_model", "True")
+        mlflow.set_tag("model_type", "LinearRegression")
         y_train_pred = reg.predict(X_train)
 
         __compute_and_log_metrics(y_train, y_train_pred)
@@ -110,13 +117,20 @@ def run_training():
         __compute_and_log_metrics(y_test, y_test_pred, "test")
 
         logger.info("this is obviously fishy")
+        # logging the model to mlflow so the run is reproducible from the tracking server
+        logger.info("Logging model to MLflow")
+        log_model(
+            sk_model=reg,
+            name="model",
+            input_example=X_train.head(),
+        )
+
         # saving the model
         logger.info("Saving model in the model folder")
         path = "models/linear"
         if os.path.isdir(path):
             shutil.rmtree(path)
         save_model(sk_model=reg, path=path)
-        # logging the model to mlflow will not work without a AWS Connection setup.. too complex for now
 
 
 if __name__ == "__main__":

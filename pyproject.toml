@@ -22,6 +22,7 @@ dev = [
     "testbook",
     "black",
     "nbdime",
+    "ipykernel<7",
 ]
 
 [tool.uv]

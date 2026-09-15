@@ -137,3 +137,15 @@ models/*
 #config file has sensitive data
 .mlflow_uri
 mlflow.db
+# Ignore data directories and large files
+data/
+fma_small/
+fma_metadata/
+*.csv
+*.pickle
+*.npz
+
+# Ignore Python & Virtual Environment
+.venv/
+__pycache__/
+.ipynb_checkpoints/
