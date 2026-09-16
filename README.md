@@ -1,21 +1,133 @@
-# ds-modeling-pipeline
+# Matcha — a music recommender you can steer
 
-Here you find a Skeleton project for building a simple model in a python script or notebook and log the results on MLFlow.
+Most recommenders keep you where you already are. Matcha lets you decide how far
+from your taste you want to travel, and shows you *why* an unfamiliar track
+still connects to where you started.
 
-There are two ways to do it: 
-* In Jupyter Notebooks:
-    We train a simple model in the [jupyter notebook](notebooks/EDA-and-modeling.ipynb), where we select only some features and do minimal cleaning. The hyperparameters of feature engineering and modeling will be logged with MLflow
+This repository holds the recommendation engine: the feature pipeline, the
+model, and the evaluation setup that every later idea is measured against.
 
-* With Python scripts:
-    The [main script](modeling/train.py) will go through exactly the same process as the jupyter notebook and also log the hyperparameters with MLflow
+---
 
-Data used is the [coffee quality dataset](https://github.com/jldbc/coffee-quality-database).
+## Where the project stands
 
-## Requirements
+**Milestone 1 — project setup: done.** The baseline works end to end: give it one
+track, get a ranked list of similar ones.
 
-- [uv](https://docs.astral.sh/uv/) (it installs the right Python for you — no pyenv, conda or pip needed)
+```bash
+uv run python -m modeling.recommender --track-id 2
+```
 
-Install uv once per machine:
+```
+seed track : AWOL — Food [Hip-Hop]
+space      : 146 components, cosine distance
+
+          distance               artist                          title          genre
+7492        0.4237              BrokeMC                    In the Dark        Hip-Hop
+149953      0.4253            K. Sparks                 Blue Real Talk        Hip-Hop
+98584       0.4481               Hi-Rez                          Relax        Hip-Hop
+115723      0.4766            Martin R.                      Acidamine     Electronic
+...
+```
+
+### Baseline scorecard
+
+Measured on held-out tracks with 5-fold cross-validation — the pipeline is
+refitted per fold, so these numbers say how it behaves on music it has never
+seen.
+
+| Metric | Held out | What it asks |
+|---|---|---|
+| `precision@10` | **0.400** ± 0.006 | how many of the ten share the seed's genre |
+| `nDCG@10` | 0.420 ± 0.006 | are the good ones near the *top* |
+| `genre_overlap@10` | 0.262 ± 0.006 | how much the full genre lists overlap |
+| `coverage` | 0.780 ± 0.004 | how much of the catalogue ever gets surfaced |
+| random guess | 0.125 | eight balanced genres, so 1-in-8 |
+
+**3.2× better than chance**, and the model never sees a genre label — it matches
+on sound alone. Genre is only used afterwards, to mark the paper.
+
+---
+
+## The data
+
+[FMA](https://github.com/mdeff/fma) `small` subset:
+
+- **8,000 tracks**, ~229 seconds each
+- **518 pre-extracted audio features** — mfcc, chroma, spectral, tonnetz, zcr, rmse
+- **8 genres**, exactly 1,000 tracks each — perfectly balanced, which is why the
+  random baseline is a clean `1/8`
+- No missing values; 17 duplicate rows
+
+Audio and metadata live under `data/` and are **not** in this repository — they
+are 32 GB. Download them from the FMA project.
+
+### Three things the EDA turned up
+
+**The features are lopsided.** Three `chroma_*` families carry 252 of the 518
+columns — 49% — while measuring much the same thing. Rhythm and texture (`zcr`,
+`rmse`) get 7 columns each. Since PCA picks directions by variance and variance
+grows with column count, the similarity space leans heavily on harmony.
+
+**The tails are heavy.** 86 of 518 columns have kurtosis above 100, one reaches
+7,599, and after standardising the most extreme value still sits 88 standard
+deviations from its mean. `RobustScaler` is the obvious fix — we tried it, and
+it scored *worse* (0.336 vs 0.413). Those outliers carry real signal.
+
+**It compresses a long way.** 146 components hold 90% of the variance, 207 hold
+95%, 334 hold 99%. No single component dominates: the strongest explains only
+11.8%.
+
+---
+
+## How it works
+
+```
+518 audio features  →  StandardScaler  →  PCA (146)  →  nearest neighbours
+                                                         cosine distance
+```
+
+PCA on its own recommends nothing — it only reshapes the features. The model is
+the last step: index every track by its position in the reduced space, and
+answer *"what sounds like this?"* with the closest tracks to it.
+
+The baseline is deliberately plain — no genre filtering, no popularity
+weighting, no learned similarity — so that every later idea has something honest
+to beat.
+
+**Cosine rather than euclidean** because it compares the *direction* of two
+feature vectors and ignores their magnitude: a loud mix and a quiet one with the
+same character stay close. Worth 0.413 against 0.378 for euclidean.
+
+---
+
+## Repository layout
+
+```
+modeling/
+├── config.py         MLflow tracking URI and experiment name
+├── data.py           load the FMA subset and its metadata
+├── features.py       scaling, PCA, artifact persistence
+├── recommender.py    the model — nearest neighbours in PCA space
+├── evaluation.py     the four metrics and k-fold validation
+└── train_pca.py      CLI: fit a feature space and log the run
+
+notebooks/
+└── 01_eda_baseline.ipynb    the analysis, step by step
+```
+
+---
+
+## Running it
+
+### Setup
+
+```bash
+uv sync --all-groups
+```
+
+[uv](https://docs.astral.sh/uv/) installs the right Python for you — no pyenv,
+conda or pip needed. Install it once per machine:
 
 ```bash
 # macOS / Linux
@@ -25,129 +137,120 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### Setup
+### MLflow
+
+Save the tracking URI locally — it is gitignored, so it never reaches the repo:
 
 ```bash
-make setup
-
-# or directly
-uv sync --all-groups
-```
-
-That creates `.venv/`, downloads a suitable Python (`>=3.11`) if you don't have one, and installs
-every dependency pinned in `uv.lock` so the whole team gets identical versions.
-
-Dependencies are declared in `pyproject.toml`: the runtime set under `[project.dependencies]`
-(what deployment of the model or a dashboard needs) and the development tools — JupyterLab,
-pytest, black, nbdime — under the `dev` group. Use `uv sync` for runtime only, or
-`uv sync --all-groups` for everything.
-
-See [UV_SETUP.md](UV_SETUP.md) for the full guide: adding and upgrading packages, pinning the
-Python version, and troubleshooting.
-
-The MLFLOW URI should **not be stored on git**, you have two options, to save it locally in the `.mlflow_uri` file:
-
-```BASH
 echo http://127.0.0.1:5000/ > .mlflow_uri
 ```
 
-This will create a local file where the uri is stored which will not be added on github (`.mlflow_uri` is in the `.gitignore` file). Alternatively you can export it as an environment variable with
+Start the server in its own terminal and leave it running:
 
 ```bash
-export MLFLOW_URI=http://127.0.0.1:5000/
+make mlflow      # uv run mlflow ui
 ```
 
-This links to your local mlflow, if you want to use a different one, then change the set uri.
+> **The trap that costs an afternoon:** notebooks run with `notebooks/` as the
+> working directory, and MLflow silently defaults to a local store there when no
+> tracking URI is set. Runs vanish from the UI without an error. Always import
+> `TRACKING_URI` from `modeling/config.py`, which resolves the path from the
+> module rather than the working directory. And never run `!mlflow ui` inside a
+> notebook cell — it blocks the kernel.
 
-The code in the [config.py](modeling/config.py) will try to read it locally and if the file doesn't exist will look in the env var.. IF that is not set the URI will be empty in your code.
-
-## Usage
-
-### Creating an MLFlow experiment
-
-You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
+### Recommend
 
 ```bash
-uv run mlflow experiments create --experiment-name 0-template-ds-modeling
+uv run python -m modeling.recommender --track-id 2          # ten similar tracks
+uv run python -m modeling.recommender --evaluate            # score it
+uv run python -m modeling.recommender --metric euclidean    # try another distance
 ```
 
-Check your local mlflow
+### Fit a feature space
+
+Every flag maps to an experiment we wanted to run, so a proposal is a flag
+rather than a notebook edit. Runs land in the `Music_Recommendation_PCA`
+experiment carrying all four metrics.
 
 ```bash
-uv run mlflow ui
+uv run python -m modeling.train_pca                              # baseline: 90% variance
+uv run python -m modeling.train_pca --n-components 60            # a fixed, smaller space
+uv run python -m modeling.train_pca --n-components 60 --scaler robust
+uv run python -m modeling.train_pca --n-components 60 --drop-chroma
 ```
 
-and open the link [http://127.0.0.1:5000](http://127.0.0.1:5000)
+`--n-components` takes either form: `0.90` is a variance target, `60` a fixed
+component count.
 
-This will throw an error if the experiment already exists. **Save the experiment name in the [config file](modeling/config.py).**
-
-In order to train the model and store test data in the data folder and the model in models run:
+### Reproduce the audit
 
 ```bash
-uv run python -m modeling.train
-
-# or
-make train
+uv run python -m modeling.evaluation
 ```
 
-In order to test that predict works on a test set you created run:
+Prints the feature-family breakdown, the tail statistics, and the full
+comparison table behind every number in this README.
 
-```bash
-uv run python -m modeling.predict models/linear data/X_test.csv data/y_test.csv
+---
 
-# or
-make predict
-```
+## What we measured, and what we left alone
 
-## About MLFLOW -- delete this when using the template
+Logged in MLflow, none applied to the baseline — it stays as the reference point
+for the final comparison.
 
-MLFlow is a tool for tracking ML experiments. You can run it locally or remotely. It stores all the information about experiments in a database.
-And you can see the overview via the GUI or access it via APIs. Sending data to mlflow is done via APIs. And with mlflow you can also store models on S3 where you version them and tag them as production for serving them in production.
-![mlflow workflow](images/0_general_tracking_mlflow.png)
+| Change | Features | Components | precision@10 |
+|---|---:|---:|---:|
+| Drop the two redundant chroma families | 350 | 119 | **0.429** |
+| Drop chroma + kurtosis/skew columns | 250 | 78 | 0.423 |
+| **Baseline** — all features | 518 | 146 | 0.413 |
+| Fixed 60 components | 518 | 60 | 0.404 |
+| RobustScaler instead of StandardScaler | 518 | 60 | 0.336 |
 
-### MLFlow GUI
+Dropping two chroma families helps *and* shrinks the space. Applying it is one
+flag, whenever we decide the baseline has served its purpose.
 
-You can group model trainings in experiments. The granularity of what an experiment is up to your usecase. Recommended is to have an experiment per data product, as for all the runs in an experiment you can compare the results.
-![gui](images/1_gui.png)
+---
 
-### Code to send data to MLFlow
+## A note on the metrics
 
-In order to send data about your model you need to set the connection information, via the tracking uri and also the experiment name (otherwise the default one is used). One run represents a model, and all the rest is metadata. For example if you want to save train MSE, test MSE and validation MSE you need to name them as 3 different metrics.
-If you are doing CV you can set the tracking as nested.
-![mlflow code](images/2_code.png)
+Genre agreement is a **proxy, not ground truth**. Two tracks can be similar and
+carry different labels, and FMA's eight genres are coarse. It is reliable for
+comparing configurations against each other — which is what we need — but it is
+not a measure of how good the recommender feels to a listener.
 
-### MLFlow metadata
+This is also why `genre_overlap@10` exists. Exact genre matching scores a
+cross-genre recommendation as simply wrong, which would mark the planned
+Familiar → Adventurous control as a regression the moment it works. Overlap
+grades the distance instead, so we can tell smart exploration from random noise.
 
-There is no constraint between runs to have the same metadata tracked. I.e. for one run you can track different tags, different metrics, and different parameters (in cv some parameters might not exist for some runs so this .. makes sense to be flexible).
+The four metrics are **frozen**. Swapping rulers halfway would invalidate every
+comparison behind them.
 
-- tags can be anything you want.. like if you do CV you might want to tag the best model as "best"
-- params are perfect for hypermeters and also for information about the data pipeline you use, if you scaling vs normalization and so on
-- metrics.. should be numeric values as these can get plotted
+---
 
-![mlflow metadata](images/3_metadata.png)
+## Development notes
 
-## Development Notes
+### Merge conflicts in notebooks
 
-### Handling Merge Conflicts in Jupyter Notebooks
+Notebooks are stored as JSON, so conflicts are ugly. This project uses
+**nbdime** (already in the `dev` dependency group).
 
-When working collaboratively, merge conflicts may occur in `.ipynb` files because notebooks are stored as JSON.  
-To simplify resolving these conflicts, this project uses **nbdime** (already included in the `dev` dependency group).
+Enable it once:
 
-#### Enable once
-After setting up your environment, enable nbdime for Git:
 ```bash
 nbdime config-git --enable
 ```
 
-#### When a merge conflict occurs
-Run the following command to open the merge tool:
+When a conflict occurs:
+
 ```bash
 nbdime mergetool
 ```
-A browser window will open showing both notebook versions side by side.
-Select the correct cells, save, and then complete the merge:
+
+A browser window opens showing both versions side by side. Select the correct
+cells, save, then finish the merge:
+
 ```bash
 git add <notebook>.ipynb
 git commit -m "Resolve notebook merge conflict"
 ```
-That’s it — clean merges for notebooks!

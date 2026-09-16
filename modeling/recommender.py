@@ -80,6 +80,49 @@ class TrackRecommender:
             out["genre"] = meta[("track", "genre_top")].values
         return out
 
+    def taste_profile(self, track_ids) -> np.ndarray:
+        """One point in the PCA space standing for a whole list of seed tracks.
+
+        The centroid — the average position of the seeds. With cosine distance
+        this reads as the average *direction* of the taste, so a list of three
+        hip-hop tracks lands firmly in hip-hop territory.
+
+        The interesting case is a deliberately mixed list: the centroid falls
+        between the styles, which may be a genuine bridge between them or may
+        be empty space resembling neither. Worth checking before building the
+        Taste Bridge on it.
+        """
+        rows = [self._position(t) for t in track_ids]
+        return self.embedding_.iloc[rows].mean(axis=0).to_numpy()
+
+    def similar_to_many(self, track_ids, n: int = DEFAULT_N) -> pd.DataFrame:
+        """Recommend for a list of seed tracks instead of a single one.
+
+        Seeds are excluded from the result — recommending a track back to
+        someone who just named it is not a recommendation.
+        """
+        track_ids = list(track_ids)
+        centroid = self.taste_profile(track_ids).reshape(1, -1)
+
+        # ask for extra so there is room to drop the seeds afterwards
+        distances, idx = self.index_.kneighbors(centroid, n_neighbors=n + len(track_ids))
+        distances, idx = distances[0], idx[0]
+
+        seeds = set(track_ids)
+        keep = [(d, i) for d, i in zip(distances, idx) if self.track_ids_[i] not in seeds][:n]
+
+        out = pd.DataFrame({
+            "track_id": [self.track_ids_[i] for _, i in keep],
+            "distance": [d for d, _ in keep],
+        }).set_index("track_id")
+
+        if self.tracks_ is not None:
+            meta = self.tracks_.loc[out.index]
+            out["artist"] = meta[("artist", "name")].values
+            out["title"] = meta[("track", "title")].values
+            out["genre"] = meta[("track", "genre_top")].values
+        return out
+
     def describe(self, track_id) -> str:
         if self.tracks_ is None:
             return str(track_id)
