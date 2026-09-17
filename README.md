@@ -47,6 +47,63 @@ seen.
 **3.2× better than chance**, and the model never sees a genre label — it matches
 on sound alone. Genre is only used afterwards, to mark the paper.
 
+**Milestone 2 — the Familiar → Adventurous control: working.** One dial, and no
+second model behind it.
+
+```bash
+uv run python -m modeling.recommender --track-id 2 --adventure 0.7
+```
+
+---
+
+## The dial
+
+The baseline answers with the ten nearest tracks — but it ranks *all 7,999*
+others. We simply never look past the first ten.
+
+```
+nearest ──────────────────────────────────────────▶ furthest
+[1][2][3][4][5][6][7][8][9][10] [11] ... [500] ... [7999]
+└──── what the baseline shows ──┘
+```
+
+So the control slides a window of ten down a ranking that already exists.
+`adventure` runs 0 → 1 and maps **geometrically** onto the starting rank,
+because distance grows slowly with rank: ranks 1-5 sit at cosine 0.42-0.48,
+ranks 31-35 at 0.55, ranks 201-205 at 0.66. A linear dial would spend most of
+its travel inside a band nobody can hear apart.
+
+| `adventure` | starts at rank | mean distance | `precision@10` | `genre_overlap@10` | `coverage` |
+|---:|---:|---:|---:|---:|---:|
+| 0.00 | 1 | 0.413 | 0.399 | 0.265 | 0.538 |
+| 0.22 | 5 | 0.439 | 0.366 | 0.231 | 0.536 |
+| 0.50 | 22 | 0.495 | 0.325 | 0.190 | 0.555 |
+| 0.75 | 106 | 0.577 | 0.264 | 0.147 | 0.577 |
+| 1.00 | 500 | 0.693 | 0.215 | 0.114 | 0.603 |
+
+```bash
+uv run python -m modeling.recommender --depth-profile   # reproduces this table
+```
+
+Three things this table settles:
+
+**Relevance decays smoothly — there is no cliff.** So a continuous slider is
+defensible; we do not have to hide the far end behind a safety cap.
+
+**Even at full adventure, `precision@10` is 0.215 — still 1.7× random.** Rank
+500 of 8,000 is the top 6% by similarity. This is *steering*, not shuffling: far
+away, but chosen. A random track is noise, and listeners learn to distrust
+noise.
+
+**Coverage moves the other way.** The further out the window, the more of the
+catalogue gets surfaced — 0.538 → 0.603. The adventure control is also the
+answer to popularity bias, which is not what it was built for.
+
+A falling `precision@10` here is the feature *working*, not a regression — which
+is exactly why `genre_overlap@10` was frozen into the scorecard before this
+existed. It grades how far a cross-genre jump landed instead of marking it
+simply wrong.
+
 ---
 
 ## The data
@@ -108,8 +165,8 @@ modeling/
 ├── config.py         MLflow tracking URI and experiment name
 ├── data.py           load the FMA subset and its metadata
 ├── features.py       scaling, PCA, artifact persistence
-├── recommender.py    the model — nearest neighbours in PCA space
-├── evaluation.py     the four metrics and k-fold validation
+├── recommender.py    the model — nearest neighbours, and the adventure dial
+├── evaluation.py     the four metrics, k-fold validation, the depth profile
 └── train_pca.py      CLI: fit a feature space and log the run
 
 notebooks/
@@ -162,6 +219,8 @@ make mlflow      # uv run mlflow ui
 
 ```bash
 uv run python -m modeling.recommender --track-id 2          # ten similar tracks
+uv run python -m modeling.recommender --adventure 0.7       # ten further-out ones
+uv run python -m modeling.recommender --depth-profile       # what adventure costs
 uv run python -m modeling.recommender --evaluate            # score it
 uv run python -m modeling.recommender --metric euclidean    # try another distance
 ```
@@ -230,9 +289,10 @@ comparing configurations against each other — which is what we need — but it
 not a measure of how good the recommender feels to a listener.
 
 This is also why `genre_overlap@10` exists. Exact genre matching scores a
-cross-genre recommendation as simply wrong, which would mark the planned
-Familiar → Adventurous control as a regression the moment it works. Overlap
-grades the distance instead, so we can tell smart exploration from random noise.
+cross-genre recommendation as simply wrong, which would have marked the
+Familiar → Adventurous control as a regression the moment it started working.
+Overlap grades the distance instead, so we can tell smart exploration from
+random noise — and the depth profile above is the first place that paid off.
 
 The four metrics are **frozen**. Swapping rulers halfway would invalidate every
 comparison behind them.

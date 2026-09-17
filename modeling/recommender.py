@@ -10,6 +10,9 @@ similarity — just distance. Everything else gets measured against it.
     # build it and see what it recommends
     uv run python -m modeling.recommender --track-id 2
 
+    # the same seed, further out
+    uv run python -m modeling.recommender --track-id 2 --adventure 0.7
+
     # score it
     uv run python -m modeling.recommender --evaluate
 """
@@ -28,6 +31,32 @@ from modeling.features import MODELS_DIR, transform
 logger = getattr(logging, "getLogger")(__name__)
 
 DEFAULT_N = 10
+
+# How deep into the ranked neighbour list the adventure slider can reach. Rank
+# 500 of 8,000 is still the top 6% by similarity — far from the seed, but never
+# random, which is the whole point of steering rather than shuffling.
+MAX_DEPTH = 500
+
+
+def depth_for(adventure: float, max_depth: int = MAX_DEPTH) -> int:
+    """Where to start reading the neighbour list, for an adventure of 0…1.
+
+    The mapping is geometric, not linear, because distance grows slowly with
+    rank: on a typical seed, ranks 1-5 sit at cosine 0.42-0.48, ranks 31-35 at
+    0.55, ranks 201-205 at 0.66. A linear slider would spend most of its travel
+    inside a band the listener cannot hear apart. This one spends half its
+    travel inside the first 22 neighbours. Returned as a 0-based offset, so the
+    window it opens starts at these neighbours, counting from 1:
+
+        0.00 →   1st     the nearest tracks, as the baseline behaves
+        0.25 →   5th
+        0.50 →  22nd
+        0.75 → 106th
+        1.00 → 500th
+    """
+    if not 0.0 <= adventure <= 1.0:
+        raise ValueError(f"adventure must be between 0 and 1, got {adventure}")
+    return int(round(max_depth ** adventure)) - 1
 
 
 class TrackRecommender:
@@ -62,14 +91,10 @@ class TrackRecommender:
             raise KeyError(f"track {track_id} is not in the indexed catalogue")
         return int(matches[0])
 
-    def similar_to(self, track_id, n: int = DEFAULT_N) -> pd.DataFrame:
-        """The n closest tracks to `track_id`, nearest first, excluding itself."""
-        row = self._position(track_id)
-        distances, idx = self.index_.kneighbors(self.embedding_.iloc[[row]], n_neighbors=n + 1)
-        distances, idx = distances[0][1:], idx[0][1:]  # drop the track itself
-
+    def _with_metadata(self, track_ids, distances, ranks) -> pd.DataFrame:
         out = pd.DataFrame({
-            "track_id": self.track_ids_[idx],
+            "track_id": track_ids,
+            "rank": ranks,
             "distance": distances,
         }).set_index("track_id")
 
@@ -79,6 +104,34 @@ class TrackRecommender:
             out["title"] = meta[("track", "title")].values
             out["genre"] = meta[("track", "genre_top")].values
         return out
+
+    def similar_to(self, track_id, n: int = DEFAULT_N, adventure: float = 0.0) -> pd.DataFrame:
+        """n tracks near `track_id`, read from a window of the ranked neighbour list.
+
+        The model already ranks the entire catalogue by distance; `adventure`
+        only decides where in that ranking the window of n starts. At 0 it is
+        the ten nearest tracks — the baseline, unchanged. Higher values slide
+        the window outward into music that is still sorted by similarity but no
+        longer the obvious answer.
+
+        This is the Familiar → Adventurous control, and it is deliberately not
+        randomisation: rank 200 of 8,000 is a considered recommendation that
+        happens to be far away, whereas a random track is noise the listener
+        learns to distrust.
+        """
+        row = self._position(track_id)
+        start = depth_for(adventure)
+        # +1 for the seed itself, which is always its own nearest neighbour
+        distances, idx = self.index_.kneighbors(
+            self.embedding_.iloc[[row]], n_neighbors=start + n + 1
+        )
+        distances, idx = distances[0][1:], idx[0][1:]  # drop the seed
+        window = slice(start, start + n)
+        return self._with_metadata(
+            self.track_ids_[idx[window]],
+            distances[window],
+            np.arange(start + 1, start + n + 1),
+        )
 
     def taste_profile(self, track_ids) -> np.ndarray:
         """One point in the PCA space standing for a whole list of seed tracks.
@@ -95,33 +148,36 @@ class TrackRecommender:
         rows = [self._position(t) for t in track_ids]
         return self.embedding_.iloc[rows].mean(axis=0).to_numpy()
 
-    def similar_to_many(self, track_ids, n: int = DEFAULT_N) -> pd.DataFrame:
+    def similar_to_many(self, track_ids, n: int = DEFAULT_N,
+                        adventure: float = 0.0) -> pd.DataFrame:
         """Recommend for a list of seed tracks instead of a single one.
 
         Seeds are excluded from the result — recommending a track back to
-        someone who just named it is not a recommendation.
+        someone who just named it is not a recommendation. `adventure` slides
+        the window exactly as in similar_to, but around the taste centroid.
         """
         track_ids = list(track_ids)
-        centroid = self.taste_profile(track_ids).reshape(1, -1)
+        # as a one-row frame, not a bare array: the index was fitted on named
+        # columns, and sklearn warns when a query arrives without them
+        centroid = pd.DataFrame([self.taste_profile(track_ids)],
+                                columns=self.embedding_.columns)
+        start = depth_for(adventure)
 
         # ask for extra so there is room to drop the seeds afterwards
-        distances, idx = self.index_.kneighbors(centroid, n_neighbors=n + len(track_ids))
+        distances, idx = self.index_.kneighbors(
+            centroid, n_neighbors=start + n + len(track_ids)
+        )
         distances, idx = distances[0], idx[0]
 
         seeds = set(track_ids)
-        keep = [(d, i) for d, i in zip(distances, idx) if self.track_ids_[i] not in seeds][:n]
+        keep = [(d, i) for d, i in zip(distances, idx) if self.track_ids_[i] not in seeds]
+        keep = keep[start:start + n]
 
-        out = pd.DataFrame({
-            "track_id": [self.track_ids_[i] for _, i in keep],
-            "distance": [d for d, _ in keep],
-        }).set_index("track_id")
-
-        if self.tracks_ is not None:
-            meta = self.tracks_.loc[out.index]
-            out["artist"] = meta[("artist", "name")].values
-            out["title"] = meta[("track", "title")].values
-            out["genre"] = meta[("track", "genre_top")].values
-        return out
+        return self._with_metadata(
+            [self.track_ids_[i] for _, i in keep],
+            [d for d, _ in keep],
+            np.arange(start + 1, start + len(keep) + 1),
+        )
 
     def describe(self, track_id) -> str:
         if self.tracks_ is None:
@@ -173,6 +229,10 @@ def parse_args(argv=None):
     parser.add_argument("--track-id", type=int, default=None,
                         help="show recommendations for this track (default: a random one)")
     parser.add_argument("-n", type=int, default=DEFAULT_N, help="how many tracks to recommend")
+    parser.add_argument("--adventure", type=float, default=0.0,
+                        help="0 = the nearest tracks, 1 = the edge of the top 6%%")
+    parser.add_argument("--depth-profile", action="store_true",
+                        help="score the recommender at every adventure level")
     parser.add_argument("--metric", default="cosine", choices=["cosine", "euclidean", "manhattan"],
                         help="distance used for similarity")
     parser.add_argument("--pca-suffix", default="_90pct",
@@ -202,9 +262,21 @@ def main(argv=None):
         track_id = int(np.random.default_rng(42).choice(rec.track_ids_))
 
     print(f"\nseed track : {rec.describe(track_id)}")
-    print(f"space      : {rec.embedding_.shape[1]} components, {args.metric} distance\n")
-    recs = rec.similar_to(track_id, n=args.n)
+    print(f"space      : {rec.embedding_.shape[1]} components, {args.metric} distance")
+    print(f"adventure  : {args.adventure:.2f} — window starts at neighbour "
+          f"{depth_for(args.adventure) + 1}\n")
+    recs = rec.similar_to(track_id, n=args.n, adventure=args.adventure)
     print(recs.to_string(float_format=lambda v: f"{v:.4f}"))
+
+    if args.depth_profile:
+        from modeling.evaluation import depth_profile, genre_sets
+
+        print("\n=== relevance against adventure ===")
+        profile = depth_profile(
+            rec.embedding_, genre_labels(tracks), genre_sets_=genre_sets(tracks),
+            k=args.n, metric=args.metric, sample=args.sample,
+        )
+        print(profile.to_string(index=False, float_format=lambda v: f"{v:.3f}"))
 
     if args.evaluate:
         labels = genre_labels(tracks)

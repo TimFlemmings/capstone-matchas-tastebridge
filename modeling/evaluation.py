@@ -118,6 +118,65 @@ def catalogue_coverage(embedding, k: int = K_NEIGHBOURS, metric: str = "cosine")
     return float(np.unique(idx[:, 1:]).size / embedding.shape[0])
 
 
+def depth_profile(embedding, labels: pd.Series, genre_sets_: pd.Series = None,
+                  depths=(0, 3, 21, 105, 499), k: int = K_NEIGHBOURS,
+                  metric: str = "cosine", sample: int = 1000, seed: int = 42) -> pd.DataFrame:
+    """How relevance decays as the recommendation window slides down the ranking.
+
+    The Familiar → Adventurous control reads k tracks starting at some depth in
+    the neighbour list rather than always from the top. This measures what that
+    costs: one row per depth, with the same rulers the baseline is scored on.
+
+    Read it as a shape, not as a score. precision@k *should* fall as the window
+    moves out — that is the feature working. What matters is where it falls off
+    a cliff, and whether genre_overlap holds up better than exact matching,
+    which would mean the far recommendations are still musically related rather
+    than merely distant.
+    """
+    from sklearn.neighbors import NearestNeighbors
+
+    lab = np.asarray(labels.astype(str))
+    sets = list(genre_sets_) if genre_sets_ is not None else None
+    n_tracks = embedding.shape[0]
+
+    rows = np.arange(n_tracks)
+    if sample is not None and sample < n_tracks:
+        rows = np.sort(np.random.default_rng(seed).choice(rows, size=sample, replace=False))
+
+    # one query deep enough for every depth, then slice it — the expensive part
+    # is the search, and it does not need repeating per window
+    deepest = max(depths) + k + 1
+    index = NearestNeighbors(metric=metric).fit(embedding)
+    Z = embedding.iloc[rows] if hasattr(embedding, "iloc") else embedding[rows]
+    distances, idx = index.kneighbors(Z, n_neighbors=deepest)
+    distances, idx = distances[:, 1:], idx[:, 1:]  # drop each seed itself
+
+    out = []
+    for depth in depths:
+        window = slice(depth, depth + k)
+        neighbours = idx[:, window]
+        hits = lab[neighbours] == lab[rows][:, None]
+
+        row = {
+            "adventure": round(np.log(depth + 1) / np.log(max(depths) + 1), 2),
+            "depth": depth,
+            "mean_distance": float(distances[:, window].mean()),
+            "precision_at_k": float(hits.mean()),
+            "coverage": float(np.unique(neighbours).size / n_tracks),
+        }
+        if sets is not None:
+            overlaps = np.empty(neighbours.shape)
+            for i, nb_row in enumerate(neighbours):
+                own = sets[rows[i]]
+                for j, other in enumerate(nb_row):
+                    union = own | sets[other]
+                    overlaps[i, j] = len(own & sets[other]) / len(union) if union else 0.0
+            row["genre_overlap_at_k"] = float(overlaps.mean())
+        out.append(row)
+
+    return pd.DataFrame(out)
+
+
 def feature_family_summary(X: pd.DataFrame) -> pd.Series:
     """Column count per feature family (mfcc, chroma_cens, zcr, ...).
 
