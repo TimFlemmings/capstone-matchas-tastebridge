@@ -195,19 +195,30 @@ comparison table behind every number in this README.
 
 ## What we measured, and what we left alone
 
-Logged in MLflow, none applied to the baseline — it stays as the reference point
-for the final comparison.
+These are **experiments, not the current pipeline.** Each was run once and
+logged in MLflow; none of them has been applied. The baseline below is what the
+code actually does today, and it stays that way — it is the reference point the
+final Baseline vs TasteBridge comparison is measured against.
 
-| Change | Features | Components | precision@10 |
+| Experiment (not applied) | Features | Components | precision@10 |
 |---|---:|---:|---:|
-| Drop the two redundant chroma families | 350 | 119 | **0.429** |
-| Drop chroma + kurtosis/skew columns | 250 | 78 | 0.423 |
-| **Baseline** — all features | 518 | 146 | 0.413 |
+| Without the two redundant chroma families | 350 | 119 | **0.429** |
+| Without chroma + the kurtosis/skew columns | 250 | 78 | 0.423 |
+| **← the pipeline as it runs today** | **518** | **146** | **0.413** |
 | Fixed 60 components | 518 | 60 | 0.404 |
 | RobustScaler instead of StandardScaler | 518 | 60 | 0.336 |
 
-Dropping two chroma families helps *and* shrinks the space. Applying it is one
-flag, whenever we decide the baseline has served its purpose.
+Two things to take from this. Dropping two chroma families would help *and*
+shrink the space, so it is the strongest lead we have. And `RobustScaler` —
+the obvious answer to those heavy tails — made things clearly worse, so the
+outliers are carrying real signal.
+
+Whenever we decide the baseline has served its purpose, applying any of these
+is one flag:
+
+```bash
+uv run python -m modeling.train_pca --n-components 60 --drop-chroma
+```
 
 ---
 
