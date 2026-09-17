@@ -32,9 +32,25 @@ logger = getattr(logging, "getLogger")(__name__)
 
 DEFAULT_N = 10
 
-# How deep into the ranked neighbour list the adventure slider can reach. Rank
-# 500 of 8,000 is still the top 6% by similarity — far from the seed, but never
-# random, which is the whole point of steering rather than shuffling.
+# How deep into the ranked neighbour list the adventure slider can reach.
+# Measured, not guessed — `depth_profile` over the whole catalogue says:
+#
+#     rank   ...  precision@10   vs random   coverage
+#      500          0.217          1.73x       0.386
+#     1000          0.194          1.55x       0.389
+#     2000          0.153          1.22x       0.393
+#     4000          0.103          0.82x       0.384   <- worse than random
+#
+# Two lines in that table set the ceiling. Around rank 3,000 the recommender
+# drops *below* chance, which is not neutral but actively wrong: mean cosine
+# distance passes 1.0 there, meaning the vectors are orthogonal and then
+# negatively correlated. The far half of the catalogue is not distant music,
+# it is opposite music.
+#
+# And coverage — the reason to go deep at all — stops improving after ~500
+# (0.386 -> 0.395 over the remaining 7,500 ranks). Past here you pay relevance
+# and buy nothing. 1,000 is defensible if the team wants a bolder far end;
+# 2,000 is not.
 MAX_DEPTH = 500
 
 

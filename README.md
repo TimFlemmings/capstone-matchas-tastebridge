@@ -99,6 +99,31 @@ noise.
 catalogue gets surfaced — 0.538 → 0.603. The adventure control is also the
 answer to popularity bias, which is not what it was built for.
 
+### Why the dial stops at rank 500
+
+Because past it the feature stops being a recommender. Pushing the profile out
+across the whole catalogue:
+
+| starting rank | share of catalogue | mean distance | `precision@10` | vs random | `coverage` |
+|---:|---:|---:|---:|---:|---:|
+| 500 | 6% | 0.699 | 0.217 | **1.73×** | 0.386 |
+| 1,000 | 13% | 0.770 | 0.194 | 1.55× | 0.389 |
+| 2,000 | 25% | 0.865 | 0.153 | 1.22× | 0.393 |
+| 4,000 | 50% | 1.005 | 0.103 | **0.82×** | 0.384 |
+| 7,900 | 99% | 1.369 | 0.063 | 0.50× | 0.353 |
+
+Around rank 3,000 the recommender falls *below* chance — not neutral but
+actively wrong, and a plain `random.choice()` would beat it. The geometry says
+why: mean cosine distance crosses **1.0** there, the value at which two vectors
+are orthogonal, and keeps climbing into negative correlation. The far half of
+the catalogue is not distant music; it is opposite music.
+
+The other half of the argument is that going deeper buys nothing. Coverage — the
+only reason to reach past the top ranks at all — flattens after 500, gaining
+0.009 across the remaining 7,500 ranks. So 500 is where relevance is still
+1.73× random and the coverage curve has already levelled off. Rank 1,000 is
+defensible if we want a bolder far end; 2,000 is not.
+
 A falling `precision@10` here is the feature *working*, not a regression — which
 is exactly why `genre_overlap@10` was frozen into the scorecard before this
 existed. It grades how far a cross-genre jump landed instead of marking it
