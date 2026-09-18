@@ -17,7 +17,9 @@ a proposal can be tested from the command line instead of by editing a notebook:
 
 Runs land in the Music_Recommendation_PCA experiment, all carrying the
 neighbour_genre_agreement metric so they can be compared against each other
-whatever was changed.
+whatever was changed. That score is measured with cosine distance, matching
+TrackRecommender — the distance is logged as a parameter because it changes not
+just the numbers but which configuration wins.
 """
 
 import argparse
@@ -97,6 +99,10 @@ def parse_args(argv=None):
         help="neighbours used by the quality metric",
     )
     parser.add_argument(
+        "--metric", default="cosine", choices=["cosine", "euclidean", "manhattan"],
+        help="distance the quality score is measured with; cosine matches the recommender",
+    )
+    parser.add_argument(
         "--no-eval", action="store_true",
         help="skip the neighbour-quality metric (faster, but the run can't be compared)",
     )
@@ -130,7 +136,8 @@ def run(args):
     quality = None
     if not args.no_eval:
         logger.info("Scoring neighbourhood quality (k=%s)", args.k)
-        quality = neighbour_genre_agreement(transform(X, scaler, pca), labels, k=args.k)
+        quality = neighbour_genre_agreement(transform(X, scaler, pca), labels,
+                                            k=args.k, metric=args.metric)
 
     mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment(MUSIC_EXPERIMENT_NAME)
@@ -146,6 +153,10 @@ def run(args):
             "pca_target": args.n_components,
             "dropped_chroma": args.drop_chroma,
             "dropped_shape_stats": args.drop_shape_stats,
+            # logged because runs scored under different distances are not
+            # comparable — cosine and euclidean rank the chroma experiments
+            # in opposite orders
+            "eval_metric": args.metric,
         })
         mlflow.log_metrics({
             "n_components_selected": pca.n_components_,

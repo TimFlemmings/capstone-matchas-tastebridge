@@ -22,7 +22,8 @@ logger = getLogger(__name__)
 K_NEIGHBOURS = 10
 
 
-def neighbour_genre_agreement(Z, labels: pd.Series, k: int = K_NEIGHBOURS) -> float:
+def neighbour_genre_agreement(Z, labels: pd.Series, k: int = K_NEIGHBOURS,
+                              metric: str = "cosine") -> float:
     """Fraction of each track's k nearest neighbours sharing its label.
 
     Z: the embedding to judge (n_tracks x n_dims) — scaled features, PCA space,
@@ -32,8 +33,22 @@ def neighbour_genre_agreement(Z, labels: pd.Series, k: int = K_NEIGHBOURS) -> fl
     The metric is a proxy: two tracks can be similar and carry different genre
     labels, so use it to compare configurations, not to claim the recommender
     is good.
+
+    `metric` defaults to cosine to match TrackRecommender. It used to be left
+    unset, which silently gave sklearn's euclidean default — so this function
+    scored a different pipeline from the one that ships, and train_pca.py logged
+    those numbers. It mattered: on the chroma experiments the two metrics rank
+    the configurations in opposite orders.
+
+        config                        euclidean   cosine
+        baseline (518 -> 146)             0.378    0.413
+        without 2 chroma families         0.394    0.429
+        without chroma + kurt/skew        0.397    0.423
+
+    Under cosine, dropping chroma alone wins. Under euclidean, dropping the
+    shape statistics as well wins. Same data, opposite conclusion.
     """
-    nn = NearestNeighbors(n_neighbors=k + 1).fit(Z)
+    nn = NearestNeighbors(n_neighbors=k + 1, metric=metric).fit(Z)
     _, idx = nn.kneighbors(Z)
     idx = idx[:, 1:]  # a track is its own nearest neighbour — drop it
     # arrow-backed dtypes (pandas reads FMA metadata as one) reject 2-D take
