@@ -118,6 +118,31 @@ def catalogue_coverage(embedding, k: int = K_NEIGHBOURS, metric: str = "cosine")
     return float(np.unique(idx[:, 1:]).size / embedding.shape[0])
 
 
+def _intra_list(values, neighbours, metric: str = "cosine") -> float:
+    """Mean distance between the recommended tracks *themselves*, not to the seed.
+
+    Every genre metric judges each recommendation against the seed. None of them
+    notices when all ten recommendations are near-copies of one another — ten
+    tracks by the same artist score a perfect precision@k and are a bad list.
+
+    catalogue_coverage does not catch it either: that is a system-level count
+    across all seeds, so a recommender can surface most of the catalogue while
+    handing every individual listener ten interchangeable tracks.
+
+    This is the per-listener version of that question, and the one an adventure
+    control has to move.
+    """
+    from sklearn.metrics import pairwise_distances
+
+    k = neighbours.shape[1]
+    # upper triangle only — the k x k distance matrix is symmetric with a zero
+    # diagonal, so a full mean would be diluted by both
+    triu = np.triu_indices(k, k=1)
+    scores = [pairwise_distances(values[row], metric=metric)[triu].mean()
+              for row in neighbours]
+    return float(np.mean(scores))
+
+
 def depth_profile(embedding, labels: pd.Series, genre_sets_: pd.Series = None,
                   depths=(0, 3, 21, 105, 499), k: int = K_NEIGHBOURS,
                   metric: str = "cosine", sample: int = 1000, seed: int = 42) -> pd.DataFrame:
@@ -150,6 +175,7 @@ def depth_profile(embedding, labels: pd.Series, genre_sets_: pd.Series = None,
     Z = embedding.iloc[rows] if hasattr(embedding, "iloc") else embedding[rows]
     distances, idx = index.kneighbors(Z, n_neighbors=deepest)
     distances, idx = distances[:, 1:], idx[:, 1:]  # drop each seed itself
+    values = embedding.values if hasattr(embedding, "values") else embedding
 
     out = []
     for depth in depths:
@@ -160,9 +186,15 @@ def depth_profile(embedding, labels: pd.Series, genre_sets_: pd.Series = None,
         row = {
             "adventure": round(np.log(depth + 1) / np.log(max(depths) + 1), 2),
             "depth": depth,
-            "mean_distance": float(distances[:, window].mean()),
+            # novelty: how far the window sits from the seed. No genre anywhere
+            # in it, and trivially gamed on its own — read it against precision.
+            "novelty": float(distances[:, window].mean()),
             "precision_at_k": float(hits.mean()),
+            # coverage is a *system*-level count: what the catalogue sees across
+            # every seed. It cannot tell that one listener got ten near-copies.
             "coverage": float(np.unique(neighbours).size / n_tracks),
+            # intra-list diversity is the per-listener version of that question.
+            "intra_list_diversity": _intra_list(values, neighbours, metric),
         }
         if sets is not None:
             overlaps = np.empty(neighbours.shape)

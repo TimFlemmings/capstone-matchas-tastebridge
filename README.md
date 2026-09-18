@@ -73,31 +73,36 @@ because distance grows slowly with rank: ranks 1-5 sit at cosine 0.42-0.48,
 ranks 31-35 at 0.55, ranks 201-205 at 0.66. A linear dial would spend most of
 its travel inside a band nobody can hear apart.
 
-| `adventure` | starts at rank | mean distance | `precision@10` | `genre_overlap@10` | `coverage` |
-|---:|---:|---:|---:|---:|---:|
-| 0.00 | 1 | 0.413 | 0.399 | 0.265 | 0.538 |
-| 0.22 | 5 | 0.439 | 0.366 | 0.231 | 0.536 |
-| 0.50 | 22 | 0.495 | 0.325 | 0.190 | 0.555 |
-| 0.75 | 106 | 0.577 | 0.264 | 0.147 | 0.577 |
-| 1.00 | 500 | 0.693 | 0.215 | 0.114 | 0.603 |
+| `adventure` | rank | `novelty` | `precision@10` | `genre_overlap@10` | `intra_list_div` | `coverage` |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0.00 | 1 | 0.412 | 0.406 | 0.269 | 0.508 | 0.603 |
+| 0.22 | 5 | 0.438 | 0.374 | 0.233 | 0.533 | 0.601 |
+| 0.50 | 22 | 0.494 | 0.316 | 0.184 | 0.598 | 0.610 |
+| 0.75 | 106 | 0.575 | 0.270 | 0.151 | 0.688 | 0.643 |
+| 1.00 | 500 | 0.692 | 0.214 | 0.113 | 0.808 | 0.683 |
+| | | **+68%** | **−47%** | **−58%** | **+59%** | **+13%** |
 
 ```bash
 uv run python -m modeling.recommender --depth-profile   # reproduces this table
 ```
 
-Three things this table settles:
+The last row is the point: the two columns that *should* fall do fall, and the
+three that should rise do rise. A dial that moved neither would be decoration.
+
+Three things this settles:
 
 **Relevance decays smoothly — there is no cliff.** So a continuous slider is
 defensible; we do not have to hide the far end behind a safety cap.
 
-**Even at full adventure, `precision@10` is 0.215 — still 1.7× random.** Rank
+**Even at full adventure, `precision@10` is 0.214 — still 1.7× random.** Rank
 500 of 8,000 is the top 6% by similarity. This is *steering*, not shuffling: far
 away, but chosen. A random track is noise, and listeners learn to distrust
 noise.
 
-**Coverage moves the other way.** The further out the window, the more of the
-catalogue gets surfaced — 0.538 → 0.603. The adventure control is also the
-answer to popularity bias, which is not what it was built for.
+**`intra_list_diversity` moves furthest of the three.** The ten tracks become
+0.508 → 0.808 apart *from each other*, which is what a listener actually
+experiences as variety. `coverage` barely notices (+13%) because it is a
+system-level count — see the note on metrics below.
 
 ### Why the dial stops at rank 500
 
@@ -307,6 +312,48 @@ uv run python -m modeling.train_pca --n-components 60 --drop-chroma
 ---
 
 ## A note on the metrics
+
+### Which ruler measures what
+
+Three of the four scorecard metrics are built on genre, and two of those are
+built on the *same* question:
+
+| Metric | Built on | Judges | Moves with adventure |
+|---|---|---|---|
+| `precision@10` | genre, hard (`genre_top`, right/wrong) | familiarity | ↓ −47% |
+| `nDCG@10` | genre, hard + position | familiarity, ordering | ↓ |
+| `genre_overlap@10` | genre, **graded** (`genres_all`, Jaccard) | how far a jump landed | ↓ −58% |
+| `coverage` | no genre at all | catalogue breadth, **system-wide** | ↑ +13% |
+
+`precision` and `nDCG` ask one question with two eyes: *is it the same genre?*
+Only `nDCG` also cares whether the right answers sit near the top.
+
+`genre_overlap` is the only genre metric that is fair to an adventurous
+recommendation, because it scores the distance rather than marking a cross-genre
+jump simply wrong.
+
+### The hole these left, and what fills it
+
+None of the four notices when **one listener's ten tracks are near-copies of
+each other**. `coverage` cannot see it: it counts what the whole catalogue
+surfaces across every seed, so a recommender can reach 68% of the catalogue
+while handing each individual listener ten interchangeable tracks.
+
+For a feature named *adventurous*, that is the wrong blind spot to keep. Two
+additions, neither of which touches genre:
+
+- **`intra_list_diversity`** — mean distance between the ten recommendations
+  *themselves*. The per-listener version of coverage, and the metric that moves
+  most across the dial (0.508 → 0.808).
+- **`novelty`** — mean distance from the seed. The plainest reading of "how far
+  did we travel". Trivially gamed on its own (recommend the furthest tracks in
+  the catalogue and it maxes out), so it is only meaningful read against
+  `precision`, which that strategy destroys.
+
+The original four stay **frozen** — every comparison in this README is built on
+them. These two are added alongside for the adventure control, not swapped in.
+
+### And the proxy caveat still holds
 
 Genre agreement is a **proxy, not ground truth**. Two tracks can be similar and
 carry different labels, and FMA's eight genres are coarse. It is reliable for
