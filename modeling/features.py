@@ -17,6 +17,56 @@ MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
 SCALERS = {"standard": StandardScaler, "robust": RobustScaler}
 
 
+# The 11 FMA feature families, grouped by what they measure. This is the single
+# place the split is defined — import it rather than retyping a column list, so
+# two people scoring two models are scoring the same columns.
+TIMBRE = ["mfcc", "spectral_contrast", "spectral_centroid", "spectral_bandwidth",
+          "spectral_rolloff", "zcr", "rmse"]      # 224 columns: texture and energy
+HARMONY = ["chroma_cens", "chroma_cqt", "chroma_stft", "tonnetz"]   # 294: pitch content
+
+# Measured, not assumed — neighbour genre agreement@10, cosine, fma_small:
+#
+#     space                        columns   agreement   vs random
+#     timbre                           224       0.458       3.66x
+#     all                              518       0.414       3.31x
+#     harmony                          294       0.278       2.22x
+#
+# The harmony block is 57% of the feature set and the weakest part of it: every
+# chroma family scores ~0.22 on its own, against 0.412 for mfcc alone. Carrying
+# it does not add a second opinion, it dilutes the first one — dropping it is
+# worth more than any amount of tuning downstream of it.
+#
+# "timbre" is therefore the default similarity space. Harmony is kept as a named
+# set rather than deleted for two reasons: it is the natural divergence axis in
+# the two-space design, and genre agreement is only a proxy for what a listener
+# hears — key and mode may well carry perceived similarity that genre labels do
+# not record. Tim's listening study is what settles that; until it does, the
+# columns stay reachable.
+FEATURE_SETS = {
+    "all": None,               # every column, the uncompressed baseline
+    "timbre": TIMBRE,
+    "harmony": HARMONY,
+    "no_chroma": None,         # everything except the two redundant chroma variants
+}
+
+
+def feature_set(X: pd.DataFrame, name: str = "timbre") -> pd.DataFrame:
+    """The named subset of feature families. See FEATURE_SETS for the measurements."""
+    if name not in FEATURE_SETS:
+        raise ValueError(f"unknown feature set {name!r} — choose from {sorted(FEATURE_SETS)}")
+
+    families = X.columns.get_level_values(0)
+    if name == "all":
+        return X
+    if name == "no_chroma":
+        keep = ~families.isin(["chroma_cqt", "chroma_stft"])
+    else:
+        keep = families.isin(FEATURE_SETS[name])
+
+    logger.info("Feature set %r: %s -> %s columns", name, X.shape[1], int(keep.sum()))
+    return X.loc[:, keep]
+
+
 def scale_features(X: pd.DataFrame, method: str = "standard"):
     """Scale every feature column. Returns (X_scaled, fitted_scaler).
 

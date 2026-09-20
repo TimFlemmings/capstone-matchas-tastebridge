@@ -3,8 +3,11 @@
 Every option here maps to one of the proposals in the feature-space review, so
 a proposal can be tested from the command line instead of by editing a notebook:
 
-    # baseline — 90% of the variance, 146 components
+    # the finalised space — timbre families, 90% of the variance
     uv run python -m modeling.train_pca
+
+    # the original all-518 baseline, for comparison
+    uv run python -m modeling.train_pca --feature-set all
 
     # proposal 1: a fixed, smaller space
     uv run python -m modeling.train_pca --n-components 60
@@ -14,6 +17,13 @@ a proposal can be tested from the command line instead of by editing a notebook:
 
     # proposal 3: stop letting chroma carry half the feature set
     uv run python -m modeling.train_pca --n-components 60 --drop-chroma
+
+`--feature-set` defaults to "timbre", not to all 518 columns: the harmony block
+is 57% of the features and scores 2.22x random against timbre's 3.66x, so
+carrying it dilutes the space rather than widening it. modeling.features records
+the measurement. Artifact names carry the set, so runs at different feature sets
+do not overwrite each other — and an older recommender loading `_90pct` still
+finds the all-518 artifacts it was fitted with.
 
 Runs land in the Music_Recommendation_PCA experiment, all carrying the
 neighbour_genre_agreement metric so they can be compared against each other
@@ -31,9 +41,11 @@ from modeling.config import MUSIC_EXPERIMENT_NAME, TRACKING_URI
 from modeling.data import genre_labels, load_fma
 from modeling.evaluation import K_NEIGHBOURS, neighbour_genre_agreement, random_baseline
 from modeling.features import (
+    FEATURE_SETS,
     SCALERS,
     drop_families,
     drop_statistics,
+    feature_set,
     fit_pca,
     pca_tag,
     save_artifacts,
@@ -79,6 +91,10 @@ def parse_args(argv=None):
         help="0.90 for a variance target, 60 for a fixed component count",
     )
     parser.add_argument(
+        "--feature-set", choices=sorted(FEATURE_SETS), default="timbre",
+        help="which feature families go in; see modeling.features.FEATURE_SETS",
+    )
+    parser.add_argument(
         "--scaler", choices=sorted(SCALERS), default="standard",
         help="how features are scaled before PCA",
     )
@@ -111,7 +127,7 @@ def parse_args(argv=None):
 
 
 def build_run_name(args) -> str:
-    parts = [f"PCA_{pca_tag(args.n_components)}"]
+    parts = [f"PCA_{pca_tag(args.n_components)}", args.feature_set]
     if args.scaler != "standard":
         parts.append(args.scaler)
     if args.drop_chroma:
@@ -125,6 +141,7 @@ def run(args):
     X, tracks = load_fma(subset=args.subset)
     labels = genre_labels(tracks)
 
+    X = feature_set(X, args.feature_set)
     if args.drop_chroma:
         X = drop_families(X, REDUNDANT_CHROMA)
     if args.drop_shape_stats:
@@ -147,6 +164,7 @@ def run(args):
     with mlflow.start_run(run_name=run_name):
         mlflow.log_params({
             "dataset": f"fma_{args.subset}",
+            "feature_set": args.feature_set,
             "original_features_count": int(X.shape[1]),
             "n_samples": int(X.shape[0]),
             "scaler": args.scaler,
@@ -169,7 +187,7 @@ def run(args):
                 "random_baseline": random_baseline(labels),
             })
 
-        suffix = f"_{tag}" + ("_robust" if args.scaler == "robust" else "")
+        suffix = f"_{tag}_{args.feature_set}" + ("_robust" if args.scaler == "robust" else "")
         suffix += "_nochroma" if args.drop_chroma else ""
         suffix += "_noshapestats" if args.drop_shape_stats else ""
         scaler_path, pca_path = save_artifacts(scaler, pca, suffix=suffix)
