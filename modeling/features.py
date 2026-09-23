@@ -42,11 +42,22 @@ HARMONY = ["chroma_cens", "chroma_cqt", "chroma_stft", "tonnetz"]   # 294: pitch
 # hears — key and mode may well carry perceived similarity that genre labels do
 # not record. Tim's listening study is what settles that; until it does, the
 # columns stay reachable.
+# Families we extracted ourselves because FMA does not ship them. rhythm.py and
+# separation.py write them; they are not in features.csv and cannot be derived
+# from it. See 04_new_features.ipynb for what each column measures.
+RHYTHM = ["tempo", "onset_rate", "onset_strength", "pulse_clarity"]   # 13 columns
+PERCUSSIVE = ["hpss_ratio"]                                           # 1 column
+
 FEATURE_SETS = {
     "all": None,               # every column, the uncompressed baseline
     "timbre": TIMBRE,
     "harmony": HARMONY,
     "no_chroma": None,         # everything except the two redundant chroma variants
+    # The two spaces the listening test left standing. They differ only in
+    # whether the 84 non-mfcc timbre columns come along, and the two rulers
+    # disagree about that: genre prefers "heard_wide", listeners "heard".
+    "heard": ["mfcc"] + RHYTHM + PERCUSSIVE,          # 154 columns
+    "heard_wide": TIMBRE + RHYTHM + PERCUSSIVE,       # 238 columns
 }
 
 
@@ -65,6 +76,62 @@ def feature_set(X: pd.DataFrame, name: str = "timbre") -> pd.DataFrame:
 
     logger.info("Feature set %r: %s -> %s columns", name, X.shape[1], int(keep.sum()))
     return X.loc[:, keep]
+
+
+def full_table(X: pd.DataFrame) -> pd.DataFrame:
+    """FMA's 518 columns beside the ones we extracted from the audio ourselves.
+
+    features.csv is a table someone else computed, and rhythm and instrumentation
+    are not in it. They were read back off the mp3s by rhythm.py and
+    separation.py, which write their own files — so the recommender only sees
+    them if something joins the three, which is what this does.
+
+    Tracks missing from any of the three are dropped: seven of the 8,000 are
+    files FMA ships truncated, or silent. A partly described track has no
+    business in a distance calculation.
+    """
+    from modeling.rhythm import OUT_PATH as RHYTHM_PATH, load as load_rhythm
+    from modeling.separation import OUT_PATH as SEP_PATH, load as load_separation
+
+    blocks = [X]
+    for path, loader, what in ((RHYTHM_PATH, load_rhythm, "rhythm"),
+                               (SEP_PATH, load_separation, "separation")):
+        if not path.exists():
+            raise FileNotFoundError(
+                f"{path} is missing — run `uv run python -m modeling.{what}` first. "
+                "It is gitignored, so a fresh checkout has to rebuild it."
+            )
+        blocks.append(loader())
+
+    common = blocks[0].index
+    for b in blocks[1:]:
+        common = common.intersection(b.index)
+    joined = pd.concat([b.loc[common] for b in blocks], axis=1)
+
+    logger.info("Full table: %s tracks x %s columns (%s dropped as incomplete)",
+                joined.shape[0], joined.shape[1], X.shape[0] - len(common))
+    return joined
+
+
+def space(name: str = "heard", X: pd.DataFrame = None) -> pd.DataFrame:
+    """The named feature space, assembled from whichever files hold its columns.
+
+    `feature_set` can only pick from what it is handed; this reaches for the
+    extracted families too, so "heard" and "heard_wide" resolve to real columns
+    rather than to silently empty selections.
+    """
+    if X is None:
+        from modeling.data import load_fma
+        X, _ = load_fma()
+    wanted = FEATURE_SETS.get(name)
+    if wanted is None:                      # "all" and "no_chroma" are FMA-only
+        return feature_set(X, name)
+
+    table = full_table(X) if set(wanted) - set(TIMBRE) - set(HARMONY) else X
+    keep = table.columns.get_level_values(0).isin(wanted)
+    out = table.loc[:, keep]
+    logger.info("Space %r: %s columns", name, out.shape[1])
+    return out
 
 
 def scale_features(X: pd.DataFrame, method: str = "standard"):

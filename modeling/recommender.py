@@ -251,8 +251,11 @@ def parse_args(argv=None):
                         help="score the recommender at every adventure level")
     parser.add_argument("--metric", default="cosine", choices=["cosine", "euclidean", "manhattan"],
                         help="distance used for similarity")
-    parser.add_argument("--pca-suffix", default="_90pct",
-                        help="which saved scaler/pca pair to load from models/")
+    parser.add_argument("--space", default="heard",
+                        help="feature space to index — 'heard' is the one the "
+                             "listening test chose; 'all' is the original 518 columns")
+    parser.add_argument("--pca-suffix", default=None,
+                        help="override the saved scaler/pca pair to load from models/")
     parser.add_argument("--subset", default="small", help="FMA subset to index")
     parser.add_argument("--evaluate", action="store_true",
                         help="score precision@k over a sample of the catalogue")
@@ -267,11 +270,18 @@ def main(argv=None):
     args = parse_args(argv)
 
     from modeling.data import genre_labels, load_fma
-    from modeling.features import load_artifacts
+    from modeling.features import load_artifacts, space
 
     X, tracks = load_fma(subset=args.subset)
-    scaler, pca = load_artifacts(suffix=args.pca_suffix)
-    rec = TrackRecommender(scaler, pca, metric=args.metric).fit(X, tracks)
+
+    # Each space has its own fitted scaler and PCA: they were fitted on that
+    # space's columns and cannot be pointed at a different set.
+    F = space(args.space, X)
+    suffix = args.pca_suffix if args.pca_suffix else (
+        "_90pct" if args.space == "all" else f"_{args.space}")
+    scaler, pca = load_artifacts(suffix=suffix)
+    tracks = tracks.loc[F.index]
+    rec = TrackRecommender(scaler, pca, metric=args.metric).fit(F, tracks)
 
     track_id = args.track_id
     if track_id is None:

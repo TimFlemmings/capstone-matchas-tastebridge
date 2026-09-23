@@ -7,6 +7,13 @@ still connects to where you started.
 This repository holds the recommendation engine: the feature pipeline, the
 model, and the evaluation setup that every later idea is measured against.
 
+Six people rated eighty pairs of tracks blind, and their answers changed what
+the model runs on. It beats a random pair to a human ear (p = 0.002), the far
+end of the dial is heard as related as the near end (p = 0.60), and two of the
+features it now uses did not exist in the dataset — listeners named them, so we
+read them off the audio. [What the listeners changed](#what-the-listeners-changed)
+is the short version.
+
 ---
 
 ## Where the project stands
@@ -20,13 +27,13 @@ uv run python -m modeling.recommender --track-id 2
 
 ```
 seed track : AWOL — Food [Hip-Hop]
-space      : 146 components, cosine distance
+space      : 57 components, cosine distance
 
-          distance               artist                          title          genre
-7492        0.4237              BrokeMC                    In the Dark        Hip-Hop
-149953      0.4253            K. Sparks                 Blue Real Talk        Hip-Hop
-98584       0.4481               Hi-Rez                          Relax        Hip-Hop
-115723      0.4766            Martin R.                      Acidamine     Electronic
+          rank  distance                   artist                      title    genre
+108495       1    0.3152  Sun Sunych ft. DanBrown        Toys (ft. DanBrown)  Hip-Hop
+22094        2    0.3800                    Gates            I Remember When  Hip-Hop
+142092       3    0.3822                       SK    woke up feeling blessed  Hip-Hop
+83717        5    0.3876                   Cullah                 Ninety Six  Hip-Hop
 ...
 ```
 
@@ -36,16 +43,31 @@ Measured on held-out tracks with 5-fold cross-validation — the pipeline is
 refitted per fold, so these numbers say how it behaves on music it has never
 seen.
 
-| Metric | Held out | What it asks |
-|---|---|---|
-| `precision@10` | **0.400** ± 0.006 | how many of the ten share the seed's genre |
-| `nDCG@10` | 0.420 ± 0.006 | are the good ones near the *top* |
-| `genre_overlap@10` | 0.262 ± 0.006 | how much the full genre lists overlap |
-| `coverage` | 0.780 ± 0.004 | how much of the catalogue ever gets surfaced |
-| random guess | 0.125 | eight balanced genres, so 1-in-8 |
+The second column is the space the project shipped for most of its life: all 518
+features FMA provides. The third is what it runs on now, after six people sat
+down and rated eighty pairs of tracks blind. Both are here because the change is
+the result, and a single column would hide it.
 
-**3.2× better than chance**, and the model never sees a genre label — it matches
-on sound alone. Genre is only used afterwards, to mark the paper.
+| Metric | all 518 | **heard, 154** | What it asks |
+|---|---|---|---|
+| `precision@10` | 0.400 ± 0.006 | **0.422** ± 0.002 | how many of the ten share the seed's genre |
+| `nDCG@10` | 0.420 ± 0.006 | **0.441** ± 0.002 | are the good ones near the *top* |
+| `genre_overlap@10` | 0.262 ± 0.006 | **0.280** ± 0.003 | how much the full genre lists overlap |
+| `coverage` | 0.780 ± 0.004 | 0.757 ± 0.005 | how much of the catalogue ever gets surfaced |
+| components | 144 | **57** | how wide the search space is |
+| random guess | 0.125 | 0.125 | eight balanced genres, so 1-in-8 |
+
+**3.4× better than chance**, up from 3.2×, on a third of the dimensions — and the
+model still never sees a genre label. It matches on sound alone; genre is only
+used afterwards, to mark the paper.
+
+`coverage` is the one that fell, 0.780 to 0.757. It counts how much of the
+catalogue is ever surfaced across every seed, and a tighter space surfaces a
+slightly narrower slice. That is the trade the other three rows paid for.
+
+The new space is smaller than the old one and contains columns the old one never
+had. Both halves of that came out of the listening test — see
+[what the listeners changed](#what-the-listeners-changed).
 
 **Milestone 2 — the Familiar → Adventurous control: working.** One dial, and no
 second model behind it.
@@ -53,6 +75,10 @@ second model behind it.
 ```bash
 uv run python -m modeling.recommender --track-id 2 --adventure 0.7
 ```
+
+**Milestone 3 — measured against human ears, not genre labels: done.** The
+recommender beats a random pair to a listener (p = 0.002), and the far end of
+the dial is heard as related as the near end (p = 0.60).
 
 ---
 
@@ -75,12 +101,12 @@ its travel inside a band nobody can hear apart.
 
 | `adventure` | rank | `novelty` | `precision@10` | `genre_overlap@10` | `intra_list_div` | `coverage` |
 |---:|---:|---:|---:|---:|---:|---:|
-| 0.00 | 1 | 0.412 | 0.406 | 0.269 | 0.508 | 0.603 |
-| 0.22 | 5 | 0.438 | 0.374 | 0.233 | 0.533 | 0.601 |
-| 0.50 | 22 | 0.494 | 0.316 | 0.184 | 0.598 | 0.610 |
-| 0.75 | 106 | 0.575 | 0.270 | 0.151 | 0.688 | 0.643 |
-| 1.00 | 500 | 0.692 | 0.214 | 0.113 | 0.808 | 0.683 |
-| | | **+68%** | **−47%** | **−58%** | **+59%** | **+13%** |
+| 0.00 | 1 | 0.338 | 0.429 | 0.292 | 0.411 | 0.590 |
+| 0.22 | 4 | 0.361 | 0.393 | 0.252 | 0.436 | 0.585 |
+| 0.50 | 22 | 0.414 | 0.333 | 0.198 | 0.496 | 0.598 |
+| 0.75 | 106 | 0.494 | 0.290 | 0.164 | 0.591 | 0.629 |
+| 1.00 | 500 | 0.621 | 0.232 | 0.125 | 0.735 | 0.674 |
+| | | **+84%** | **−46%** | **−57%** | **+79%** | **+14%** |
 
 ```bash
 uv run python -m modeling.recommender --depth-profile   # reproduces this table
@@ -89,15 +115,33 @@ uv run python -m modeling.recommender --depth-profile   # reproduces this table
 The last row is the point: the two columns that *should* fall do fall, and the
 three that should rise do rise. A dial that moved neither would be decoration.
 
+The same table on the old 518-column space, for comparison — the shape survived
+the change, and two of the five ends improved:
+
+| `adventure` | `novelty` | `precision@10` | `genre_overlap@10` | `intra_list_div` | `coverage` |
+|---:|---:|---:|---:|---:|---:|
+| 0.00 | 0.412 | 0.406 | 0.269 | 0.508 | 0.603 |
+| 1.00 | 0.692 | 0.214 | 0.113 | 0.808 | 0.683 |
+| | **+68%** | **−47%** | **−58%** | **+59%** | **+13%** |
+
+`novelty` and `intra_list_diversity` now travel further across the dial — +84%
+and +79%, against +68% and +59% — because the new space starts tighter. At
+`adventure = 0` its ten recommendations sit closer to the seed and to each
+other, which is what "familiar" should look like, and it has further to go.
+
 Three things this settles:
 
 **Relevance decays smoothly — there is no cliff.** So a continuous slider is
 defensible; we do not have to hide the far end behind a safety cap.
 
-**Even at full adventure, `precision@10` is 0.214 — still 1.7× random.** Rank
+**Even at full adventure, `precision@10` is 0.232 — still 1.9× random.** Rank
 500 of 8,000 is the top 6% by similarity. This is *steering*, not shuffling: far
 away, but chosen. A random track is noise, and listeners learn to distrust
 noise.
+
+Listeners confirmed that directly, which is the part no metric could settle:
+pairs drawn from rank 50 and 200 were rated **as related as the model's own top
+five** (p = 0.60), and both beat a random pair (p = 0.003 and p = 0.002).
 
 **`intra_list_diversity` moves furthest of the three.** The ten tracks become
 0.508 → 0.808 apart *from each other*, which is what a listener actually
@@ -133,6 +177,131 @@ A falling `precision@10` here is the feature *working*, not a regression — whi
 is exactly why `genre_overlap@10` was frozen into the scorecard before this
 existed. It grades how far a cross-genre jump landed instead of marking it
 simply wrong.
+
+---
+
+## What the listeners changed
+
+Every number above this line is built on genre labels, and genre is a proxy for
+the thing we actually care about. So we asked people.
+
+Eighty pairs of thirty-second clips, six raters, blind: a pair number and two
+clips, no artist, no title, no genre, no cosine score, volumes matched from
+`features.csv` so loudness could not read as similarity. 124 scored ratings came
+back, covering every pair. Built in `02_listening_test.ipynb`, read back in
+`03_listening_test_results.ipynb`.
+
+Three kinds of pair, because a score with nothing to read it against says
+nothing:
+
+| kind | what it is | why |
+|---|---|---|
+| `model` | the seed and one of its top five | the thing being tested |
+| `random` | the seed and a track drawn at random | the floor |
+| `deep` | the seed and its rank 50 or rank 200 | the far end of the dial |
+
+### It works, to a person
+
+| kind | ratings | mean |
+|---|---:|---:|
+| `deep` | 29 | 3.03 |
+| `model` | 80 | 2.96 |
+| `random` | 15 | 1.87 |
+
+`model` beats `random` at **p = 0.002**, `deep` beats it at **p = 0.003**, and
+`model` and `deep` are indistinguishable at **p = 0.60**.
+
+That last one is the result for the dial. Rank 200 is heard as related as rank
+1, and both are heard as more related than chance. Far away, but chosen.
+
+Raters agree with each other at r = 0.40 — some pairs split four points of five —
+so the average of six is reliable at 0.80, which caps any model near 0.90. The
+shipped space reaches −0.77 against that average on the nine shared pairs.
+
+### Most of the 518 columns have nothing to do with what people hear
+
+Distance in each space, correlated against the human score. Negative is the good
+direction: closer in that space, rated more alike.
+
+| space | columns | genre agreement | matches the ear |
+|---|---:|---:|---:|
+| all 518 | 518 | 0.414 | +0.047 |
+| harmony | 294 | 0.278 | +0.040 |
+| timbre | 224 | 0.458 | −0.179 |
+| **mfcc** | 140 | 0.412 | **−0.314** |
+
+`all 518` and `mfcc` are within 0.002 of each other on genre agreement, and a
+listener separates them immediately. The full space carries 294 harmony columns
+that pull the wrong way and drown the signal the 140 mfcc columns carry. No
+amount of tuning against the frozen metrics would have found that; they cannot
+see it.
+
+### The second question is the one that turned into work
+
+The form asks what connects a pair, from a fixed vocabulary. Those words, lined
+up against the feature families that could carry them:
+
+| word | mentions | mean score | families in FMA |
+|---|---:|---:|---|
+| `mood` | 50 | 3.42 | none — and deliberately not built |
+| `energy` | 48 | 3.67 | rmse, zcr |
+| `harmony` | 33 | 3.61 | chroma × 3, tonnetz |
+| **`rhythm`** | 29 | 3.83 | **none** |
+| **`instrumentation`** | 25 | 4.00 | **none** |
+| `timbre` | 18 | 3.44 | mfcc, spectral × 4 |
+| `nothing` | 19 | 1.11 | the control word, behaving |
+
+```bash
+uv run python -m modeling.listening    # rebuilds this table from responses/
+```
+
+FMA's eleven families are pitch, texture or loudness. Nothing measures time, and
+nothing says what is producing the sound. So the model could not tell whether two
+tracks share a beat, and the raters kept saying that is what connects them.
+
+Neither is recoverable from `features.csv`, so both were read back off the mp3s.
+
+### Two features, and what survived
+
+| module | columns | kept | why |
+|---|---:|---:|---|
+| `rhythm.py` | 13 | 13 | tempo, note density, how hard it hits, how firmly it keeps the beat |
+| `separation.py` | 81 | 1 | the drum-to-instrument energy ratio |
+
+The other 80 were the timbre of the drums and the instruments described
+separately, after splitting the audio. They produced **the best genre agreement
+in the project, 0.488** — and left the supervised ceiling flat at 0.546, which is
+the signature of information rearranged rather than added. They also made the
+match with human ratings worse. Judged on agreement alone we would have kept
+them.
+
+Three other ideas were built and rejected the same way: a space made only of the
+families the ear approved, key-invariant chroma (rotating each track's pitch
+histogram so its strongest note sits first, to test whether absolute key was why
+harmony fails — it was not), and the split-timbre block above.
+`04_new_features.ipynb` walks the surviving columns one at a time.
+
+### What is still open
+
+The listening test leaves two spaces standing, and the two rulers disagree about
+them:
+
+| | `heard` (shipped) | `heard_wide` |
+|---|---:|---:|
+| columns | 154 | 238 |
+| genre agreement | 0.438 | **0.474** |
+| supervised ceiling | 0.533 | **0.546** |
+| matches the ear | **−0.351** | −0.217 |
+
+They differ only in whether the 84 non-mfcc timbre columns come along, and
+across 500 seeds they share 4.5 of their top 10 — so half of what a listener
+would hear is different.
+
+`heard` ships because the ear is the ruler this project exists to serve, and
+because that ordering held five times as returns arrived, at 42 ratings, then
+63, 84, 103 and 124. **But the data that chose it cannot also validate it.** A
+second round, put as a forced choice between the two on fresh seeds, is the
+honest way to settle it and has not been run.
 
 ---
 
@@ -194,14 +363,34 @@ same character stay close. Worth 0.413 against 0.378 for euclidean.
 modeling/
 ├── config.py         MLflow tracking URI and experiment name
 ├── data.py           load the FMA subset and its metadata
-├── features.py       scaling, PCA, artifact persistence
+├── features.py       the named spaces, scaling, PCA, artifact persistence
 ├── recommender.py    the model — nearest neighbours, and the adventure dial
 ├── evaluation.py     the four metrics, k-fold validation, the depth profile
-└── train_pca.py      CLI: fit a feature space and log the run
+├── interpretation.py reading a PCA space back in terms of the original columns
+├── train_pca.py      CLI: fit a feature space and log the run
+│
+├── rhythm.py         13 columns FMA does not ship, read off the mp3s
+├── separation.py     the harmonic-percussive split and what came out of it
+└── listening.py      read the listening test back and name the feature gaps
 
 notebooks/
-└── 01_eda_baseline.ipynb    the analysis, step by step
+├── 01_eda_baseline.ipynb            the analysis, step by step
+├── 02_listening_test.ipynb          building the blind test
+├── 03_listening_test_results.ipynb  reading it back, and what it decided
+└── 04_new_features.ipynb            the columns we added, one at a time
 ```
+
+The bottom three modules did not exist until listeners asked for them. They
+write to `data/`, which is gitignored, so a fresh checkout rebuilds them:
+
+```bash
+uv run python -m modeling.rhythm       # ~90 seconds on eight cores
+uv run python -m modeling.separation   # ~20 minutes; splitting audio is the slow part
+```
+
+The listening test's own paperwork *is* tracked — `data/listening_test/` holds
+the 124 ratings, the answer key and the assignments. Everything else under
+`data/` regenerates; six people rating eighty pairs does not.
 
 ---
 
@@ -270,6 +459,21 @@ uv run python -m modeling.train_pca --n-components 60 --drop-chroma
 
 `--n-components` takes either form: `0.90` is a variance target, `60` a fixed
 component count.
+
+### Pick a feature space
+
+`--space` selects which columns the recommender runs on. `heard` is the default
+and the one the listening test chose; the others are kept so any number in this
+file can be reproduced.
+
+```bash
+uv run python -m modeling.recommender --track-id 2                    # heard, 154 columns
+uv run python -m modeling.recommender --track-id 2 --space all        # the original 518
+uv run python -m modeling.recommender --track-id 2 --space heard_wide # the runner-up
+```
+
+Each space has its own fitted `scaler`/`pca` pair in `models/`, because a scaler
+fitted on 154 columns cannot be pointed at 518.
 
 ### Reproduce the audit
 
@@ -353,12 +557,35 @@ additions, neither of which touches genre:
 The original four stay **frozen** — every comparison in this README is built on
 them. These two are added alongside for the adventure control, not swapped in.
 
-### And the proxy caveat still holds
+### The proxy caveat was right, and we can now say how badly
 
 Genre agreement is a **proxy, not ground truth**. Two tracks can be similar and
-carry different labels, and FMA's eight genres are coarse. It is reliable for
-comparing configurations against each other — which is what we need — but it is
-not a measure of how good the recommender feels to a listener.
+carry different labels, and FMA's eight genres are coarse. This file has said so
+since the first milestone. The listening test turned it from a caveat into a
+measurement:
+
+> `all 518` scores 0.414 on genre agreement and `mfcc` scores 0.412 — a gap of
+> 0.002. Against human ratings they score +0.047 and −0.314. **The proxy could
+> not see a difference listeners heard immediately.**
+
+So the honest reading of the frozen metrics is narrower than we used to write.
+They are good at one thing:
+
+| question | genre agreement |
+|---|---|
+| is this space broken? (0.13 is chance) | **yes, reliably** |
+| did new columns add information, or only reweight it? | yes, via the supervised ceiling |
+| is this space *better* than that one? | **no** |
+
+The third row is the one this project got wrong for a while, and the one the
+listening test corrects.
+
+The supervised ceiling deserves its own caveat. It asks how much genre
+information a set of columns holds by handing a classifier the labels and
+letting it train on them, so a column that carries something real but
+genre-irrelevant leaves it flat and looks worthless. Where that mattered, we
+checked redundancy directly instead — predicting the new columns from the old
+ones, no labels anywhere.
 
 This is also why `genre_overlap@10` exists. Exact genre matching scores a
 cross-genre recommendation as simply wrong, which would have marked the
@@ -367,7 +594,20 @@ Overlap grades the distance instead, so we can tell smart exploration from
 random noise — and the depth profile above is the first place that paid off.
 
 The four metrics are **frozen**. Swapping rulers halfway would invalidate every
-comparison behind them.
+comparison behind them — which is why the listening test was added *alongside*
+them rather than replacing them, and why both feature spaces are scored on all
+four in this file.
+
+### One ruler the two baselines do not share
+
+Tim's parallel baseline excludes same-artist neighbours when scoring; this one
+does not. That single difference accounts for the whole gap between his 0.343
+and this file's 0.414 — same data, same features, same metric. Until the two
+protocols match, the two baselines cannot be compared, and roughly 0.07 of the
+apparent quality here is the model finding other tracks by the same artist.
+
+Adding the exclusion would move every number in this file. That makes it a
+decision about the frozen metrics rather than a bug fix, and it is still open.
 
 ---
 
