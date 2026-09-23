@@ -304,7 +304,7 @@ harmony fails — it was not), and the split-timbre block above.
 
 ---
 
-## The average hides a very wide spread
+## The average hides a wide spread — and the spread is about the labels
 
 `precision@10` of 0.433 is a mean over 8,000 seeds, and a listener meets one
 seed at a time. Per seed it runs the whole range:
@@ -339,34 +339,58 @@ not resemble each other — and this model matches on sound. Read that as the
 label failing rather than the model: it is the same proxy problem as everywhere
 else in this file, showing up per genre instead of in aggregate.
 
-### What we do about it
+### And the spread means less than it looks like
 
-The part of this we can see *before* recommending anything, with no label
-involved, is how crowded a track's corner of the space is — the mean distance
-to its ten nearest neighbours. Over the catalogue that correlates −0.36 with
-per-seed precision:
+The obvious next move is to predict which seeds will score badly and warn about
+them. There is even a signal to do it with: how crowded a track's corner of the
+space is — the mean distance to its ten nearest neighbours, no label involved.
+Against the genre metric it works well, correlating −0.36 across the catalogue:
 
 | | mean distance | `precision@10` | scores zero |
 |---|---:|---:|---:|
 | densest fifth | 0.215 | 0.595 | 5.7% |
 | loneliest fifth | 0.459 | 0.285 | 14.3% |
 
-So the recommender now says so up front:
+So we checked it against the listening test, and it does not survive.
+
+Across the ten seeds the test used, crowding correlates **+0.11** with the
+scores the model's own pairs received — the wrong sign, and nowhere near
+significant (p = 0.24). The clearest case is the loneliest seed of the ten:
+
+| seed | crowding | same-genre | rated by listeners |
+|---|---:|---:|---:|
+| Zlatne Uste Balkan Brass Band | 0.172 | 8 / 10 | 3.00 |
+| Myo | 0.299 | — | **1.85** |
+| Mutilation Rites | 0.369 | 8 / 10 | 3.50 |
+| **Alec K. Redfearn & the Eyesores** | **0.444** | **1 / 10** | **3.50** |
+
+Redfearn's accordion folk sits in the emptiest corner of the space and scores
+worst on genre agreement of any seed in the test. Listeners gave its pairs the
+joint highest score of the ten. Its neighbours are not in its genre and they do
+sound like it.
+
+So the per-seed spread is a fact about the *labels*, not a map of where the
+recommender fails. `10.8% score zero` means those tracks have no same-genre
+neighbour — which is what it says, and not what it would be tempting to read it
+as.
+
+Ten seeds is far too few to conclude that crowding is irrelevant to what a
+listener hears; it is enough to say we have no evidence that it is relevant. So
+the recommender prints it as what it is:
 
 ```
 seed track : Alec K. Redfearn & the Eyesores — Queen Of The Wires [Folk]
-crowding   : 0.444 — a sparse corner — the nearest tracks are not very near
+crowding   : 0.444 — a thinly populated corner, mean distance to the nearest 10
 ```
 
-That seed returns 1 of 10 same-genre. The warning costs one extra neighbour
-query and turns a silent failure into a stated one. It does not make the
-recommendation better; it makes the product honest about when it is guessing,
-which for a feature whose whole premise is *you decide how far to travel* is
-the more useful of the two.
+A geometric fact about where the seed sits, one extra neighbour query, and no
+claim about quality attached to it. Dressing it up as a confidence score would
+be this project's own mistake repeated in miniature: trusting a genre-shaped
+measurement about something genre has already been shown not to see.
 
-A second use for the same number is open: the dial's depth is a fixed 500 ranks
-for every seed, and a sparse corner is already far away at rank 50. Scaling the
-depth by crowding is the obvious next thing to try and has not been tried.
+A second use for the same number is open and untried: the dial's depth is a
+fixed 500 ranks for every seed, and a thinly populated corner is already far
+away at rank 50.
 
 ---
 

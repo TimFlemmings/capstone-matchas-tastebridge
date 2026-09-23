@@ -130,17 +130,26 @@ class TrackRecommender:
         International. A single number for the whole catalogue hides all of
         that, and a listener meets one seed at a time, not the average.
 
-        This is the part of it we can see in advance, with no label anywhere:
-        how far the nearest neighbours actually are. Measured over the
-        catalogue it correlates -0.36 with per-seed precision, and sorting
+        Against the genre metrics this is a strong signal. Over the catalogue it
+        correlates -0.36 with per-seed precision (p ~ 1e-243), and sorting
         tracks into fifths by it separates them cleanly:
 
-            densest fifth    mean distance 0.215    precision 0.595
-            loneliest fifth  mean distance 0.459    precision 0.285
+            densest fifth    mean distance 0.215    precision 0.595    5.7% score 0
+            loneliest fifth  mean distance 0.459    precision 0.285   14.3% score 0
 
-        Zero-scoring seeds are 5.7% of the densest fifth and 14.3% of the
-        loneliest. So a track in an empty corner is not a track the recommender
-        fails on silently — it is one where it can say so first.
+        **Against human ratings it shows nothing.** On the ten seeds the
+        listening test used, crowding correlates +0.11 with the scores the
+        model's own pairs received (p = 0.24) — the wrong sign, and not
+        significant. The loneliest seed of the ten, Redfearn's accordion folk at
+        0.444, returns 1 of 10 by genre and was rated 3.5 out of 5 by listeners,
+        the joint highest of the ten.
+
+        Ten seeds is far too few to conclude that crowding is irrelevant to
+        perceived quality. It is enough to say we have no evidence that it is
+        relevant, so this is reported as what it is — a fact about where a track
+        sits — and not as a confidence score. Treating it as one would be
+        repeating the mistake this project exists to correct: trusting a
+        genre-shaped measurement about something genre cannot see.
         """
         row = self._position(track_id)
         distances, _ = self.index_.kneighbors(self.embedding_.iloc[[row]],
@@ -376,14 +385,16 @@ def main(argv=None):
     print(f"adventure  : {args.adventure:.2f} — window starts at neighbour "
           f"{depth_for(args.adventure) + 1}")
 
-    # Quality varies enormously by seed, and the crowding of a track's corner is
-    # the part of that we can see before recommending anything. Saying so beats
-    # returning ten scattered tracks with the same confidence as ten good ones.
+    # How far this track's nearest neighbours actually are. A geometric fact
+    # about where the seed sits, printed because it is cheap and true — not a
+    # quality score. It predicts genre agreement well and shows no sign of
+    # predicting what a listener hears; see crowding() for both measurements.
     crowding = rec.crowding(track_id, n=args.n)
-    reading = ("a crowded corner — expect coherent neighbours" if crowding < 0.25
+    reading = ("a crowded corner of the space" if crowding < 0.25
                else "an average corner" if crowding < 0.40
-               else "a sparse corner — the nearest tracks are not very near")
-    print(f"crowding   : {crowding:.3f} — {reading}\n")
+               else "a thinly populated corner")
+    print(f"crowding   : {crowding:.3f} — {reading}, "
+          f"mean distance to the nearest {args.n}\n")
     recs = rec.similar_to(track_id, n=args.n, adventure=args.adventure)
     print(recs.to_string(float_format=lambda v: f"{v:.4f}"))
 
