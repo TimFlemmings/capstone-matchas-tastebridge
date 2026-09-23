@@ -12,6 +12,7 @@ dependencies = [
     "statsmodels",
     "mlflow",
     "parsenvy",
+    "librosa>=0.11.0",
 ]
 
 [dependency-groups]
