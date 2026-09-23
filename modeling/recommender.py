@@ -259,15 +259,73 @@ def parse_args(argv=None):
     parser.add_argument("--subset", default="small", help="FMA subset to index")
     parser.add_argument("--evaluate", action="store_true",
                         help="score precision@k over a sample of the catalogue")
+    parser.add_argument("--compare", action="store_true",
+                        help="score every feature space side by side, fitting each "
+                             "from the raw data — reproduces the README's comparison")
     parser.add_argument("--sample", type=int, default=1000,
                         help="tracks sampled when scoring with --evaluate")
     parser.add_argument("--save", action="store_true", help="persist the fitted recommender")
     return parser.parse_args(argv)
 
 
+def compare_spaces(names=("all", "heard_wide", "heard"), k=DEFAULT_N, sample=1000):
+    """Score every named space on the frozen metrics, side by side.
+
+    The point of this is not the numbers — those are in the README. It is that
+    a reader who does not believe the README can produce them, from the raw
+    data, in one command. A claim that only exists as prose is a claim nobody
+    can check, and the whole argument of this project is that unchecked claims
+    are how we ended up steering by a proxy for two milestones.
+
+    Each space is fitted here rather than loaded, so the comparison does not
+    depend on which artifacts happen to be sitting in models/.
+    """
+    import pandas as pd
+
+    from modeling.data import genre_labels, load_fma
+    from modeling.evaluation import genre_sets, depth_profile
+    from modeling.features import fit_pca, scale_features, space
+
+    X, tracks = load_fma()
+    rows = []
+    for name in names:
+        F = space(name, X)
+        t = tracks.loc[F.index]
+        scaled, _ = scale_features(F)
+        pca = fit_pca(scaled, n_components=0.90)
+        Z = pd.DataFrame(pca.transform(scaled), index=F.index)
+
+        profile = depth_profile(Z, genre_labels(t), genre_sets_=genre_sets(t),
+                                k=k, sample=sample)
+        near, far = profile.iloc[0], profile.iloc[-1]
+        rows.append({
+            "space": name,
+            "columns": F.shape[1],
+            "components": Z.shape[1],
+            # In-sample over `sample` seeds, so these sit slightly below the
+            # README's held-out figures and are not the same measurement. What
+            # they are good for is the comparison between the rows.
+            "precision@k": round(near["precision_at_k"], 3),
+            "genre_overlap": round(near["genre_overlap_at_k"], 3),
+            "novelty 0->1": f"+{(far['novelty'] / near['novelty'] - 1):.0%}",
+            "precision 0->1": f"{(far['precision_at_k'] / near['precision_at_k'] - 1):.0%}",
+        })
+    return pd.DataFrame(rows)
+
+
 def main(argv=None):
     logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO)
     args = parse_args(argv)
+
+    if args.compare:
+        table = compare_spaces(k=args.n, sample=args.sample)
+        print("\n=== every feature space, scored on the frozen metrics ===")
+        print("'heard' is what ships. 'all' is what shipped before the listening test.\n")
+        print(table.to_string(index=False))
+        print("\nThe last two columns are the adventure dial: novelty should rise "
+              "\nacross it and precision should fall. A dial that moved neither "
+              "\nwould be decoration.")
+        return
 
     from modeling.data import genre_labels, load_fma
     from modeling.features import load_artifacts, space

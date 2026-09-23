@@ -69,6 +69,27 @@ The new space is smaller than the old one and contains columns the old one never
 had. Both halves of that came out of the listening test — see
 [what the listeners changed](#what-the-listeners-changed).
 
+**Do not take the comparison on trust.** Every space is still here, still
+fitted from the raw data, and one command scores all of them side by side:
+
+```bash
+uv run python -m modeling.recommender --compare
+```
+
+```
+     space  columns  components  precision@k  genre_overlap  novelty 0->1  precision 0->1
+       all      518         146        0.414          0.270          +67%            -47%
+heard_wide      238          81        0.469          0.325          +79%            -51%
+     heard      154          57        0.433          0.287          +86%            -51%
+```
+
+Those are in-sample over a seed sample, so they sit a little below the held-out
+table above and are not the same measurement — what they are good for is the
+comparison between the rows. Note that this output does **not** agree with the
+choice this repository made: on genre agreement `heard_wide` wins. The reason we
+ship `heard` anyway is the listening test, and
+[what is still open](#what-is-still-open) says how we would settle it properly.
+
 **Milestone 2 — the Familiar → Adventurous control: working.** One dial, and no
 second model behind it.
 
@@ -474,6 +495,14 @@ uv run python -m modeling.recommender --track-id 2 --space heard_wide # the runn
 
 Each space has its own fitted `scaler`/`pca` pair in `models/`, because a scaler
 fitted on 154 columns cannot be pointed at 518.
+
+```bash
+uv run python -m modeling.recommender --compare
+```
+
+scores all three from the raw data in one run, fitting each rather than loading
+it, so nothing in this file has to be taken on trust. The old space was not
+deleted when the default moved; every claim about the change can be re-derived.
 
 ### Reproduce the audit
 
