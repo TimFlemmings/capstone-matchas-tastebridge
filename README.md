@@ -302,6 +302,74 @@ histogram so its strongest note sits first, to test whether absolute key was why
 harmony fails — it was not), and the split-timbre block above.
 `04_new_features.ipynb` walks the surviving columns one at a time.
 
+---
+
+## The average hides a very wide spread
+
+`precision@10` of 0.433 is a mean over 8,000 seeds, and a listener meets one
+seed at a time. Per seed it runs the whole range:
+
+| | per-seed `precision@10` |
+|---|---:|
+| 10th percentile | 0.0 |
+| 25th | 0.2 |
+| median | 0.4 |
+| 75th | 0.7 |
+| 90th | 0.9 |
+
+**10.8% of tracks score zero** — the recommender finds no same-genre neighbour
+at all for one track in nine. Another 6.1% score a perfect ten.
+
+By the seed's own genre:
+
+| genre | mean | |
+|---|---:|---|
+| International | 0.541 | 4.3× chance |
+| Hip-Hop | 0.538 | |
+| Folk | 0.505 | |
+| Rock | 0.501 | |
+| Instrumental | 0.492 | |
+| Electronic | 0.403 | |
+| Experimental | 0.290 | |
+| **Pop** | **0.199** | 1.6× chance |
+
+Pop and Experimental are the two genres that are not a sound. Pop is whatever
+charts and Experimental is defined by not fitting elsewhere, so their tracks do
+not resemble each other — and this model matches on sound. Read that as the
+label failing rather than the model: it is the same proxy problem as everywhere
+else in this file, showing up per genre instead of in aggregate.
+
+### What we do about it
+
+The part of this we can see *before* recommending anything, with no label
+involved, is how crowded a track's corner of the space is — the mean distance
+to its ten nearest neighbours. Over the catalogue that correlates −0.36 with
+per-seed precision:
+
+| | mean distance | `precision@10` | scores zero |
+|---|---:|---:|---:|
+| densest fifth | 0.215 | 0.595 | 5.7% |
+| loneliest fifth | 0.459 | 0.285 | 14.3% |
+
+So the recommender now says so up front:
+
+```
+seed track : Alec K. Redfearn & the Eyesores — Queen Of The Wires [Folk]
+crowding   : 0.444 — a sparse corner — the nearest tracks are not very near
+```
+
+That seed returns 1 of 10 same-genre. The warning costs one extra neighbour
+query and turns a silent failure into a stated one. It does not make the
+recommendation better; it makes the product honest about when it is guessing,
+which for a feature whose whole premise is *you decide how far to travel* is
+the more useful of the two.
+
+A second use for the same number is open: the dial's depth is a fixed 500 ranks
+for every seed, and a sparse corner is already far away at rank 50. Scaling the
+depth by crowding is the obvious next thing to try and has not been tried.
+
+---
+
 ### What is still open
 
 The listening test leaves two spaces standing, and the two rulers disagree about

@@ -121,6 +121,32 @@ class TrackRecommender:
             out["genre"] = meta[("track", "genre_top")].values
         return out
 
+    def crowding(self, track_id, n: int = DEFAULT_N) -> float:
+        """Mean distance to a track's n nearest neighbours: how busy its corner is.
+
+        The headline `precision@10` of 0.433 is an average over a very wide
+        spread. Per seed it runs from 0 to 1, 11% of tracks score zero, and by
+        the seed's own genre it ranges from 0.20 for Pop to 0.54 for
+        International. A single number for the whole catalogue hides all of
+        that, and a listener meets one seed at a time, not the average.
+
+        This is the part of it we can see in advance, with no label anywhere:
+        how far the nearest neighbours actually are. Measured over the
+        catalogue it correlates -0.36 with per-seed precision, and sorting
+        tracks into fifths by it separates them cleanly:
+
+            densest fifth    mean distance 0.215    precision 0.595
+            loneliest fifth  mean distance 0.459    precision 0.285
+
+        Zero-scoring seeds are 5.7% of the densest fifth and 14.3% of the
+        loneliest. So a track in an empty corner is not a track the recommender
+        fails on silently — it is one where it can say so first.
+        """
+        row = self._position(track_id)
+        distances, _ = self.index_.kneighbors(self.embedding_.iloc[[row]],
+                                              n_neighbors=n + 1)
+        return float(distances[0][1:].mean())
+
     def similar_to(self, track_id, n: int = DEFAULT_N, adventure: float = 0.0) -> pd.DataFrame:
         """n tracks near `track_id`, read from a window of the ranked neighbour list.
 
@@ -348,7 +374,16 @@ def main(argv=None):
     print(f"\nseed track : {rec.describe(track_id)}")
     print(f"space      : {rec.embedding_.shape[1]} components, {args.metric} distance")
     print(f"adventure  : {args.adventure:.2f} — window starts at neighbour "
-          f"{depth_for(args.adventure) + 1}\n")
+          f"{depth_for(args.adventure) + 1}")
+
+    # Quality varies enormously by seed, and the crowding of a track's corner is
+    # the part of that we can see before recommending anything. Saying so beats
+    # returning ten scattered tracks with the same confidence as ten good ones.
+    crowding = rec.crowding(track_id, n=args.n)
+    reading = ("a crowded corner — expect coherent neighbours" if crowding < 0.25
+               else "an average corner" if crowding < 0.40
+               else "a sparse corner — the nearest tracks are not very near")
+    print(f"crowding   : {crowding:.3f} — {reading}\n")
     recs = rec.similar_to(track_id, n=args.n, adventure=args.adventure)
     print(recs.to_string(float_format=lambda v: f"{v:.4f}"))
 
