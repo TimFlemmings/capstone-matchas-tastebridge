@@ -138,12 +138,25 @@ models/*
 .mlflow_uri
 mlflow.db
 # Ignore data directories and large files
-data/
+data/*
+!data/listening_test/
+data/listening_test/*
 fma_small/
 fma_metadata/
 *.csv
 *.pickle
 *.npz
+
+# ...except the listening test's paperwork, which is the one thing under
+# data/ that cannot be regenerated. The audio downloads, the features
+# rebuild in minutes, but six people will not sit down and rate 80 pairs
+# again. A few KB of text, and the evidence behind every human number in
+# the README.
+!data/listening_test/responses/
+!data/listening_test/responses/*.csv
+!data/listening_test/assignments.csv
+!data/listening_test/manifest.csv
+!data/listening_test/pairs_key.csv
 
 # Ignore Python & Virtual Environment
 .venv/

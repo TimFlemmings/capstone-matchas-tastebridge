@@ -1,0 +1,22 @@
+rater,pair_id,similarity_1_5,connects
+R3,P04,2,instrumentation
+R3,P08,1,nothing
+R3,P11,5,mood
+R3,P20,5,instrumentation mood
+R3,P25,3,energy
+R3,P27,5,instrumentation harmony
+R3,P33,4,rhythm timbre
+R3,P37,2,
+R3,P40,5,energy
+R3,P46,3,rhythm
+R3,P47,4,mood
+R3,P58,1,nothing
+R3,P59,5,instrumentation mood rhythm energy
+R3,P64,3,timbre
+R3,P68,1,
+R3,P70,5,rhythm energy
+R3,P71,4,production
+R3,P72,3,instrumentation
+R3,P75,5,rhythm energy
+R3,P76,1,nothing
+R3,P78,2,rhythm
