@@ -14,6 +14,59 @@ features it now uses did not exist in the dataset — listeners named them, so w
 read them off the audio. [What the listeners changed](#what-the-listeners-changed)
 is the short version.
 
+**Just cloned this?** Four steps, in
+[From a fresh clone, in order](#from-a-fresh-clone-in-order). Two of them build
+feature files that are not in the repository, and the recommender will not start
+without them.
+
+**Want the story rather than the code?** `notebooks/03_listening_test_results.ipynb`
+works through the listening test in the order the results were found, with its
+outputs saved — nothing to run. `notebooks/04_new_features.ipynb` walks the new
+columns one at a time. And `data/listening_test/all_ratings.csv` is all 125
+ratings with both tracks named, if you would rather just read the data.
+
+---
+
+## In plain terms
+
+Skip this if you already know the project.
+
+**What it does.** You give it one song. It gives you ten that sound like it, and
+a dial that decides how far from the original you want to go. At one end you get
+near-copies; at the other you get tracks that are still connected but much
+further away.
+
+**How it works.** A computer cannot listen, so every track is turned into a row
+of numbers measured from the audio — how bright it is, how much drum there is,
+how many notes go by per second, and so on. Two tracks count as similar when
+their rows of numbers are close together. Nothing is trained, and the model
+never sees a genre label.
+
+**The dial is not a second model.** The recommender has already put all 7,999
+other tracks in order. The dial only decides where in that list to start
+reading: position 1 for familiar, position 500 for adventurous.
+
+**The problem we had.** To check whether the recommendations were any good, we
+counted how many of them carried the same genre tag as the original. That is a
+convenient stand-in, not the real thing. Two rock tracks can sound nothing
+alike, and a genre tag is one coarse word chosen by whoever uploaded the file.
+
+**So we asked people.** Six of them, eighty pairs of clips, no names or genres
+shown. We asked two questions about each pair: how similar do these sound, and
+what connects them.
+
+**What we learned.** The recommendations beat randomly chosen tracks, which
+nobody had shown before. The far end of the dial was rated just as related as
+the near end, which is exactly what the dial is supposed to do. And the answers
+to the second question pointed at two things the data did not measure at all —
+rhythm and whether a track has drums — so we computed them from the audio
+ourselves and put them in the model.
+
+**What we did not do.** Fix everything. The average recommendation is rated 3
+out of 5, which on the raters' own scale means "a recognisable connection, with
+substantial differences". It works. It is not yet good, and the rest of this
+file says where it falls short.
+
 ---
 
 ## Where the project stands
@@ -533,22 +586,42 @@ the 124 ratings, the answer key and the assignments. Everything else under
 
 ## Running it
 
-### Setup
+### From a fresh clone, in order
+
+Four steps. Steps 3 and 4 are the ones people miss — the recommender will refuse
+to start without them, because two of the feature families it uses are not in
+the repository and have to be read back off the audio.
 
 ```bash
+# 1. install uv, once per machine
+curl -LsSf https://astral.sh/uv/install.sh | sh                          # macOS / Linux
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"   # Windows
+
+# 2. install the project
 uv sync --all-groups
+
+# 3. put the FMA data in place — data/fma_small/ and data/fma_metadata/
+#    (~8GB of audio and a 900MB feature table; not in this repo)
+
+# 4. build the two feature files we extract ourselves
+uv run python -m modeling.rhythm       # ~90 seconds on eight cores
+uv run python -m modeling.separation   # ~20 minutes; splitting audio is slow
 ```
 
-[uv](https://docs.astral.sh/uv/) installs the right Python for you — no pyenv,
-conda or pip needed. Install it once per machine:
+Step 4 is not training anything. Both commands read the 8,000 mp3s once and
+write a table of numbers — `data/rhythm_features.csv` and
+`data/separation_features.csv`, 1.8MB and 12MB. They are gitignored because one
+command rebuilds them, and the recommender reads them at startup alongside FMA's
+own `features.csv`. Run them once and forget them.
+
+Then:
 
 ```bash
-# macOS / Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows (PowerShell)
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv run python -m modeling.recommender --track-id 2
 ```
+
+If step 4 was skipped, that command stops with a message naming the file it
+wants and the command that makes it.
 
 ### MLflow
 
