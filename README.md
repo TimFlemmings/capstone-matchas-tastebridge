@@ -37,16 +37,28 @@ space      : 57 components, cosine distance
 ...
 ```
 
+### Why the space changed
+
+The reason is not on a genre scorecard. It is this:
+
+| space | matches what listeners said |
+|---|---:|
+| all 518 FMA features | +0.05 — no relation at all |
+| **heard, 154 columns** | **−0.35** |
+
+Distance in each space, correlated against 124 blind human ratings. Negative is
+the good direction: closer in that space, rated more alike. The old space has no
+relationship to what people hear; the new one has a strong one, and that
+ordering held five times as ratings arrived, at 42, 63, 84, 103 and 124.
+
+That is the argument. Everything below is a check that the change did not cost
+anything, not a reason for making it.
+
 ### Baseline scorecard
 
 Measured on held-out tracks with 5-fold cross-validation — the pipeline is
 refitted per fold, so these numbers say how it behaves on music it has never
 seen.
-
-The second column is the space the project shipped for most of its life: all 518
-features FMA provides. The third is what it runs on now, after six people sat
-down and rated eighty pairs of tracks blind. Both are here because the change is
-the result, and a single column would hide it.
 
 | Metric | all 518 | **heard, 154** | What it asks |
 |---|---|---|---|
@@ -57,13 +69,19 @@ the result, and a single column would hide it.
 | components | 144 | **57** | how wide the search space is |
 | random guess | 0.125 | 0.125 | eight balanced genres, so 1-in-8 |
 
-**3.4× better than chance**, up from 3.2×, on a third of the dimensions — and the
-model still never sees a genre label. It matches on sound alone; genre is only
-used afterwards, to mark the paper.
+Three of the four rose and one fell, on a third of the dimensions. **Read that
+as "nothing broke", not as the result.**
 
-`coverage` is the one that fell, 0.780 to 0.757. It counts how much of the
-catalogue is ever surfaced across every seed, and a tighter space surfaces a
-slightly narrower slice. That is the trade the other three rows paid for.
+All four are built on genre, and two things make them weak evidence here. The
+rise is close to mechanical: 294 of the removed columns were the ones dragging
+genre agreement down, so dropping them had to lift it. And a higher genre score
+is not obviously a better recommender — a system that returned nothing but the
+seed's own genre would score beautifully and be exactly the bubble this project
+exists to get out of.
+
+`coverage` is the row that fell. It counts how much of the catalogue is ever
+surfaced across every seed, and a tighter space surfaces a slightly narrower
+slice.
 
 The new space is smaller than the old one and contains columns the old one never
 had. Both halves of that came out of the listening test — see
@@ -100,6 +118,12 @@ uv run python -m modeling.recommender --track-id 2 --adventure 0.7
 **Milestone 3 — measured against human ears, not genre labels: done.** The
 recommender beats a random pair to a listener (p = 0.002), and the far end of
 the dial is heard as related as the near end (p = 0.60).
+
+One number from that worth sitting with: listeners rated the model's own top
+five at **2.96 out of 5**, which on the rubric they were given is "a
+recognisable connection, with substantial differences". Clearly above the
+random floor of 1.87, and clearly not "strongly related". The recommender
+works; it is not yet good.
 
 ---
 
