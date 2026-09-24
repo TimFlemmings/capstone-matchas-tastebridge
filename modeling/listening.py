@@ -113,11 +113,42 @@ def gaps(tag_counts: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def flat_table(d: pd.DataFrame = None) -> pd.DataFrame:
+    """Every rating as one row, with both tracks named.
+
+    The ratings live in six files keyed only by pair id, and the names live in
+    the answer key, which was deliberately kept away from the raters. Now that
+    the test is closed there is no reason to keep them apart, and one table is
+    what anyone actually wants to look at.
+    """
+    if d is None:
+        d = responses()
+    columns = [
+        "rater", "pair_id", "kind", "rank", "in_core",
+        "similarity_1_5", "connects",
+        "seed", "seed_artist", "seed_title", "seed_genre",
+        "other", "other_artist", "other_title", "other_genre",
+        "track_a", "track_b",
+    ]
+    out = d[[c for c in columns if c in d.columns]].copy()
+    out["same_genre"] = out["seed_genre"] == out["other_genre"]
+    return out.sort_values(["rater", "pair_id"]).reset_index(drop=True)
+
+
 def _main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--responses", type=Path, default=TEST_DIR / "responses")
+    parser.add_argument("--csv", type=Path, nargs="?", const=TEST_DIR / "all_ratings.csv",
+                        help="write every rating, with both tracks named, to one file")
     args = parser.parse_args()
+
+    if args.csv:
+        table = flat_table(responses(args.responses))
+        args.csv.parent.mkdir(parents=True, exist_ok=True)
+        table.to_csv(args.csv, index=False)
+        print(f"{len(table)} ratings x {table.shape[1]} columns -> {args.csv}")
+        return
 
     d = responses(args.responses)
 

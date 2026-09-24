@@ -157,6 +157,10 @@ fma_metadata/
 !data/listening_test/assignments.csv
 !data/listening_test/manifest.csv
 !data/listening_test/pairs_key.csv
+# Rebuildable from the six above with `modeling.listening --csv`, but tracked
+# anyway: it is the one file someone opens to see what the test actually found,
+# and asking them to run something first is a good way to have nobody look.
+!data/listening_test/all_ratings.csv
 
 # Ignore Python & Virtual Environment
 .venv/
