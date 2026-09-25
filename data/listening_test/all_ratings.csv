@@ -1,126 +1,126 @@
 rater,pair_id,kind,rank,in_core,similarity_1_5,connects,seed,seed_artist,seed_title,seed_genre,other,other_artist,other_title,other_genre,track_a,track_b,same_genre
-R1,P02,model,1.0,False,4.0,mood rhythm harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,44805,Monk Turner + Fascinoma,Start Again,Pop,140,44805,False
-R1,P07,model,1.0,False,4.0,harmony mood rhythm energy,59876,Boy Friend,Lovedropper,Rock,35544,Garmisch,Facing the Sea,Pop,59876,35544,False
-R1,P08,deep,50.0,True,1.0,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R1,P09,model,5.0,False,2.0,vocals,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,52953,Marissa Nadler,Your Heart Is A Twisted Vine,Folk,140,52953,True
-R1,P20,model,1.0,True,2.0,mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R1,P23,model,1.0,False,3.0,mood,54033,alright lover,Snow Wave,Pop,145556,This Mess is Mine,Roommates (Piano Version by AGPB),Folk,145556,54033,False
-R1,P25,model,5.0,True,5.0,mood energy harmony production instrumentation rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R1,P28,random,,False,3.0,rhythm production,68893,Broke For Free,Sidewalk Chalk,Electronic,75782,Square People,I'm Not Lazy,Rock,75782,68893,False
-R1,P35,random,,False,2.0,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,76437,Misay Day,Southside,Folk,42234,76437,False
-R1,P38,model,1.0,False,1.0,nothing,43883,Myo,crickets,Experimental,66482,Qkcofse,Phase a Couple Rooms,Experimental,43883,66482,True
-R1,P41,deep,50.0,False,4.0,mood energy harmony rhythm,63471,Mutilation Rites,Goliath,Rock,87151,Still Pluto,Open up your eyes,Rock,63471,87151,True
-R1,P44,model,4.0,False,4.0,mood energy rhythm,149701,Sro,Answering M,Electronic,12690,Bo Marley + Disrupt + Volfoniq,L'Anchoïade,International,149701,12690,False
-R1,P47,model,2.0,True,4.0,rhythm energy mood,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R1,P50,random,,False,1.0,nothing,63471,Mutilation Rites,Goliath,Rock,41020,Garage firm,Digital system,International,63471,41020,False
-R1,P59,model,4.0,True,3.0,energy mood,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R1,P60,deep,200.0,False,4.0,energy rhythm mood,63471,Mutilation Rites,Goliath,Rock,125001,Let Me Crazy,899 Seconds,Rock,63471,125001,True
-R1,P69,model,5.0,False,1.0,nothing,43883,Myo,crickets,Experimental,48368,Cloudkicker,A Hymn to the Projectile,Rock,48368,43883,False
-R1,P71,random,,True,2.0,mood,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R1,P72,model,2.0,True,5.0,rhythm harmony energy mood instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R1,P75,deep,50.0,True,5.0,rhythm energy production harmony mood,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R1,P76,model,1.0,True,2.0,,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R2,P08,deep,50.0,True,1.0,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R2,P17,deep,200.0,False,2.0,rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,11239,Justice Yeldham,hamar 261005,Experimental,11239,123978,False
-R2,P18,deep,200.0,False,5.0,harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,117161,Blue Dot Sessions,Reptile Theme,Instrumental,140,117161,False
-R2,P20,model,1.0,True,2.0,rhythm,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R2,P21,model,5.0,False,3.0,nothing,54033,alright lover,Snow Wave,Pop,134388,Scott Holmes,Magical Moments,Pop,134388,54033,True
-R2,P25,model,5.0,True,4.0,timbre energy,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R2,P29,model,2.0,False,5.0,instrumentation,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,36273,Demiran Ćerimović and His Orkestar,"Competition Rehearsal, Song 2",International,36273,42234,True
-R2,P30,model,5.0,False,2.0,harmony,149701,Sro,Answering M,Electronic,126773,Gorowski,Emu In The Bass,Electronic,126773,149701,True
-R2,P42,model,4.0,False,4.0,mood,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,110451,Papascandy,Linton,International,110451,140,False
-R2,P43,model,3.0,False,4.0,instrumentation harmony,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,36277,Demiran Ćerimović and His Orkestar,"Restaurant Concert, Song 2",International,36277,42234,True
-R2,P47,model,2.0,True,2.0,energy,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R2,P48,model,2.0,False,1.0,nothing,149701,Sro,Answering M,Electronic,130986,Jaan Patterson,"Doctor, what has Cesuacantho to do with this?",Experimental,149701,130986,False
-R2,P59,model,4.0,True,4.0,instrumentation energy,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R2,P65,random,,False,3.0,rhythm,17608,Alash Ensemble,Bai-Taiga,International,15880,Kokusai Bunka Shinkokai,Taishikichô Chôshi,International,15880,17608,True
-R2,P71,random,,True,2.0,timbre,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R2,P72,model,2.0,True,3.0,timbre,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R2,P73,model,3.0,False,2.0,energy,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,77564,Bryyn,Abba Ingee,Pop,140,77564,False
-R2,P74,model,4.0,False,4.0,timbre harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,100552,Megatone,First Space Voyage,Electronic,68893,100552,True
-R2,P75,deep,50.0,True,5.0,timbre rhythm harmony,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R2,P76,model,1.0,True,3.0,harmony energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R2,P77,deep,50.0,False,4.0,timbre harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,85599,Garmisch,Native Son,Pop,85599,140,False
-R3,P04,model,2.0,False,2.0,instrumentation,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,115850,Dead Peoples Records,11am,Experimental,115850,123978,False
-R3,P08,deep,50.0,True,1.0,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R3,P11,model,5.0,False,5.0,mood,17608,Alash Ensemble,Bai-Taiga,International,68841,Howie Mitchell,Old Molly Hare,Folk,68841,17608,False
-R3,P20,model,1.0,True,5.0,instrumentation mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R3,P25,model,5.0,True,3.0,energy,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R3,P27,model,3.0,False,5.0,instrumentation harmony,63471,Mutilation Rites,Goliath,Rock,54942,Dolorvotre,Brilliant Brightness,Rock,63471,54942,True
-R3,P33,model,3.0,False,4.0,rhythm timbre,54033,alright lover,Snow Wave,Pop,14571,Ergo Phizmiz,Through the Doors of the Circus,Instrumental,14571,54033,False
-R3,P37,deep,50.0,False,2.0,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,10695,BOPD,2.17.05,Hip-Hop,42234,10695,False
-R3,P40,model,4.0,False,5.0,energy,59876,Boy Friend,Lovedropper,Rock,64009,Gosprom,Nevesta (Flayve Remix),Pop,59876,64009,False
-R3,P46,deep,200.0,False,3.0,rhythm,59876,Boy Friend,Lovedropper,Rock,12692,Bo Marley + Disrupt + Volfoniq,La Brandade,International,12692,59876,False
-R3,P47,model,2.0,True,4.0,mood,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R3,P58,model,5.0,False,1.0,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,51301,John Badger & The Moustache Riders of Doom,Skeletons Fighting Over A Pickled Herring,Experimental,68893,51301,False
-R3,P59,model,4.0,True,5.0,instrumentation mood rhythm energy,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R3,P64,deep,200.0,False,3.0,timbre,149701,Sro,Answering M,Electronic,42018,Electronischebasisgeluide,La boite a track (Spain),Electronic,42018,149701,True
-R3,P68,model,3.0,False,1.0,,149701,Sro,Answering M,Electronic,29720,Codex Machine,S.P.Y.,Hip-Hop,149701,29720,False
-R3,P70,model,2.0,False,5.0,rhythm energy,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,6803,Watcha Clan,Balkan Qoulou,International,6803,140,False
-R3,P71,random,,True,4.0,production,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R3,P72,model,2.0,True,3.0,instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R3,P75,deep,50.0,True,5.0,rhythm energy,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R3,P76,model,1.0,True,1.0,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R3,P78,deep,200.0,False,2.0,rhythm,43883,Myo,crickets,Experimental,122088,Jahzzar,What?,Rock,43883,122088,False
-R4,P06,model,4.0,False,3.0,energy mood,43883,Myo,crickets,Experimental,38905,File Under Toner,si los curas,Experimental,38905,43883,True
-R4,P08,deep,50.0,True,3.0,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R4,P10,model,3.0,False,4.0,mood energy vocals production harmony,59876,Boy Friend,Lovedropper,Rock,36959,Garmisch,Facing the Sea (Album Version),Pop,36959,59876,False
-R4,P15,deep,50.0,False,2.0,mood,68893,Broke For Free,Sidewalk Chalk,Electronic,54063,Yair Yona,Mad About You,Folk,68893,54063,False
-R4,P20,model,1.0,True,2.0,mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R4,P22,deep,50.0,False,3.0,mood energy,59876,Boy Friend,Lovedropper,Rock,56249,Jiony,Woman Alone,Pop,56249,59876,False
-R4,P25,model,5.0,True,2.0,mood timbre,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R4,P31,random,,False,1.0,nothing,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,14538,Opio,Infrared Beams,Hip-Hop,14538,123978,True
-R4,P34,random,,False,2.0,,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,14661,Jonathan Coulton,Re: Your Brains,Folk,14661,140,True
-R4,P47,model,2.0,True,3.0,mood energy timbre,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R4,P51,model,2.0,False,4.0,energy mood timbre rhythm harmony,17608,Alash Ensemble,Bai-Taiga,International,116706,Howie Mitchell,Henry Martin,Folk,17608,116706,False
-R4,P52,deep,50.0,False,3.0,mood energy harmony rhythm timbre,17608,Alash Ensemble,Bai-Taiga,International,141143,Michael Brückner,Flüchtig,Instrumental,141143,17608,False
-R4,P54,model,3.0,False,4.0,mood energy production,43883,Myo,crickets,Experimental,38907,File Under Toner,take me to the movies,Experimental,38907,43883,True
-R4,P56,model,2.0,False,3.0,mood energy production harmony,43883,Myo,crickets,Experimental,112668,ODOR BABY,45,Experimental,43883,112668,True
-R4,P59,model,4.0,True,4.0,instrumentation mood energy harmony timbre rhythm,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R4,P63,model,3.0,False,3.0,timbre mood harmony,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,92283,DJ Spooky,Antarctic Dawn (Bonus Track),Electronic,92283,123978,False
-R4,P71,random,,True,1.0,nothing,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R4,P72,model,2.0,True,1.0,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R4,P75,deep,50.0,True,4.0,mood energy instrumentation production harmony rhythm,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R4,P76,model,1.0,True,2.0,mood energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R4,P79,model,5.0,False,1.0,nothing,59876,Boy Friend,Lovedropper,Rock,44950,SONGO 21,Amor Y Felicidad,International,44950,59876,False
-R5,P05,model,4.0,False,5.0,timbre instrumentation harmony energy,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,44821,Black Bear Combo,Otrov,International,44821,42234,True
-R5,P08,deep,50.0,True,1.0,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R5,P19,random,,False,1.0,nothing,43883,Myo,crickets,Experimental,131941,Choban Elektrik,Unknown Cocek Tune,International,43883,131941,False
-R5,P20,model,1.0,True,1.0,nothing,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R5,P25,model,5.0,True,3.0,energy mood,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R5,P36,model,5.0,False,3.0,instrumentation harmony,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,44820,Black Bear Combo,Rhumbus,International,44820,42234,True
-R5,P39,model,5.0,False,4.0,rhythm energy mood harmony,63471,Mutilation Rites,Goliath,Rock,3833,Lightning Bolt,Track 01,Rock,3833,63471,True
-R5,P45,model,4.0,False,4.0,energy production,54033,alright lover,Snow Wave,Pop,114070,Blue Dot Sessions,Grand Fell,Instrumental,114070,54033,False
-R5,P47,model,2.0,True,1.0,nothing,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R5,P49,deep,50.0,False,3.0,rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,29037,Digi G'Alessio,raw instrumental pt.1,Electronic,123978,29037,False
-R5,P53,model,1.0,False,1.0,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,136137,Philippa Dowding and Allister Thompson,Spring,Folk,42234,136137,False
-R5,P55,model,2.0,False,5.0,mood energy instrumentation vocals,63471,Mutilation Rites,Goliath,Rock,86417,One Master,The Destroyer (Parts 1 and 2),Rock,86417,63471,True
-R5,P59,model,4.0,True,5.0,energy instrumentation vocals,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R5,P61,random,,False,1.0,energy,149701,Sro,Answering M,Electronic,116759,Alex Mason,Raid On The Camp,Instrumental,149701,116759,False
-R5,P62,model,2.0,False,2.0,mood harmony vocals,59876,Boy Friend,Lovedropper,Rock,141617,Barbarix,The Secret Garden,Electronic,59876,141617,False
-R5,P66,deep,200.0,False,3.0,mood,54033,alright lover,Snow Wave,Pop,3274,Arborea,Forewarned,Folk,3274,54033,False
-R5,P67,deep,200.0,False,5.0,rhythm instrumentation energy,68893,Broke For Free,Sidewalk Chalk,Electronic,27667,Gradient,Deep Performance,Electronic,27667,68893,True
-R5,P71,random,,True,1.0,vocals,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R5,P72,model,2.0,True,1.0,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R5,P75,deep,50.0,True,4.0,energy mood instrumentation rhythm production vocals,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R5,P76,model,1.0,True,1.0,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R6,P01,model,1.0,False,2.0,harmony,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,1069,Lucky Dragons,Un Lagrima en la Discoteca,Experimental,123978,1069,False
-R6,P03,model,3.0,False,2.0,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,131796,Pranavibes,Tempête,Instrumental,68893,131796,False
-R6,P08,deep,50.0,True,2.0,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
-R6,P12,model,4.0,False,3.0,harmony mood,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,997,Kevin Shields,Nothing's Ever Ending,Experimental,123978,997,False
-R6,P13,deep,200.0,False,2.0,rhythm,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,37920,Wizwars,8 Bit Raceway,Electronic,37920,42234,False
-R6,P14,model,1.0,False,2.0,mood instrumentation production timbre,149701,Sro,Answering M,Electronic,107048,Elvin Brandhi,Mønstah,Pop,149701,107048,False
-R6,P16,model,1.0,False,4.0,energy mood instrumentation harmony,17608,Alash Ensemble,Bai-Taiga,International,43028,Huun Huur Tu,Samagaldai,International,17608,43028,True
-R6,P20,model,1.0,True,2.0,energy instrumentation,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
-R6,P24,model,3.0,False,2.0,mood energy production,17608,Alash Ensemble,Bai-Taiga,International,68840,Howie Mitchell,John's Laughing Place,Folk,68840,17608,False
-R6,P25,model,5.0,True,3.0,instrumentation mood energy production,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
-R6,P26,deep,50.0,False,4.0,mood production instrumentation energy,54033,alright lover,Snow Wave,Pop,75607,Rho,The Last Ocean,Instrumental,54033,75607,False
-R6,P32,deep,200.0,False,2.0,mood,17608,Alash Ensemble,Bai-Taiga,International,125618,Blue Dot Sessions,Flitless,Instrumental,125618,17608,False
-R6,P47,model,2.0,True,2.0,mood energy,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
-R6,P57,model,4.0,False,2.0,timbre harmony,17608,Alash Ensemble,Bai-Taiga,International,39663,Quiet Hooves,Til It Stops Talkin,Pop,39663,17608,False
-R6,P59,model,4.0,True,5.0,instrumentation mood energy harmony timbre,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
-R6,P71,random,,True,2.0,harmony,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
-R6,P72,model,2.0,True,2.0,instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
-R6,P75,deep,50.0,True,,harmony timbre energy mood,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
-R6,P76,model,1.0,True,2.0,,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
-R6,P80,random,,False,2.0,,54033,alright lover,Snow Wave,Pop,124916,Six Umbrellas,Zombie Disco,Electronic,124916,54033,False
+R1,P02,model,1.0,False,4,mood rhythm harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,44805,Monk Turner + Fascinoma,Start Again,Pop,140,44805,False
+R1,P07,model,1.0,False,4,harmony mood rhythm energy,59876,Boy Friend,Lovedropper,Rock,35544,Garmisch,Facing the Sea,Pop,59876,35544,False
+R1,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R1,P09,model,5.0,False,2,vocals,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,52953,Marissa Nadler,Your Heart Is A Twisted Vine,Folk,140,52953,True
+R1,P20,model,1.0,True,2,mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R1,P23,model,1.0,False,3,mood,54033,alright lover,Snow Wave,Pop,145556,This Mess is Mine,Roommates (Piano Version by AGPB),Folk,145556,54033,False
+R1,P25,model,5.0,True,5,mood energy harmony production instrumentation rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R1,P28,random,,False,3,rhythm production,68893,Broke For Free,Sidewalk Chalk,Electronic,75782,Square People,I'm Not Lazy,Rock,75782,68893,False
+R1,P35,random,,False,2,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,76437,Misay Day,Southside,Folk,42234,76437,False
+R1,P38,model,1.0,False,1,nothing,43883,Myo,crickets,Experimental,66482,Qkcofse,Phase a Couple Rooms,Experimental,43883,66482,True
+R1,P41,deep,50.0,False,4,mood energy harmony rhythm,63471,Mutilation Rites,Goliath,Rock,87151,Still Pluto,Open up your eyes,Rock,63471,87151,True
+R1,P44,model,4.0,False,4,mood energy rhythm,149701,Sro,Answering M,Electronic,12690,Bo Marley + Disrupt + Volfoniq,L'Anchoïade,International,149701,12690,False
+R1,P47,model,2.0,True,4,rhythm energy mood,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R1,P50,random,,False,1,nothing,63471,Mutilation Rites,Goliath,Rock,41020,Garage firm,Digital system,International,63471,41020,False
+R1,P59,model,4.0,True,3,energy mood,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R1,P60,deep,200.0,False,4,energy rhythm mood,63471,Mutilation Rites,Goliath,Rock,125001,Let Me Crazy,899 Seconds,Rock,63471,125001,True
+R1,P69,model,5.0,False,1,nothing,43883,Myo,crickets,Experimental,48368,Cloudkicker,A Hymn to the Projectile,Rock,48368,43883,False
+R1,P71,random,,True,2,mood,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R1,P72,model,2.0,True,5,rhythm harmony energy mood instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R1,P75,deep,50.0,True,5,rhythm energy production harmony mood,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R1,P76,model,1.0,True,2,,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R2,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R2,P17,deep,200.0,False,2,rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,11239,Justice Yeldham,hamar 261005,Experimental,11239,123978,False
+R2,P18,deep,200.0,False,5,harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,117161,Blue Dot Sessions,Reptile Theme,Instrumental,140,117161,False
+R2,P20,model,1.0,True,2,rhythm,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R2,P21,model,5.0,False,3,nothing,54033,alright lover,Snow Wave,Pop,134388,Scott Holmes,Magical Moments,Pop,134388,54033,True
+R2,P25,model,5.0,True,4,timbre energy,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R2,P29,model,2.0,False,5,instrumentation,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,36273,Demiran Ćerimović and His Orkestar,"Competition Rehearsal, Song 2",International,36273,42234,True
+R2,P30,model,5.0,False,2,harmony,149701,Sro,Answering M,Electronic,126773,Gorowski,Emu In The Bass,Electronic,126773,149701,True
+R2,P42,model,4.0,False,4,mood,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,110451,Papascandy,Linton,International,110451,140,False
+R2,P43,model,3.0,False,4,instrumentation harmony,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,36277,Demiran Ćerimović and His Orkestar,"Restaurant Concert, Song 2",International,36277,42234,True
+R2,P47,model,2.0,True,2,energy,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R2,P48,model,2.0,False,1,nothing,149701,Sro,Answering M,Electronic,130986,Jaan Patterson,"Doctor, what has Cesuacantho to do with this?",Experimental,149701,130986,False
+R2,P59,model,4.0,True,4,instrumentation energy,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R2,P65,random,,False,3,rhythm,17608,Alash Ensemble,Bai-Taiga,International,15880,Kokusai Bunka Shinkokai,Taishikichô Chôshi,International,15880,17608,True
+R2,P71,random,,True,2,timbre,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R2,P72,model,2.0,True,3,timbre,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R2,P73,model,3.0,False,2,energy,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,77564,Bryyn,Abba Ingee,Pop,140,77564,False
+R2,P74,model,4.0,False,4,timbre harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,100552,Megatone,First Space Voyage,Electronic,68893,100552,True
+R2,P75,deep,50.0,True,5,timbre rhythm harmony,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R2,P76,model,1.0,True,3,harmony energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R2,P77,deep,50.0,False,4,timbre harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,85599,Garmisch,Native Son,Pop,85599,140,False
+R3,P04,model,2.0,False,2,instrumentation,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,115850,Dead Peoples Records,11am,Experimental,115850,123978,False
+R3,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R3,P11,model,5.0,False,5,mood,17608,Alash Ensemble,Bai-Taiga,International,68841,Howie Mitchell,Old Molly Hare,Folk,68841,17608,False
+R3,P20,model,1.0,True,5,instrumentation mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R3,P25,model,5.0,True,3,energy,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R3,P27,model,3.0,False,5,instrumentation harmony,63471,Mutilation Rites,Goliath,Rock,54942,Dolorvotre,Brilliant Brightness,Rock,63471,54942,True
+R3,P33,model,3.0,False,4,rhythm timbre,54033,alright lover,Snow Wave,Pop,14571,Ergo Phizmiz,Through the Doors of the Circus,Instrumental,14571,54033,False
+R3,P37,deep,50.0,False,2,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,10695,BOPD,2.17.05,Hip-Hop,42234,10695,False
+R3,P40,model,4.0,False,5,energy,59876,Boy Friend,Lovedropper,Rock,64009,Gosprom,Nevesta (Flayve Remix),Pop,59876,64009,False
+R3,P46,deep,200.0,False,3,rhythm,59876,Boy Friend,Lovedropper,Rock,12692,Bo Marley + Disrupt + Volfoniq,La Brandade,International,12692,59876,False
+R3,P47,model,2.0,True,4,mood,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R3,P58,model,5.0,False,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,51301,John Badger & The Moustache Riders of Doom,Skeletons Fighting Over A Pickled Herring,Experimental,68893,51301,False
+R3,P59,model,4.0,True,5,instrumentation mood rhythm energy,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R3,P64,deep,200.0,False,3,timbre,149701,Sro,Answering M,Electronic,42018,Electronischebasisgeluide,La boite a track (Spain),Electronic,42018,149701,True
+R3,P68,model,3.0,False,1,,149701,Sro,Answering M,Electronic,29720,Codex Machine,S.P.Y.,Hip-Hop,149701,29720,False
+R3,P70,model,2.0,False,5,rhythm energy,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,6803,Watcha Clan,Balkan Qoulou,International,6803,140,False
+R3,P71,random,,True,4,production,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R3,P72,model,2.0,True,3,instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R3,P75,deep,50.0,True,5,rhythm energy,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R3,P76,model,1.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R3,P78,deep,200.0,False,2,rhythm,43883,Myo,crickets,Experimental,122088,Jahzzar,What?,Rock,43883,122088,False
+R4,P06,model,4.0,False,3,energy mood,43883,Myo,crickets,Experimental,38905,File Under Toner,si los curas,Experimental,38905,43883,True
+R4,P08,deep,50.0,True,3,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R4,P10,model,3.0,False,4,mood energy vocals production harmony,59876,Boy Friend,Lovedropper,Rock,36959,Garmisch,Facing the Sea (Album Version),Pop,36959,59876,False
+R4,P15,deep,50.0,False,2,mood,68893,Broke For Free,Sidewalk Chalk,Electronic,54063,Yair Yona,Mad About You,Folk,68893,54063,False
+R4,P20,model,1.0,True,2,mood,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R4,P22,deep,50.0,False,3,mood energy,59876,Boy Friend,Lovedropper,Rock,56249,Jiony,Woman Alone,Pop,56249,59876,False
+R4,P25,model,5.0,True,2,mood timbre,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R4,P31,random,,False,1,nothing,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,14538,Opio,Infrared Beams,Hip-Hop,14538,123978,True
+R4,P34,random,,False,2,,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,14661,Jonathan Coulton,Re: Your Brains,Folk,14661,140,True
+R4,P47,model,2.0,True,3,mood energy timbre,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R4,P51,model,2.0,False,4,energy mood timbre rhythm harmony,17608,Alash Ensemble,Bai-Taiga,International,116706,Howie Mitchell,Henry Martin,Folk,17608,116706,False
+R4,P52,deep,50.0,False,3,mood energy harmony rhythm timbre,17608,Alash Ensemble,Bai-Taiga,International,141143,Michael Brückner,Flüchtig,Instrumental,141143,17608,False
+R4,P54,model,3.0,False,4,mood energy production,43883,Myo,crickets,Experimental,38907,File Under Toner,take me to the movies,Experimental,38907,43883,True
+R4,P56,model,2.0,False,3,mood energy production harmony,43883,Myo,crickets,Experimental,112668,ODOR BABY,45,Experimental,43883,112668,True
+R4,P59,model,4.0,True,4,instrumentation mood energy harmony timbre rhythm,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R4,P63,model,3.0,False,3,timbre mood harmony,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,92283,DJ Spooky,Antarctic Dawn (Bonus Track),Electronic,92283,123978,False
+R4,P71,random,,True,1,nothing,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R4,P72,model,2.0,True,1,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R4,P75,deep,50.0,True,4,mood energy instrumentation production harmony rhythm,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R4,P76,model,1.0,True,2,mood energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R4,P79,model,5.0,False,1,nothing,59876,Boy Friend,Lovedropper,Rock,44950,SONGO 21,Amor Y Felicidad,International,44950,59876,False
+R5,P05,model,4.0,False,5,timbre instrumentation harmony energy,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,44821,Black Bear Combo,Otrov,International,44821,42234,True
+R5,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R5,P19,random,,False,1,nothing,43883,Myo,crickets,Experimental,131941,Choban Elektrik,Unknown Cocek Tune,International,43883,131941,False
+R5,P20,model,1.0,True,1,nothing,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R5,P25,model,5.0,True,3,energy mood,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R5,P36,model,5.0,False,3,instrumentation harmony,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,44820,Black Bear Combo,Rhumbus,International,44820,42234,True
+R5,P39,model,5.0,False,4,rhythm energy mood harmony,63471,Mutilation Rites,Goliath,Rock,3833,Lightning Bolt,Track 01,Rock,3833,63471,True
+R5,P45,model,4.0,False,4,energy production,54033,alright lover,Snow Wave,Pop,114070,Blue Dot Sessions,Grand Fell,Instrumental,114070,54033,False
+R5,P47,model,2.0,True,1,nothing,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R5,P49,deep,50.0,False,3,rhythm,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,29037,Digi G'Alessio,raw instrumental pt.1,Electronic,123978,29037,False
+R5,P53,model,1.0,False,1,,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,136137,Philippa Dowding and Allister Thompson,Spring,Folk,42234,136137,False
+R5,P55,model,2.0,False,5,mood energy instrumentation vocals,63471,Mutilation Rites,Goliath,Rock,86417,One Master,The Destroyer (Parts 1 and 2),Rock,86417,63471,True
+R5,P59,model,4.0,True,5,energy instrumentation vocals,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R5,P61,random,,False,1,energy,149701,Sro,Answering M,Electronic,116759,Alex Mason,Raid On The Camp,Instrumental,149701,116759,False
+R5,P62,model,2.0,False,2,mood harmony vocals,59876,Boy Friend,Lovedropper,Rock,141617,Barbarix,The Secret Garden,Electronic,59876,141617,False
+R5,P66,deep,200.0,False,3,mood,54033,alright lover,Snow Wave,Pop,3274,Arborea,Forewarned,Folk,3274,54033,False
+R5,P67,deep,200.0,False,5,rhythm instrumentation energy,68893,Broke For Free,Sidewalk Chalk,Electronic,27667,Gradient,Deep Performance,Electronic,27667,68893,True
+R5,P71,random,,True,1,vocals,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R5,P72,model,2.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R5,P75,deep,50.0,True,4,energy mood instrumentation rhythm production vocals,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R5,P76,model,1.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R6,P01,model,1.0,False,2,harmony,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,1069,Lucky Dragons,Un Lagrima en la Discoteca,Experimental,123978,1069,False
+R6,P03,model,3.0,False,2,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,131796,Pranavibes,Tempête,Instrumental,68893,131796,False
+R6,P08,deep,50.0,True,2,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
+R6,P12,model,4.0,False,3,harmony mood,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,997,Kevin Shields,Nothing's Ever Ending,Experimental,123978,997,False
+R6,P13,deep,200.0,False,2,rhythm,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,37920,Wizwars,8 Bit Raceway,Electronic,37920,42234,False
+R6,P14,model,1.0,False,2,mood instrumentation production timbre,149701,Sro,Answering M,Electronic,107048,Elvin Brandhi,Mønstah,Pop,149701,107048,False
+R6,P16,model,1.0,False,4,energy mood instrumentation harmony,17608,Alash Ensemble,Bai-Taiga,International,43028,Huun Huur Tu,Samagaldai,International,17608,43028,True
+R6,P20,model,1.0,True,2,energy instrumentation,63471,Mutilation Rites,Goliath,Rock,145199,Conduit,Opening the Mouth/ Salt,Rock,63471,145199,True
+R6,P24,model,3.0,False,2,mood energy production,17608,Alash Ensemble,Bai-Taiga,International,68840,Howie Mitchell,John's Laughing Place,Folk,68840,17608,False
+R6,P25,model,5.0,True,3,instrumentation mood energy production,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,114279,Azureflux,Bipolar Bear,Electronic,123978,114279,False
+R6,P26,deep,50.0,False,4,mood production instrumentation energy,54033,alright lover,Snow Wave,Pop,75607,Rho,The Last Ocean,Instrumental,54033,75607,False
+R6,P32,deep,200.0,False,2,mood,17608,Alash Ensemble,Bai-Taiga,International,125618,Blue Dot Sessions,Flitless,Instrumental,125618,17608,False
+R6,P47,model,2.0,True,2,mood energy,54033,alright lover,Snow Wave,Pop,63456,Big Blood,Away pt. II,Folk,63456,54033,False
+R6,P57,model,4.0,False,2,timbre harmony,17608,Alash Ensemble,Bai-Taiga,International,39663,Quiet Hooves,Til It Stops Talkin,Pop,39663,17608,False
+R6,P59,model,4.0,True,5,instrumentation mood energy harmony timbre,63471,Mutilation Rites,Goliath,Rock,73521,Hounds Of Hate,Brotherhood Of Night,Rock,63471,73521,True
+R6,P71,random,,True,2,harmony,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,Why,International,113265,59876,False
+R6,P72,model,2.0,True,2,instrumentation,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
+R6,P75,deep,50.0,True,4,harmony timbre energy mood,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
+R6,P76,model,1.0,True,2,,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R6,P80,random,,False,2,,54033,alright lover,Snow Wave,Pop,124916,Six Umbrellas,Zombie Disco,Electronic,124916,54033,False

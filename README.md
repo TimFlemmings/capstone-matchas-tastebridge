@@ -9,7 +9,7 @@ model, and the evaluation setup that every later idea is measured against.
 
 Six people rated eighty pairs of tracks blind, and their answers changed what
 the model runs on. It beats a random pair to a human ear (p = 0.002), the far
-end of the dial is heard as related as the near end (p = 0.60), and two of the
+end of the dial is heard as related as the near end (p = 0.65), and two of the
 features it now uses did not exist in the dataset — listeners named them, so we
 read them off the audio. [What the listeners changed](#what-the-listeners-changed)
 is the short version.
@@ -97,12 +97,12 @@ The reason is not on a genre scorecard. It is this:
 | space | matches what listeners said |
 |---|---:|
 | all 518 FMA features | +0.05 — no relation at all |
-| **heard, 154 columns** | **−0.35** |
+| **heard, 154 columns** | **−0.36** |
 
-Distance in each space, correlated against 124 blind human ratings. Negative is
+Distance in each space, correlated against 125 blind human ratings. Negative is
 the good direction: closer in that space, rated more alike. The old space has no
 relationship to what people hear; the new one has a strong one, and that
-ordering held five times as ratings arrived, at 42, 63, 84, 103 and 124.
+ordering held as every batch of ratings arrived, at 42, 63, 84, 103, 124 and 125.
 
 That is the argument. Everything below is a check that the change did not cost
 anything, not a reason for making it.
@@ -170,7 +170,7 @@ uv run python -m modeling.recommender --track-id 2 --adventure 0.7
 
 **Milestone 3 — measured against human ears, not genre labels: done.** The
 recommender beats a random pair to a listener (p = 0.002), and the far end of
-the dial is heard as related as the near end (p = 0.60).
+the dial is heard as related as the near end (p = 0.65).
 
 One number from that worth sitting with: listeners rated the model's own top
 five at **2.96 out of 5**, which on the rubric they were given is "a
@@ -239,7 +239,7 @@ noise.
 
 Listeners confirmed that directly, which is the part no metric could settle:
 pairs drawn from rank 50 and 200 were rated **as related as the model's own top
-five** (p = 0.60), and both beat a random pair (p = 0.003 and p = 0.002).
+five** (p = 0.65), and both beat a random pair (p = 0.002 and p = 0.002).
 
 **`intra_list_diversity` moves furthest of the three.** The ten tracks become
 0.508 → 0.808 apart *from each other*, which is what a listener actually
@@ -285,7 +285,7 @@ the thing we actually care about. So we asked people.
 
 Eighty pairs of thirty-second clips, six raters, blind: a pair number and two
 clips, no artist, no title, no genre, no cosine score, volumes matched from
-`features.csv` so loudness could not read as similarity. 124 scored ratings came
+`features.csv` so loudness could not read as similarity. 125 scored ratings came
 back, covering every pair. Built in `02_listening_test.ipynb`, read back in
 `03_listening_test_results.ipynb`.
 
@@ -302,18 +302,18 @@ nothing:
 
 | kind | ratings | mean |
 |---|---:|---:|
-| `deep` | 29 | 3.03 |
+| `deep` | 30 | 3.07 |
 | `model` | 80 | 2.96 |
 | `random` | 15 | 1.87 |
 
-`model` beats `random` at **p = 0.002**, `deep` beats it at **p = 0.003**, and
-`model` and `deep` are indistinguishable at **p = 0.60**.
+`model` beats `random` at **p = 0.002**, `deep` beats it at **p = 0.002**, and
+`model` and `deep` are indistinguishable at **p = 0.65**.
 
 That last one is the result for the dial. Rank 200 is heard as related as rank
 1, and both are heard as more related than chance. Far away, but chosen.
 
-Raters agree with each other at r = 0.40 — some pairs split four points of five —
-so the average of six is reliable at 0.80, which caps any model near 0.90. The
+Raters agree with each other at r = 0.53 — some pairs still split four points of
+five — so the average of six is reliable at 0.87, which caps any model near 0.93. The
 shipped space reaches −0.77 against that average on the nine shared pairs.
 
 ### Most of the 518 columns have nothing to do with what people hear
@@ -323,10 +323,10 @@ direction: closer in that space, rated more alike.
 
 | space | columns | genre agreement | matches the ear |
 |---|---:|---:|---:|
-| all 518 | 518 | 0.414 | +0.047 |
+| all 518 | 518 | 0.414 | +0.049 |
 | harmony | 294 | 0.278 | +0.040 |
-| timbre | 224 | 0.458 | −0.179 |
-| **mfcc** | 140 | 0.412 | **−0.314** |
+| timbre | 224 | 0.458 | −0.172 |
+| **mfcc** | 140 | 0.412 | **−0.321** |
 
 `all 518` and `mfcc` are within 0.002 of each other on genre agreement, and a
 listener separates them immediately. The full space carries 294 harmony columns
@@ -430,9 +430,9 @@ Against the genre metric it works well, correlating −0.36 across the catalogue
 
 So we checked it against the listening test, and it does not survive.
 
-Across the ten seeds the test used, crowding correlates **+0.11** with the
+Across the ten seeds the test used, crowding correlates **+0.10** with the
 scores the model's own pairs received — the wrong sign, and nowhere near
-significant (p = 0.24). The clearest case is the loneliest seed of the ten:
+significant (p = 0.29). The clearest case is the loneliest seed of the ten:
 
 | seed | crowding | same-genre | rated by listeners |
 |---|---:|---:|---:|
@@ -481,7 +481,7 @@ them:
 | columns | 154 | 238 |
 | genre agreement | 0.438 | **0.474** |
 | supervised ceiling | 0.533 | **0.546** |
-| matches the ear | **−0.351** | −0.217 |
+| matches the ear | **−0.358** | −0.213 |
 
 They differ only in whether the 84 non-mfcc timbre columns come along, and
 across 500 seeds they share 4.5 of their top 10 — so half of what a listener
@@ -489,7 +489,7 @@ would hear is different.
 
 `heard` ships because the ear is the ruler this project exists to serve, and
 because that ordering held five times as returns arrived, at 42 ratings, then
-63, 84, 103 and 124. **But the data that chose it cannot also validate it.** A
+63, 84, 103, 124 and 125. **But the data that chose it cannot also validate it.** A
 second round, put as a forced choice between the two on fresh seeds, is the
 honest way to settle it and has not been run.
 
@@ -579,7 +579,7 @@ uv run python -m modeling.separation   # ~20 minutes; splitting audio is the slo
 ```
 
 The listening test's own paperwork *is* tracked — `data/listening_test/` holds
-the 124 ratings, the answer key and the assignments. Everything else under
+the 125 ratings, the answer key and the assignments. Everything else under
 `data/` regenerates; six people rating eighty pairs does not.
 
 ---
@@ -783,7 +783,7 @@ since the first milestone. The listening test turned it from a caveat into a
 measurement:
 
 > `all 518` scores 0.414 on genre agreement and `mfcc` scores 0.412 — a gap of
-> 0.002. Against human ratings they score +0.047 and −0.314. **The proxy could
+> 0.002. Against human ratings they score +0.049 and −0.321. **The proxy could
 > not see a difference listeners heard immediately.**
 
 So the honest reading of the frozen metrics is narrower than we used to write.
