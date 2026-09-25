@@ -600,9 +600,10 @@ the 125 ratings, the answer key and the assignments. Everything else under
 
 ### From a fresh clone, in order
 
-Four steps. Steps 3 and 4 are the ones people miss — the recommender will refuse
-to start without them, because two of the feature families it uses are not in
-the repository and have to be read back off the audio.
+Five steps. Steps 3 to 5 are the ones people miss — the recommender refuses to
+start without them, because two of the feature families it uses are not in the
+repository and have to be read back off the audio, and the fitted scaler and PCA
+are outputs rather than source. Each refusal names the command that fixes it.
 
 ```bash
 # 1. install uv, once per machine
@@ -618,6 +619,9 @@ uv sync --all-groups
 # 4. build the two feature files we extract ourselves
 uv run python -m modeling.rhythm       # ~90 seconds on eight cores
 uv run python -m modeling.separation   # ~20 minutes; splitting audio is slow
+
+# 5. fit the scaler and PCA for the shipped space
+uv run python -m modeling.train_pca --feature-set heard --n-components 0.90
 ```
 
 Step 4 is not training anything. Both commands read the 8,000 mp3s once and
@@ -625,6 +629,11 @@ write a table of numbers — `data/rhythm_features.csv` and
 `data/separation_features.csv`, 1.8MB and 12MB. They are gitignored because one
 command rebuilds them, and the recommender reads them at startup alongside FMA's
 own `features.csv`. Run them once and forget them.
+
+Step 5 writes `models/scaler_90pct_heard.pkl` and `models/pca_90pct_heard.pkl`,
+also gitignored: a fitted transform is an output, not source. Without them the
+recommender has nothing to project with, and it will say so and print this exact
+command.
 
 Then:
 

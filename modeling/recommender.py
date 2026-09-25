@@ -372,7 +372,7 @@ def main(argv=None):
     F = space(args.space, X)
     suffix = args.pca_suffix if args.pca_suffix else (
         "_90pct" if args.space == "all" else f"_{args.space}")
-    scaler, pca = load_artifacts(suffix=suffix)
+    scaler, pca = load_artifacts(suffix=suffix, space=args.space)
     tracks = tracks.loc[F.index]
     rec = TrackRecommender(scaler, pca, metric=args.metric).fit(F, tracks)
 

@@ -248,9 +248,29 @@ def save_artifacts(
     return scaler_path, pca_path
 
 
-def load_artifacts(directory: Path = MODELS_DIR, suffix: str = ""):
+def load_artifacts(directory: Path = MODELS_DIR, suffix: str = "", space: str = None):
+    """The fitted scaler and PCA for one space.
+
+    `train_pca.py` names what it writes `_<variance tag>_<feature set>`, and the
+    recommender asks for `_<feature set>`. Both spellings are in use, so both are
+    tried before giving up — and giving up names the command that creates them,
+    because they are gitignored and a fresh clone has none.
+    """
     directory = Path(directory)
-    return (
-        joblib.load(directory / f"scaler{suffix}.pkl"),
-        joblib.load(directory / f"pca{suffix}.pkl"),
+    tried = [suffix]
+    if space is not None:
+        tried += [f"_90pct_{space}", f"_{space}"]
+    for candidate in dict.fromkeys(tried):          # keep order, drop repeats
+        scaler = directory / f"scaler{candidate}.pkl"
+        pca = directory / f"pca{candidate}.pkl"
+        if scaler.exists() and pca.exists():
+            logger.info("Loading artifacts %r from %s", candidate, directory)
+            return joblib.load(scaler), joblib.load(pca)
+
+    looked = ", ".join(f"scaler{c}.pkl" for c in dict.fromkeys(tried))
+    raise FileNotFoundError(
+        f"No fitted scaler and PCA in {directory} (looked for {looked}). "
+        "They are gitignored, so a fresh clone has to fit them:\n"
+        f"    uv run python -m modeling.train_pca --feature-set {space or 'heard'} "
+        "--n-components 0.90"
     )
