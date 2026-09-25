@@ -25,6 +25,10 @@ outputs saved — nothing to run. `notebooks/04_new_features.ipynb` walks the ne
 columns one at a time. And `data/listening_test/all_ratings.csv` is all 125
 ratings with both tracks named, if you would rather just read the data.
 
+**Picking this up to evaluate or extend it?** [`FOR_TIM.md`](FOR_TIM.md) is the
+short path: how to get it running, what the model is, why it changed, and the
+one evaluation that has not been done.
+
 ---
 
 ## In plain terms
@@ -368,10 +372,18 @@ Neither is recoverable from `features.csv`, so both were read back off the mp3s.
 
 The other 80 were the timbre of the drums and the instruments described
 separately, after splitting the audio. They produced **the best genre agreement
-in the project, 0.488** — and left the supervised ceiling flat at 0.546, which is
-the signature of information rearranged rather than added. They also made the
-match with human ratings worse. Judged on agreement alone we would have kept
-them.
+in the project, 0.488** — and left the supervised ceiling flat, 0.533 → 0.534 in
+the shipped space and 0.546 → 0.546 in the wider one, which is the signature of
+information rearranged rather than added: eighty more columns of mfcc, computed
+on two halves of a signal whose unsplit mfcc we already had.
+
+They do move the match with human ratings the right way, −0.358 → −0.374, and
+that deserves saying plainly rather than being quietly dropped from the story.
+It is not worth eighty columns. The gain is 0.016 on a correlation measured over
+125 ratings, it arrives with no new information behind it, and every other large
+block added to this space has diluted it. Judged on agreement alone we would
+have kept them; judged on the ear alone, marginally so; judged on whether they
+told us anything we did not already know, no.
 
 Three other ideas were built and rejected the same way: a space made only of the
 families the ear approved, key-invariant chroma (rotating each track's pitch
