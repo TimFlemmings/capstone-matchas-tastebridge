@@ -64,7 +64,17 @@ def responses(directory: Path = TEST_DIR / "responses") -> pd.DataFrame:
     if not files:
         raise FileNotFoundError(f"no *_ratings.csv in {directory}")
     ratings = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
-    key = pd.read_csv(TEST_DIR / "pairs_key.csv")
+
+    # One key per round, concatenated. Round two's pair ids start with Q rather
+    # than P, so a rating finds its own round's key and nothing collides —
+    # which is what lets returns from both rounds share one folder.
+    keys = sorted(TEST_DIR.glob("pairs_key*.csv"))
+    if not keys:
+        raise FileNotFoundError(f"no pairs_key*.csv in {TEST_DIR}")
+    key = pd.concat([pd.read_csv(f) for f in keys], ignore_index=True)
+    if key["pair_id"].duplicated().any():
+        clash = sorted(key.loc[key["pair_id"].duplicated(), "pair_id"])
+        raise ValueError(f"the same pair id appears in two keys: {clash[:5]}")
     logger.info("%s ratings from %s raters", len(ratings), ratings["rater"].nunique())
     return ratings.merge(key, on="pair_id")
 
