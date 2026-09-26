@@ -99,16 +99,37 @@ def build_space(X: pd.DataFrame, random_state: int = 42):
     return Z
 
 
-def choose_seeds(candidates, used, rng, n):
+def choose_seeds(candidates, used, rng, n, genres=None):
     """Fresh seeds, with audio on disk and no part in round one.
 
     Reusing a seed would put the new ratings back inside the sample that chose
     the space, which is the whole thing round two exists to escape.
+
+    Spread across genres rather than drawn freely, because a free draw of twelve
+    came back five Pop and three Rock with no Hip-Hop at all. Pop is the genre
+    this recommender handles worst — 0.199 against a 0.125 floor, because Pop is
+    a market category and not a sound — so that round would have scored badly on
+    the luck of the draw and told us nothing about where the model actually
+    fails. One seed per genre first, then the remainder drawn at random.
     """
     pool = [t for t in candidates if t not in used and audio_path(t).exists()]
     if len(pool) < n:
         raise ValueError(f"only {len(pool)} usable seeds outside round one, wanted {n}")
-    return [int(t) for t in rng.choice(pool, size=n, replace=False)]
+    if genres is None:
+        return [int(t) for t in rng.choice(pool, size=n, replace=False)]
+
+    by_genre = {}
+    for t in pool:
+        by_genre.setdefault(str(genres.get(t)), []).append(t)
+
+    chosen = []
+    for genre in sorted(by_genre):                      # one each, in a fixed order
+        if len(chosen) < n:
+            chosen.append(int(rng.choice(by_genre[genre])))
+    rest = [t for t in pool if t not in chosen]
+    if len(chosen) < n:
+        chosen += [int(t) for t in rng.choice(rest, size=n - len(chosen), replace=False)]
+    return list(rng.permutation(chosen[:n]).astype(int))
 
 
 def build_pairs(seeds, heard_rank, all_rank, pool, rng):
@@ -182,6 +203,8 @@ def main(argv=None):
                         help="pairs everybody hears, for rater agreement")
     parser.add_argument("--random-state", type=int, default=2026,
                         help="different from round one's 42, so the draws differ")
+    parser.add_argument("--free-draw", action="store_true",
+                        help="draw seeds at random instead of one per genre first")
     args = parser.parse_args(argv)
 
     from modeling.data import load_fma
@@ -208,7 +231,9 @@ def main(argv=None):
         used = set(round1["seed"]) | set(round1["other"])
         logger.info("Round one used %s tracks; excluding all of them", len(used))
 
-    seeds = choose_seeds(list(common), used, rng, args.seeds)
+    genre_of = tracks[("track", "genre_top")]
+    seeds = choose_seeds(list(common), used, rng, args.seeds,
+                         genres=None if args.free_draw else genre_of)
     heard_rank = ranked_neighbours(Z_heard, common, seeds, max(DEPTHS))
     all_rank = ranked_neighbours(Z_all, common, seeds, TOP_K)
 

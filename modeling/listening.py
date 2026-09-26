@@ -145,13 +145,106 @@ def flat_table(d: pd.DataFrame = None) -> pd.DataFrame:
     return out.sort_values(["rater", "pair_id"]).reset_index(drop=True)
 
 
+def blind_spots(d: pd.DataFrame = None, space_name: str = "heard"):
+    """Where the model and the listeners disagree most, and what the words say.
+
+    The counts above tell you which words people use. They do not tell you which
+    ones the model is *failing* at, because a word can be used constantly on
+    pairs the model already gets right.
+
+    This asks the sharper question. For every rated pair, take the model's
+    distance and the listeners' score, rank both, and subtract. A pair the model
+    puts far away that people heard as close is a pair the model is missing
+    something about — and whatever the raters ticked on it is the name of that
+    something. Rhythm was found exactly this way, by hand.
+
+    Two tables come back: the worst disagreements in each direction, and how
+    each word's rate differs between them.
+    """
+    if d is None:
+        d = responses()
+    d = d.dropna(subset=["similarity_1_5"])
+
+    from scipy.spatial.distance import cosine
+    from sklearn.preprocessing import StandardScaler
+
+    from modeling.data import load_fma
+    from modeling.features import space
+
+    X, _ = load_fma("small")
+    S = space(space_name, X)
+    Z = pd.DataFrame(StandardScaler().fit_transform(S), index=S.index)
+
+    pairs = d.groupby("pair_id").agg(
+        heard=("similarity_1_5", "mean"), votes=("similarity_1_5", "size"),
+        a=("track_a", "first"), b=("track_b", "first"),
+        seed_artist=("seed_artist", "first"), other_artist=("other_artist", "first"),
+        seed_genre=("seed_genre", "first"), kind=("kind", "first"))
+    pairs["distance"] = [cosine(Z.loc[a], Z.loc[b]) for a, b in zip(pairs.a, pairs.b)]
+
+    # Ranks, not raw values: the two are on different scales and only their
+    # ordering is being compared. Positive means people heard more connection
+    # than the geometry has any account of.
+    pairs["miss"] = (pairs["heard"].rank(pct=True)
+                     - (1 - pairs["distance"].rank(pct=True)))
+
+    words = d.assign(tag=d["connects"].fillna("").str.split()).explode("tag")
+    words = words[words["tag"].astype(bool)]
+    # Both ends are failures, and they are different failures. A high miss is a
+    # connection the model cannot see; a low one is the model insisting on a
+    # closeness nobody hears. Calling the second end "right" would hide half the
+    # problem — it is the model overreaching, not agreeing.
+    cut = pairs["miss"].quantile([0.25, 0.75])
+    side = pd.Series("middle", index=pairs.index)
+    side[pairs["miss"] >= cut[0.75]] = "blind"
+    side[pairs["miss"] <= cut[0.25]] = "overreached"
+    words = words.join(side.rename("side"), on="pair_id")
+
+    rates = (words[words["side"] != "middle"]
+             .pivot_table(index="tag", columns="side", values="pair_id",
+                          aggfunc="count")
+             .fillna(0))
+    for column in ("blind", "overreached"):
+        rates[column] = rates.get(column, 0)
+    totals = side.value_counts()
+    rates = rates.div([totals.get(c, 1) for c in rates.columns], axis=1).round(2)
+    rates["gap"] = (rates["blind"] - rates["overreached"]).round(2)
+    return pairs.sort_values("miss", ascending=False), rates.sort_values("gap", ascending=False)
+
+
 def _main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--responses", type=Path, default=TEST_DIR / "responses")
     parser.add_argument("--csv", type=Path, nargs="?", const=TEST_DIR / "all_ratings.csv",
                         help="write every rating, with both tracks named, to one file")
+    parser.add_argument("--blind-spots", action="store_true",
+                        help="where the model and the listeners disagree, and what "
+                             "the raters called those pairs — the next feature, if "
+                             "there is one")
+    parser.add_argument("--space", default="heard",
+                        help="which feature space to measure the disagreement in")
     args = parser.parse_args()
+
+    if args.blind_spots:
+        worst, rates = blind_spots(responses(args.responses), args.space)
+        show = ["seed_artist", "other_artist", "seed_genre", "kind",
+                "heard", "distance", "miss"]
+        print(f"\n=== the two ways the '{args.space}' space is wrong ===")
+        print("\nBLIND — people heard a connection the geometry has no account of:")
+        print(worst.head(8)[show].round(3).to_string())
+        print("\nOVERREACHED — the model put these close and nobody agreed:")
+        print(worst.tail(8)[show].round(3).to_string())
+        print("\n=== how often each word was used at each end ===")
+        print(rates.to_string())
+        n_side = max(1, len(worst) // 4)
+        print(f"\nEach column is a rate over about {n_side} pairs, so one pair moves it "
+              f"by {1 / n_side:.2f}. Treat anything under that as noise.")
+        print("A positive gap names something people hear and the model cannot. Check "
+              "\nit against `modeling.listening` with no arguments: if that word already "
+              "\nhas features, they are not doing their job; if it has none, it is the "
+              "\nnext thing to build. That is how rhythm was found.")
+        return
 
     if args.csv:
         table = flat_table(responses(args.responses))
