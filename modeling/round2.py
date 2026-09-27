@@ -33,6 +33,7 @@ against `heard_wide`, which needs a forced choice rather than a rating.
 """
 
 import argparse
+import ast
 import json
 import logging
 import shutil
@@ -75,10 +76,33 @@ def rating_page_template() -> str:
     cells = json.loads(NOTEBOOK.read_text())["cells"]
     for cell in cells:
         source = "".join(cell["source"])
-        if "RATING_PAGE = " in source and "__RATER__" in source:
-            body = source.split('RATING_PAGE = """', 1)[1]
-            return body.split('"""', 1)[0]
+        if "RATING_PAGE = " not in source or "__RATER__" not in source:
+            continue
+        # Parsed rather than sliced out between the quotes. The template's
+        # JavaScript contains "\\n" and "\\u2014", which Python turns into a
+        # literal \n and an em-dash when it evaluates the literal. Taking the
+        # raw source text skips that step and ships the backslashes doubled,
+        # which shows up as the characters — on the page and, far worse,
+        # joins the rater's exported CSV on the text "\n" — one long line
+        # instead of one row per pair.
+        for node in ast.walk(ast.parse(source)):
+            if (isinstance(node, ast.Assign)
+                    and any(getattr(t, "id", None) == "RATING_PAGE" for t in node.targets)
+                    and isinstance(node.value, ast.Constant)):
+                return node.value.value
     raise ValueError(f"no RATING_PAGE template found in {NOTEBOOK.name}")
+
+
+def spell(n: int) -> str:
+    """Small numbers as words, because the form's first line is a sentence."""
+    words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+             "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
+             "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"]
+    if n < len(words):
+        return words[n]
+    if n < 30:
+        return f"Twenty-{words[n - 20].lower()}"
+    return str(n)
 
 
 def ranked_neighbours(Z, index, seeds, depth):
@@ -302,8 +326,17 @@ def main(argv=None):
         page = (template
                 .replace("__DATA__", json.dumps(mine.to_dict("records")))
                 .replace("__RATER__", rater)
-                .replace("__N__ pairs of 30-second", f"{len(mine)} pairs of 30-second")
+                .replace("__N__ pairs of 30-second",
+                         f"{spell(len(mine))} pairs of 30-second")
                 .replace("__N__", str(len(mine))))
+        # The escapes inside the form's JavaScript are the whole reason the
+        # template is parsed rather than sliced. If a doubled one ever gets
+        # through again, the rater's export comes back as one line and nobody
+        # notices until the returns are useless.
+        for broken in ("\\\\n", "\\\\u"):
+            if broken in page:
+                raise ValueError(f"{rater}: the rating form has doubled escapes "
+                                 "— rating_page_template() is not decoding them")
         (folder / "rate.html").write_text(page, encoding="utf-8")
         mb = sum(f.stat().st_size for f in (folder / "clips").glob("*.mp3")) / 1e6
         logger.info("%s: %s pairs, %.0f MB", rater, len(mine), mb)
