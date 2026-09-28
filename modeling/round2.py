@@ -207,11 +207,18 @@ def assign(pairs, n_raters, core_size, rng, seed):
         [p for p in pairs["pair_id"] if p not in core])]
     rotation = -(-len(rest) // n_raters) if rest else 0
 
+    # R1b, not R1. The form names its download after the rater, so a second
+    # round from the same six people would arrive as six files called
+    # R1_ratings.csv — and dropping those into responses/ would overwrite round
+    # one's 125 ratings. The suffix keeps the person recognisable and the file
+    # distinct, and it also keeps the two rounds separable when agreement is
+    # measured, since a rater's second sitting is not the same observation as
+    # their first.
     rows = []
     for r in range(n_raters):
         share = rest[r * rotation:(r + 1) * rotation] if rotation else []
         for pair_id in core + share:
-            rows.append({"rater": f"R{r + 1}", "pair_id": pair_id,
+            rows.append({"rater": f"R{r + 1}b", "pair_id": pair_id,
                          "in_core": pair_id in core})
     return pd.DataFrame(rows), core
 
