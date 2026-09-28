@@ -1,7 +1,7 @@
 [project]
-name = "ds-modeling-pipeline"
+name = "tastebridge"
 version = "0.1.0"
-description = "Coffee quality modeling pipeline with MLflow tracking"
+description = "User-controlled and explainable music discovery recommender"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -12,6 +12,16 @@ dependencies = [
     "statsmodels",
     "mlflow",
     "parsenvy",
+    "jupyter>=1.1.1",
+    "librosa>=0.11.0",
+    "soundfile>=0.14.0",
+    "torch>=2.14.0",
+    "transformers>=5.17.0",
+    "huggingface-hub>=1.31.0",
+    "streamlit>=1.63.0",
+    "plotly>=7.0.0",
+    "networkx>=3.6.1",
+    "pycountry>=24.6.1",
 ]
 
 [dependency-groups]
