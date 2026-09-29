@@ -72,7 +72,22 @@ def feature_set(X: pd.DataFrame, name: str = "timbre") -> pd.DataFrame:
     if name == "no_chroma":
         keep = ~families.isin(["chroma_cqt", "chroma_stft"])
     else:
-        keep = families.isin(FEATURE_SETS[name])
+        # A set naming a family this table does not have is a caller who handed
+        # us FMA's 518 columns and asked for a space that needs the extracted
+        # ones too. Selecting quietly would return mfcc alone and everything
+        # downstream would look fine — Tim found exactly that: `train_pca
+        # --feature-set heard` fitting on 140 columns while the recommender
+        # asked for 154. Use space() for those; it joins the files first.
+        wanted = FEATURE_SETS[name]
+        absent = [f for f in wanted if f not in set(families)]
+        if absent:
+            raise ValueError(
+                f"feature set {name!r} needs {', '.join(absent)}, which are not in "
+                "this table — they come from rhythm.py and separation.py. Call "
+                f"modeling.features.space({name!r}, X), which joins those files, "
+                "rather than feature_set()."
+            )
+        keep = families.isin(wanted)
 
     logger.info("Feature set %r: %s -> %s columns", name, X.shape[1], int(keep.sum()))
     return X.loc[:, keep]

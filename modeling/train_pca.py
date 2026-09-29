@@ -45,11 +45,11 @@ from modeling.features import (
     SCALERS,
     drop_families,
     drop_statistics,
-    feature_set,
     fit_pca,
     pca_tag,
     save_artifacts,
     scale_features,
+    space,
     transform,
 )
 
@@ -141,7 +141,9 @@ def run(args):
     X, tracks = load_fma(subset=args.subset)
     labels = genre_labels(tracks)
 
-    X = feature_set(X, args.feature_set)
+    # space(), not feature_set(): the shipped sets need the rhythm and drum
+    # columns we extracted ourselves, and only space() joins those files in.
+    X = space(args.feature_set, X)
     if args.drop_chroma:
         X = drop_families(X, REDUNDANT_CHROMA)
     if args.drop_shape_stats:
