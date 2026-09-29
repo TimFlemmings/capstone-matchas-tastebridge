@@ -108,8 +108,13 @@ the good direction: closer in that space, rated more alike. The old space has no
 relationship to what people hear; the new one has a strong one, and that
 ordering held as every batch of ratings arrived, at 42, 63, 84, 103, 124 and 125.
 
-That is the argument. Everything below is a check that the change did not cost
-anything, not a reason for making it.
+**That was the argument, and a second round has since not supported it.** Round
+two put fresh seeds and new listeners against both spaces, and on those pairs
+the old space correlates −0.46 and the new one −0.43 — effectively tied, with
+the raw figures actually favouring the old one. The change is therefore *not*
+validated. `heard` still ships, on the narrower ground that it is 154 columns
+and 57 dimensions instead of 518 and 144; the claim that it is better to a
+listener is withdrawn. See **[Round two](#round-two-the-change-did-not-hold)**.
 
 ### Baseline scorecard
 
@@ -485,8 +490,9 @@ away at rank 50.
 
 ### What is still open
 
-The listening test leaves two spaces standing, and the two rulers disagree about
-them:
+Round two settled `heard` against `all` — see below; it did not settle `heard`
+against `heard_wide`, which is this table and needs a forced choice rather than
+a rating to answer at all:
 
 | | `heard` (shipped) | `heard_wide` |
 |---|---:|---:|
@@ -501,9 +507,54 @@ would hear is different.
 
 `heard` ships because the ear is the ruler this project exists to serve, and
 because that ordering held five times as returns arrived, at 42 ratings, then
-63, 84, 103, 124 and 125. **But the data that chose it cannot also validate it.** A
-second round, put as a forced choice between the two on fresh seeds, is the
-honest way to settle it and has not been run.
+63, 84, 103, 124 and 125. **But the data that chose it cannot also validate it.**
+
+---
+
+## Round two: the change did not hold
+
+So we ran the second round rather than only promising it. Twelve fresh seeds,
+one from every genre — a free draw came back five Pop and no Hip-Hop, which
+would have scored badly on the luck of the draw and told us nothing. Six pairs
+per seed: two from `heard`'s top five, two from `all`'s top five, one from
+`heard` at rank 50 or 200, one drawn at random. On all twelve seeds the two
+spaces picked **no track in common**, so there was a real comparison to make.
+The threshold for calling it a failure is in
+`data/listening_test/ROUND2_PREREGISTRATION.md`, committed before a single
+rating came back. Four of six raters are in.
+
+**What replicated, more strongly than the first time.** Model picks score
+**3.45** against a random floor of **1.27**, p = 0.00004. Round one's gap was
+1.09; this is 2.18 — on tracks nobody had heard, with listeners who had not
+taken part before. The raters also agree with each other at **0.81**, against
+0.53 in round one.
+
+**What did not.** Correlating distance against the human score on round two's
+own pairs:
+
+| space | round one (which chose the space) | round two (independent) |
+|---|---:|---:|
+| all 518 | +0.05 | **−0.46** |
+| `heard`, 154 | **−0.358** | −0.43 |
+
+The ordering reverses. Two things temper that: the deep pairs were drawn only
+from `heard`'s ranking, with no `all` equivalent, which penalises `heard`
+systematically — a design error on our side — and 13 of the 72 pairs are the
+same artist twice where round one had none. The figures above already have both
+removed; on the raw pairs the gap is wider still, −0.50 against −0.33.
+
+On the pre-registered measure — `heard`'s picks against `all`'s picks on the
+same seeds — `heard` leads by 0.36 of a point at p = 0.43. **No detectable
+difference. The change is not validated**, and by the rule written down
+beforehand that means `heard` stays on parsimony alone.
+
+**And one finding neither round was designed to produce.** Looking only at the
+top-five pairs — what a user actually sees — *neither* space correlates with
+what listeners heard: −0.15 for `all`, +0.03 for `heard`. The correlation in
+every table above comes almost entirely from random pairs being far away and
+scored low. **The model separates related from unrelated. It does not rank
+among the related.** No genre metric could have shown that, and it is the
+clearest open problem the project has.
 
 ---
 
