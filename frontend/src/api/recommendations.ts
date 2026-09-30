@@ -5,6 +5,7 @@ export type Track = {
     genre: string;
     duration: string;
     coverUrl: string;
+    previewUrl?: string;
 };
 
 export type Recommendation = Track & {
