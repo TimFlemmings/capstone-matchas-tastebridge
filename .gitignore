@@ -110,6 +110,7 @@ celerybeat.pid
 .venv
 node_modules/
 *.tsbuildinfo
+frontend/.env.effnet
 env/
 venv/
 ENV/

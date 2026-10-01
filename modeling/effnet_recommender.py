@@ -50,7 +50,8 @@ class EffNetRecommender:
         self.embedding_ = pd.DataFrame(embeddings, index=self.track_ids_)
         self.index_ = NearestNeighbors(metric=self.metric).fit(embeddings)
         self.tracks_ = tracks
-        logger.info("Indexed %s tracks in %s dimensions", embeddings.shape[0], embeddings.shape[1])
+        logger.info("Indexed %s tracks in %s dimensions",
+                    embeddings.shape[0], embeddings.shape[1])
         return self
 
     @classmethod
@@ -84,7 +85,7 @@ class EffNetRecommender:
         return out
 
     def similar_to(self, track_id, n: int = DEFAULT_N, adventure: float = 0.0,
-                    max_depth: int = MAX_DEPTH) -> pd.DataFrame:
+                   max_depth: int = MAX_DEPTH) -> pd.DataFrame:
         """n tracks near `track_id`, read from a window of the ranked neighbour list.
 
         Same `depth_for()` dial as TrackRecommender — a window into the
@@ -105,6 +106,26 @@ class EffNetRecommender:
             self.track_ids_[idx[window]],
             distances[window],
             np.arange(start + 1, start + n + 1),
+        )
+
+    def similar_to_rank_window(self, track_id, n: int = DEFAULT_N,
+                               start_rank: int = 1) -> pd.DataFrame:
+        """Return a window of neighbours beginning at a 1-based rank."""
+        if n < 1 or start_rank < 1:
+            raise ValueError("n and start_rank must be positive")
+
+        row = self._position(track_id)
+        stop_rank = start_rank + n - 1
+        distances, idx = self.index_.kneighbors(
+            self.embedding_.iloc[[row]], n_neighbors=stop_rank + 1
+        )
+        distances, idx = distances[0][1:], idx[0][1:]
+        offset = start_rank - 1
+        window = slice(offset, offset + n)
+        return self._with_metadata(
+            self.track_ids_[idx[window]],
+            distances[window],
+            np.arange(start_rank, start_rank + len(idx[window])),
         )
 
     def taste_profile(self, track_ids) -> np.ndarray:

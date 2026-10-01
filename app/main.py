@@ -86,7 +86,7 @@ def _track_payload(request: Request, track_id) -> dict:
         "genre": row[("track", "genre_top")] or "Unknown",
         "duration": _duration_str(row[("track", "duration")]),
         "coverUrl": _cover_url(track_id),
-        "previewUrl": _preview_url(request, track_id),
+        "audioUrl": _preview_url(request, track_id),
     }
 
 

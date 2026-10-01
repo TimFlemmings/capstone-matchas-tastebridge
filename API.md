@@ -47,7 +47,7 @@ curl "http://localhost:8000/tracks?query=food"
       "genre": "Hip-Hop",
       "duration": "2:48",
       "coverUrl": "https://picsum.photos/seed/tastebridge-2/400/400",
-      "previewUrl": "http://localhost:8000/audio/2"
+      "audioUrl": "http://localhost:8000/audio/2"
     }
   ]
 }
@@ -71,7 +71,7 @@ curl -X POST http://localhost:8000/recommendations \
       "genre": "Electronic",
       "duration": "1:21",
       "coverUrl": "https://picsum.photos/seed/tastebridge-13668/400/400",
-      "previewUrl": "http://localhost:8000/audio/13668",
+      "audioUrl": "http://localhost:8000/audio/13668",
       "rank": 1,
       "distance": 0.282
     }
@@ -102,9 +102,9 @@ curl -H "Range: bytes=0-1023" http://localhost:8000/audio/2 -D - -o /dev/null
 # content-range: bytes 0-1023/960738
 ```
 
-Every `Track`/`Recommendation` the API returns includes a `previewUrl`
+Every `Track`/`Recommendation` the API returns includes a `audioUrl`
 pointing here — the frontend's play buttons (`frontend/src/App.tsx`) are wired
-to it via a real `<audio>` element. In preview mode there's no `previewUrl`
+to it via a real `<audio>` element. In preview mode there's no `audioUrl`
 (the sample catalogue has no backing audio), so the play buttons are disabled
 rather than lying about playing something.
 
