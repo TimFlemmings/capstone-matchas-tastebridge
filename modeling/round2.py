@@ -191,7 +191,7 @@ def write_clips(pairs, clips_dir):
     return len(pairs) * 2, total
 
 
-def assign(pairs, n_raters, core_size, rng, seed):
+def assign(pairs, n_raters, core_size, rng, seed, suffix="b"):
     """Everyone hears a shared core; the rest is split so nothing goes unheard.
 
     The core is what lets the raters be measured against each other at all —
@@ -218,7 +218,7 @@ def assign(pairs, n_raters, core_size, rng, seed):
     for r in range(n_raters):
         share = rest[r * rotation:(r + 1) * rotation] if rotation else []
         for pair_id in core + share:
-            rows.append({"rater": f"R{r + 1}b", "pair_id": pair_id,
+            rows.append({"rater": f"R{r + 1}{suffix}", "pair_id": pair_id,
                          "in_core": pair_id in core})
     return pd.DataFrame(rows), core
 

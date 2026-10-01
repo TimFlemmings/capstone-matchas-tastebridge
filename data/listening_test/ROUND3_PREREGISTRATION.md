@@ -46,6 +46,11 @@ a shared core every rater hears for agreement. Raters are `R1c`…`R6c` so their
 files cannot overwrite earlier rounds. **Amin's own ratings are a pilot and are
 never counted** — he is the author.
 
+**Addendum, 2026-10-01, still before any rating.** The first draw gave one
+artist (Blue Dot Sessions) two of the twelve seeds. Seeds are now drawn with at
+most one per artist and the pairs regenerated. No clip from the first draw was
+sent to anyone. The threshold below is unchanged.
+
 ## The threshold
 
 Primary measure: each pair's score is the mean over the raters who heard it;
