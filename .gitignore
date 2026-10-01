@@ -157,6 +157,10 @@ fma_metadata/
 !data/listening_test/assignments.csv
 !data/listening_test/manifest.csv
 !data/listening_test/pairs_key.csv
+# Later rounds' keys and the thresholds written before their returns. A
+# pre-registration that git never saw proves nothing about when it was written.
+!data/listening_test/pairs_key_r*.csv
+!data/listening_test/ROUND*_PREREGISTRATION.md
 # Rebuildable from the six above with `modeling.listening --csv`, but tracked
 # anyway: it is the one file someone opens to see what the test actually found,
 # and asking them to run something first is a good way to have nobody look.
