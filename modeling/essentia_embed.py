@@ -21,6 +21,7 @@ without a separate license from UPF.
 
 import argparse
 import logging
+import os
 from pathlib import Path
 
 import numpy as np
@@ -81,9 +82,12 @@ def embed_file(path) -> np.ndarray | None:
 
 
 def _save_checkpoint(path: Path, ids: list, embeds: list):
+    """Write to a temp file, then rename over `path` -- a crash mid-write leaves the old checkpoint intact."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(path, ids=np.array(ids, dtype=np.int64),
+    tmp = path.with_name(path.stem + ".tmp.npz")
+    np.savez(tmp, ids=np.array(ids, dtype=np.int64),
               embeddings=np.vstack(embeds) if embeds else np.empty((0, 1280), dtype=np.float32))
+    os.replace(tmp, path)
 
 
 def embed_catalogue(track_ids, log_every: int = 50, checkpoint_path: Path = None, checkpoint_every: int = 250,
@@ -113,12 +117,18 @@ def embed_catalogue(track_ids, log_every: int = 50, checkpoint_path: Path = None
 
 
 def _main():
+    global AUDIO_DIR
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--track-list", type=Path, required=True,
                          help="csv with an index column of FMA track ids")
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "data" / "effnet_embeddings.npz")
     parser.add_argument("--limit", type=int, help="only the first N tracks")
+    parser.add_argument("--audio-dir", type=Path, default=AUDIO_DIR,
+                         help="FMA audio root, e.g. data/fma_medium (default: data/fma_small)")
+    parser.add_argument("--shard", type=str,
+                         help="i/n: only every n-th track starting at i, so n processes can split one list; "
+                              "give each its own --out")
     parser.add_argument("--checkpoint-every", type=int, default=250,
                          help="write partial progress to --out this often, in tracks")
     parser.add_argument("--no-resume", action="store_true",
@@ -126,8 +136,12 @@ def _main():
     args = parser.parse_args()
 
     track_ids = pd.read_csv(args.track_list, index_col=0).index.tolist()
+    if args.shard:
+        i, n = (int(x) for x in args.shard.split("/"))
+        track_ids = track_ids[i::n]
     if args.limit:
         track_ids = track_ids[: args.limit]
+    AUDIO_DIR = args.audio_dir
 
     resume_ids, resume_embeds = [], []
     if args.out.exists() and not args.no_resume:
@@ -148,8 +162,7 @@ def _main():
     if failed:
         logger.warning("%s tracks failed to embed", failed)
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(args.out, ids=ids, embeddings=embeds)
+    _save_checkpoint(args.out, list(ids), list(embeds))
     logger.info("Wrote %s tracks x %s dims to %s", embeds.shape[0], embeds.shape[1], args.out)
 
 

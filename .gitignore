@@ -138,6 +138,8 @@ dmypy.json
 
 data/*.csv
 data/*.npz
+data/embeddings_partial/
+data/web_audio/
 models/*.sav
 mlruns
 models/*
