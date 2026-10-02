@@ -11,7 +11,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sklearn.decomposition import PCA
 
+from modeling.connecting_factors import ConnectingFactors
 from modeling.effnet_recommender import EffNetRecommender
+from modeling.tiers import build_connecting_factors, explore_tiers, tier_for_adventure
 
 
 REPO_ROOT = Path(__file__).resolve().parent
@@ -30,11 +32,7 @@ API_PUBLIC_BASE = os.environ.get(
     "API_PUBLIC_BASE", "http://localhost:8001").rstrip("/")
 MAX_SEARCH_RESULTS = 25
 
-# Rank bands measured and documented for Tim's Familiar / Bridge / Adventurous tiers.
-TIER_RANKS = ((1, 15), (30, 150), (500, 2000))
-
-
-def load_effnet_catalogue() -> tuple[pd.DataFrame, EffNetRecommender, pd.DataFrame]:
+def load_effnet_catalogue() -> tuple[pd.DataFrame, EffNetRecommender, ConnectingFactors, pd.DataFrame]:
     tracks_path = FMA_METADATA_DIR / "tracks.csv"
     missing = [str(path) for path in (tracks_path, FMA_AUDIO_DIR,
                                       EMBEDDINGS_PATH) if not path.exists()]
@@ -57,12 +55,15 @@ def load_effnet_catalogue() -> tuple[pd.DataFrame, EffNetRecommender, pd.DataFra
     map_points = pd.DataFrame(
         map_coordinates, index=indexed_ids, columns=["x", "y"]
     )
-    return tracks, recommender, map_points
+    connecting_factors = build_connecting_factors(
+        recommender, tracks, genres_csv=FMA_METADATA_DIR / "genres.csv")
+    return tracks, recommender, connecting_factors, map_points
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.tracks, app.state.recommender, app.state.map_points = load_effnet_catalogue()
+    (app.state.tracks, app.state.recommender, app.state.connecting_factors,
+     app.state.map_points) = load_effnet_catalogue()
     yield
 
 
@@ -164,33 +165,33 @@ def get_audio(track_id: str, request: Request):
     return FileResponse(path, media_type="audio/mpeg", filename=path.name)
 
 
-def tier_start(adventure: float, limit: int) -> int:
-    tier_index = min(int(adventure * 3), 2)
-    local_progress = adventure * 3 - tier_index
-    low_rank, high_rank = TIER_RANKS[tier_index]
-    latest_start = max(low_rank, high_rank - limit + 1)
-    return int(round(low_rank + local_progress * (latest_start - low_rank)))
-
-
 @app.post("/recommendations")
 def recommendations(payload: RecommendationRequest, request: Request):
     recommender: EffNetRecommender = request.app.state.recommender
     tracks: pd.DataFrame = request.app.state.tracks
     try:
         seed_id = int(payload.track_id)
-        start_rank = tier_start(payload.adventure, payload.limit)
-        neighbors = recommender.similar_to_rank_window(
-            seed_id, n=payload.limit, start_rank=start_rank
-        )
+        seed_artist = tracks.loc[seed_id, ("artist", "name")]
     except (ValueError, KeyError):
         raise HTTPException(
             status_code=404, detail="Seed track not found") from None
 
+    # Tim's tuned Familiar / Bridge / Adventurous tiers (notebook 09, round 3):
+    # the slider picks a tier, the tier applies its rank band, connection
+    # gate, genre-diversity caps, decade filter and country preference.
+    tier = tier_for_adventure(payload.adventure)
+    picks = explore_tiers(
+        recommender, request.app.state.connecting_factors, tracks,
+        seed_id=seed_id, seed_artist=seed_artist, n=payload.limit, only=tier,
+    )[tier]
+
     output = []
-    for track_id, neighbor in neighbors.iterrows():
+    for track_id, distance, rank, factors in picks:
         track_id = int(track_id)
         item = track_payload(track_id, tracks.loc[track_id])
-        item["rank"] = int(neighbor["rank"])
-        item["distance"] = float(neighbor["distance"])
+        item["rank"] = int(rank)
+        item["distance"] = float(distance)
+        item["tier"] = tier
+        item["connectingFactors"] = list(factors)
         output.append(item)
     return {"recommendations": output}

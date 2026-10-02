@@ -28,7 +28,7 @@ from modeling.connecting_factors import ConnectingFactors
 from modeling.data import load_tracks
 from modeling.effnet_recommender import EffNetRecommender
 from modeling.rhythm import audio_path
-from modeling.tiers import DEFAULT_BANDS, explore_tiers, tier_for_adventure
+from modeling.tiers import DEFAULT_BANDS, build_connecting_factors, explore_tiers, tier_for_adventure
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EMBEDDINGS_PATH = REPO_ROOT / "data" / "effnet_embeddings_full.npz"
@@ -53,7 +53,7 @@ def load_model() -> None:
     global _tracks, _rec, _cf
     _tracks = load_tracks("small")
     _rec = EffNetRecommender.from_npz(EMBEDDINGS_PATH, _tracks)
-    _cf = ConnectingFactors.build(_rec.tracks_)
+    _cf = build_connecting_factors(_rec, _rec.tracks_)
 
 
 class RecommendRequest(BaseModel):
