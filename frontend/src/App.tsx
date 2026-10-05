@@ -127,9 +127,12 @@ function App() {
         if (isPreview) return;
 
         let active = true;
-        searchTracks("")
-            .then((found) => {
+        // the catalogue's first page, plus the default starting track (it isn't on that page)
+        Promise.all([searchTracks(""), searchTracks(DEFAULT_SEED.title).catch(() => [] as Track[])])
+            .then(([catalogue, matches]) => {
                 if (!active) return;
+                const defaultSeed = matches.find((track) => track.id === DEFAULT_SEED.id);
+                const found = defaultSeed ? [defaultSeed, ...catalogue.filter((track) => track.id !== defaultSeed.id)] : catalogue;
                 const { nodes, currentKey } = store.getState().journey;
                 const resumed = nodes.find((node) => node.key === currentKey);
                 const journeyTracks = nodes.map((node) => node.track)
@@ -469,6 +472,9 @@ function App() {
         </div>
     );
 }
+
+/** Where a first visit starts. Visitors with a saved journey resume their own seed. */
+const DEFAULT_SEED = { id: "13668", title: "No Time For Lookin' Back" };  // by This One
 
 function tierFor(adventure: number): Tier {
     // mirrors the server's tier_for_adventure
