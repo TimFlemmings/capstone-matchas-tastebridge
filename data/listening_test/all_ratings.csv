@@ -41,6 +41,23 @@ R2,P74,model,4.0,False,4,timbre harmony,68893,Broke For Free,Sidewalk Chalk,Elec
 R2,P75,deep,50.0,True,5,timbre rhythm harmony,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
 R2,P76,model,1.0,True,3,harmony energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
 R2,P77,deep,50.0,False,4,timbre harmony,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,85599,Garmisch,Native Son,Pop,85599,140,False
+R2b,Q01,all_top,3.0,False,4,mood rhythm,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,12065,Big Blood,So Old Again,Folk,12065,1193,True
+R2b,Q10,all_top,4.0,True,3,mood energy,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,142516,Jacket Thor,1990,Folk,1193,142516,True
+R2b,Q14,heard_top,4.0,True,5,harmony mood,64919,The Units,Digital Stimulation,Rock,11933,Isolated Atoms,Tell Me What I Want,Rock,11933,64919,True
+R2b,Q20,heard_top,1.0,False,2,nothing,64919,The Units,Digital Stimulation,Rock,123440,The Dread,Staring At The Sun,Hip-Hop,123440,64919,False
+R2b,Q28,heard_top,2.0,False,1,nothing,128760,Synapsis,AT1,Electronic,57938,R.Tists for Christmas,12 Days of Christmas,Experimental,128760,57938,False
+R2b,Q32,all_top,3.0,False,4,rhythm,19418,Orquestra Popular De Paio Pires,PAIO PIRES-CACILHAS (Directo),Pop,85840,Frame,The Last One (Old Times),Electronic,19418,85840,False
+R2b,Q38,all_top,1.0,False,4,instrumentation,64919,The Units,Digital Stimulation,Rock,121595,Phatte Harry,'85s,Electronic,64919,121595,False
+R2b,Q41,all_top,3.0,False,5,mood energy harmony,64919,The Units,Digital Stimulation,Rock,130683,The Zombie Dandies,The Friendly Monster Shop,Rock,130683,64919,True
+R2b,Q45,heard_top,4.0,True,5,mood rhythm instrumentation,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,107588,Kelly Latimore,Ode to Diving Pelicans (Reprise),Folk,1193,107588,True
+R2b,Q48,random,1521.0,False,1,nothing,72288,Squarehead,Hammertime,Rock,40161,Gwilly Edmondez,Tarantella Tomatoes,Experimental,72288,40161,False
+R2b,Q51,all_top,5.0,False,5,instrumentation mood rhythm energy,115474,Blue Dot Sessions,Farsical - Thematic,Instrumental,126408,Blue Dot Sessions,A Simple Shroud,Instrumental,126408,115474,True
+R2b,Q53,all_top,3.0,True,1,nothing,128760,Synapsis,AT1,Electronic,108487,Sun Sunych,About myself (outro),Hip-Hop,108487,128760,False
+R2b,Q54,all_top,4.0,False,1,nothing,56471,Alash Ensemble,Karachal,International,27798,spinningmerkaba,Inspire Me Forever (Secret Anomaly Jonez Mix),Electronic,27798,56471,False
+R2b,Q59,all_top,2.0,False,4,energy,34258,Bebe Fang,Work,Experimental,116514,SULCUS,R.A.H.M.A.V.N. [221],Experimental,34258,116514,True
+R2b,Q64,all_top,3.0,False,2,nothing,112066,Still Pluto,Lullaby,Rock,98617,KINGS OF THE CITY,Mad Men,Hip-Hop,112066,98617,False
+R2b,Q67,heard_deep,1.0,True,5,instrumentation production energy mood rhythm,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126218,Blue Dot Sessions,La Focsa,Instrumental,126290,126218,True
+R2b,Q68,random,2686.0,True,1,nothing,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,63936,Snail Bob,Angry People,Experimental,126290,63936,False
 R3,P04,model,2.0,False,2,instrumentation,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,115850,Dead Peoples Records,11am,Experimental,115850,123978,False
 R3,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
 R3,P11,model,5.0,False,5,mood,17608,Alash Ensemble,Bai-Taiga,International,68841,Howie Mitchell,Old Molly Hare,Folk,68841,17608,False
@@ -62,6 +79,23 @@ R3,P72,model,2.0,True,3,instrumentation,68893,Broke For Free,Sidewalk Chalk,Elec
 R3,P75,deep,50.0,True,5,rhythm energy,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
 R3,P76,model,1.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
 R3,P78,deep,200.0,False,2,rhythm,43883,Myo,crickets,Experimental,122088,Jahzzar,What?,Rock,43883,122088,False
+R3b,Q02,heard_deep,2.0,False,1,nothing,56471,Alash Ensemble,Karachal,International,141617,Barbarix,The Secret Garden,Electronic,56471,141617,False
+R3b,Q03,heard_top,3.0,False,3,rhythm mood energy,129391,A la Mode,Mountaintop,Pop,145241,Vukovar,THE THREE SHADES,Rock,129391,145241,False
+R3b,Q07,heard_deep,1.0,False,1,nothing,108493,Sun Sunych ft. DanBrown,Ladder (ft. DanBrown),Hip-Hop,142566,GOYMAMBA,Criminal,International,142566,108493,False
+R3b,Q10,all_top,4.0,True,4,mood rhythm energy instrumentation harmony,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,142516,Jacket Thor,1990,Folk,1193,142516,True
+R3b,Q14,heard_top,4.0,True,2,instrumentation rhythm harmony,64919,The Units,Digital Stimulation,Rock,11933,Isolated Atoms,Tell Me What I Want,Rock,11933,64919,True
+R3b,Q15,heard_deep,1.0,False,1,nothing,72288,Squarehead,Hammertime,Rock,6390,Kavala Brass Band,track 5,International,72288,6390,False
+R3b,Q22,heard_top,1.0,False,3,energy instrumentation rhythm mood,115474,Blue Dot Sessions,Farsical - Thematic,Instrumental,126717,Blue Dot Sessions,Nuthatch,Instrumental,126717,115474,True
+R3b,Q26,all_top,3.0,False,4,mood energy instrumentation,115474,Blue Dot Sessions,Farsical - Thematic,Instrumental,115472,Blue Dot Sessions,Farsical - Slow Driver,Instrumental,115474,115472,True
+R3b,Q29,random,1630.0,False,3,energy mood,56471,Alash Ensemble,Karachal,International,42442,univeria zekt,A2 Altcheringa,Rock,42442,56471,False
+R3b,Q45,heard_top,4.0,True,4,production rhythm mood energy instrumentation,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,107588,Kelly Latimore,Ode to Diving Pelicans (Reprise),Folk,1193,107588,True
+R3b,Q49,heard_deep,1.0,False,2,nothing,112066,Still Pluto,Lullaby,Rock,124755,Gritt,The Void,Electronic,124755,112066,False
+R3b,Q50,heard_top,5.0,False,4,mood rhythm energy instrumentation harmony,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,116869,Blue Dot Sessions,Ray Gun - Lull,Instrumental,126290,116869,True
+R3b,Q53,all_top,3.0,True,1,nothing,128760,Synapsis,AT1,Electronic,108487,Sun Sunych,About myself (outro),Hip-Hop,108487,128760,False
+R3b,Q61,all_top,3.0,False,4,mood rhythm timbre energy harmony,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126276,Blue Dot Sessions,Lights Out,Instrumental,126276,126290,True
+R3b,Q66,all_top,5.0,False,4,energy rhythm harmony timbre,129391,A la Mode,Mountaintop,Pop,111396,Fierbinteanu,The Cop,Pop,111396,129391,True
+R3b,Q67,heard_deep,1.0,True,3,rhythm energy mood timbre,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126218,Blue Dot Sessions,La Focsa,Instrumental,126290,126218,True
+R3b,Q68,random,2686.0,True,1,nothing,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,63936,Snail Bob,Angry People,Experimental,126290,63936,False
 R4,P06,model,4.0,False,3,energy mood,43883,Myo,crickets,Experimental,38905,File Under Toner,si los curas,Experimental,38905,43883,True
 R4,P08,deep,50.0,True,3,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
 R4,P10,model,3.0,False,4,mood energy vocals production harmony,59876,Boy Friend,Lovedropper,Rock,36959,Garmisch,Facing the Sea (Album Version),Pop,36959,59876,False
@@ -83,6 +117,23 @@ R4,P72,model,2.0,True,1,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,7
 R4,P75,deep,50.0,True,4,mood energy instrumentation production harmony rhythm,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
 R4,P76,model,1.0,True,2,mood energy,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
 R4,P79,model,5.0,False,1,nothing,59876,Boy Friend,Lovedropper,Rock,44950,SONGO 21,Amor Y Felicidad,International,44950,59876,False
+R4b,Q09,random,3891.0,False,1,nothing,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,89376,Stanislav Bobrytskyy,Logic PIano,Experimental,89376,1193,False
+R4b,Q10,all_top,4.0,True,4,rhythm timbre mood energy production vocals,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,142516,Jacket Thor,1990,Folk,1193,142516,True
+R4b,Q11,all_top,3.0,False,5,rhythm timbre mood instrumentation energy production harmony vocals,56471,Alash Ensemble,Karachal,International,56468,Alash Ensemble,Buura,International,56471,56468,True
+R4b,Q14,heard_top,4.0,True,4,rhythm mood energy instrumentation,64919,The Units,Digital Stimulation,Rock,11933,Isolated Atoms,Tell Me What I Want,Rock,11933,64919,True
+R4b,Q25,all_top,3.0,False,1,nothing,129391,A la Mode,Mountaintop,Pop,1686,The Sounds of Taraab,Rufiji,International,129391,1686,False
+R4b,Q27,heard_deep,1.0,False,4,rhythm production,128760,Synapsis,AT1,Electronic,10435,Funky Terrorist,Paku Paku,Experimental,128760,10435,False
+R4b,Q30,random,7007.0,False,1,,128760,Synapsis,AT1,Electronic,137211,Punk Rock Opera,What Now?,Rock,128760,137211,False
+R4b,Q36,heard_deep,1.0,False,3,vocals production,129391,A la Mode,Mountaintop,Pop,53586,Big Blood,Run,Folk,53586,129391,False
+R4b,Q42,heard_top,5.0,False,2,mood,128760,Synapsis,AT1,Electronic,38967,Talulah Lotus,Spooky,Experimental,128760,38967,False
+R4b,Q45,heard_top,4.0,True,4,rhythm instrumentation mood energy,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,107588,Kelly Latimore,Ode to Diving Pelicans (Reprise),Folk,1193,107588,True
+R4b,Q53,all_top,3.0,True,2,energy,128760,Synapsis,AT1,Electronic,108487,Sun Sunych,About myself (outro),Hip-Hop,108487,128760,False
+R4b,Q56,heard_deep,2.0,False,3,rhythm mood energy,34258,Bebe Fang,Work,Experimental,122166,"Binary Slim, John Juan & Jaan Patterson",Grimaces and other useful techniques,Experimental,122166,34258,True
+R4b,Q57,random,3657.0,False,1,nothing,34258,Bebe Fang,Work,Experimental,84485,BLEO,A_Merican_Skweeez feat. STARPAUSE,Electronic,34258,84485,False
+R4b,Q58,heard_top,2.0,False,5,rhythm timbre vocals mood energy instrumentation production,108493,Sun Sunych ft. DanBrown,Ladder (ft. DanBrown),Hip-Hop,108492,Sun Sunych,43-13,Hip-Hop,108493,108492,True
+R4b,Q67,heard_deep,1.0,True,4,rhythm mood energy,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126218,Blue Dot Sessions,La Focsa,Instrumental,126290,126218,True
+R4b,Q68,random,2686.0,True,2,energy,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,63936,Snail Bob,Angry People,Experimental,126290,63936,False
+R4b,Q71,heard_top,1.0,False,4,rhythm mood energy instrumentation production timbre,108493,Sun Sunych ft. DanBrown,Ladder (ft. DanBrown),Hip-Hop,22094,Gates,I Remember When,Hip-Hop,108493,22094,True
 R5,P05,model,4.0,False,5,timbre instrumentation harmony energy,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,44821,Black Bear Combo,Otrov,International,44821,42234,True
 R5,P08,deep,50.0,True,1,nothing,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False
 R5,P19,random,,False,1,nothing,43883,Myo,crickets,Experimental,131941,Choban Elektrik,Unknown Cocek Tune,International,43883,131941,False
@@ -104,6 +155,23 @@ R5,P71,random,,True,1,vocals,59876,Boy Friend,Lovedropper,Rock,113265,Mc Norman,
 R5,P72,model,2.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,72071,Decktonic,Spectrum,Electronic,72071,68893,True
 R5,P75,deep,50.0,True,4,energy mood instrumentation rhythm production vocals,149701,Sro,Answering M,Electronic,113035,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,149701,113035,False
 R5,P76,model,1.0,True,1,nothing,68893,Broke For Free,Sidewalk Chalk,Electronic,133028,SPCZ,Eternal Glide,Electronic,68893,133028,True
+R5b,Q10,all_top,4.0,True,5,rhythm mood instrumentation energy production harmony vocals timbre,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,142516,Jacket Thor,1990,Folk,1193,142516,True
+R5b,Q13,random,15.0,False,1,nothing,19418,Orquestra Popular De Paio Pires,PAIO PIRES-CACILHAS (Directo),Pop,210,Ed Askew,In the French Court,Folk,19418,210,False
+R5b,Q14,heard_top,4.0,True,4,rhythm timbre energy production harmony,64919,The Units,Digital Stimulation,Rock,11933,Isolated Atoms,Tell Me What I Want,Rock,11933,64919,True
+R5b,Q18,all_top,5.0,False,2,harmony,72288,Squarehead,Hammertime,Rock,6332,Raya Brass Band,Taso's Hasapiko,International,6332,72288,False
+R5b,Q23,random,2163.0,False,1,nothing,112066,Still Pluto,Lullaby,Rock,54152,Mark Neil,04 Lone,Instrumental,112066,54152,False
+R5b,Q35,heard_deep,1.0,False,1,nothing,64919,The Units,Digital Stimulation,Rock,137417,Monkey Mind,In the Morning,Rock,64919,137417,True
+R5b,Q37,all_top,2.0,False,3,harmony rhythm,112066,Still Pluto,Lullaby,Rock,98619,KINGS OF THE CITY,Mad Men,Hip-Hop,112066,98619,False
+R5b,Q40,heard_deep,2.0,False,2,energy mood harmony,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,86259,Mystified,Bending The Spoon,Experimental,1193,86259,False
+R5b,Q45,heard_top,4.0,True,5,rhythm mood energy timbre instrumentation harmony production,1193,Mount Eerie,Wooly Mammoth's Absence,Folk,107588,Kelly Latimore,Ode to Diving Pelicans (Reprise),Folk,1193,107588,True
+R5b,Q46,all_top,3.0,False,5,rhythm mood instrumentation harmony production timbre energy,72288,Squarehead,Hammertime,Rock,104086,Carsick Cars,The Best VPN So Far,Rock,72288,104086,True
+R5b,Q52,heard_top,1.0,False,5,vocals harmony production energy instrumentation timbre mood rhythm,129391,A la Mode,Mountaintop,Pop,52950,Marissa Nadler,All Love Must Die,Folk,52950,129391,False
+R5b,Q53,all_top,3.0,True,2,mood timbre,128760,Synapsis,AT1,Electronic,108487,Sun Sunych,About myself (outro),Hip-Hop,108487,128760,False
+R5b,Q67,heard_deep,1.0,True,4,rhythm mood instrumentation energy timbre production harmony,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126218,Blue Dot Sessions,La Focsa,Instrumental,126290,126218,True
+R5b,Q68,random,2686.0,True,1,nothing,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,63936,Snail Bob,Angry People,Experimental,126290,63936,False
+R5b,Q69,all_top,4.0,False,5,rhythm mood energy instrumentation timbre harmony production,34258,Bebe Fang,Work,Experimental,133580,David Szesztay,Wake Up,Instrumental,34258,133580,False
+R5b,Q70,all_top,4.0,False,5,rhythm mood instrumentation energy harmony production timbre,126290,Blue Dot Sessions,Thread Ceylon,Instrumental,126231,Blue Dot Sessions,Silky,Instrumental,126290,126231,True
+R5b,Q72,heard_top,5.0,False,1,,112066,Still Pluto,Lullaby,Rock,61670,Gosprom,Japan Punk,Pop,61670,112066,False
 R6,P01,model,1.0,False,2,harmony,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,1069,Lucky Dragons,Un Lagrima en la Discoteca,Experimental,123978,1069,False
 R6,P03,model,3.0,False,2,harmony,68893,Broke For Free,Sidewalk Chalk,Electronic,131796,Pranavibes,Tempête,Instrumental,68893,131796,False
 R6,P08,deep,50.0,True,2,mood energy,43883,Myo,crickets,Experimental,112734,Is,Summoning,Rock,43883,112734,False

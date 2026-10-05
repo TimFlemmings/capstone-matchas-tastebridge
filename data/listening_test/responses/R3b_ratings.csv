@@ -1,0 +1,18 @@
+rater,pair_id,similarity_1_5,connects
+R3b,Q02,1,nothing
+R3b,Q03,3,rhythm mood energy
+R3b,Q07,1,nothing
+R3b,Q10,4,mood rhythm energy instrumentation harmony
+R3b,Q14,2,instrumentation rhythm harmony
+R3b,Q15,1,nothing
+R3b,Q22,3,energy instrumentation rhythm mood
+R3b,Q26,4,mood energy instrumentation
+R3b,Q29,3,energy mood
+R3b,Q45,4,production rhythm mood energy instrumentation
+R3b,Q49,2,nothing
+R3b,Q50,4,mood rhythm energy instrumentation harmony
+R3b,Q53,1,nothing
+R3b,Q61,4,mood rhythm timbre energy harmony
+R3b,Q66,4,energy rhythm harmony timbre
+R3b,Q67,3,rhythm energy mood timbre
+R3b,Q68,1,nothing
