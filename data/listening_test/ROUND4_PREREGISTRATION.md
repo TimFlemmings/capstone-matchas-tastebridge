@@ -80,3 +80,11 @@ not beat random, "not shown to be related".
 
 Whatever comes back, including a null. A tier that does not beat random is a
 finding about the tiers, not a reason to rerun the round until it does.
+
+**Addendum, 2026-10-05, before any pair was built or rated.** The first draw
+picked track 80391 (Instrumental), which the live app does not serve — it holds
+24,757 of fma_medium's 25,000 tracks and answers 404. It was removed and the
+draw repeated (`modeling.round4 draw --not-in-app 80391`); the other five seeds
+came out unchanged and 78100 replaced it. The app also ignores `limit` and
+always returns 15; "the first five" is read off those 15. Questions and
+thresholds are unchanged.
