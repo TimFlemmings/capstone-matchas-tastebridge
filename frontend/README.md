@@ -13,7 +13,7 @@ npm run dev
 
 For complete setup instructions, including the required local embedding and FMA files, see [`TIM_SETUP.md`](../TIM_SETUP.md).
 
-The separate EffNet backend uses `data/effnet_embeddings_full.npz` plus local FMA data. Set `FMA_DATA_DIR` and `EFFNET_EMBEDDINGS_PATH` for your machine, then start it from the repository root:
+The separate EffNet backend serves the 25k fma_medium catalogue from `data/effnet_embeddings_medium.npz` (recommendations) and `data/clap_embeddings_medium.npz` (text search) plus local FMA data. Set `FMA_DATA_DIR` for your machine (and `EFFNET_EMBEDDINGS_PATH` / `CLAP_EMBEDDINGS_PATH` if the files live elsewhere), then start it from the repository root:
 
 ```bash
 uv run uvicorn app_effnet:app --host 0.0.0.0 --port 8001
@@ -37,7 +37,7 @@ By default, the API looks for a sibling `capstone-matchas/data` directory and it
 
 ## API contract
 
-The adapter expects `GET /tracks?query=<text>` to return `{ "tracks": Track[] }`, and `POST /recommendations` to accept `{ "track_id": string, "adventure": number, "limit": number }` and return `{ "recommendations": Recommendation[] }`.
+The adapter expects `GET /tracks?query=<text>` to return `{ "tracks": Track[] }`, and `POST /recommendations` to accept `{ "track_id": string, "adventure": number }` and return `{ "recommendations": Recommendation[] }`. The server decides how many picks to return (15); the request carries no count.
 
 Track fields are `id`, `title`, `artist`, `genre`, `duration`, `coverUrl`, and an optional `previewUrl`. Recommendation fields add `rank` and `distance`. The UI forwards the adventure value and renders the returned ordering; it does not implement model ranking.
 

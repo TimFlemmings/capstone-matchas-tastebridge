@@ -5,19 +5,24 @@ recommender from notebooks 08/09. It implements exactly the contract
 `frontend/README.md` already specified — nothing on the frontend needed to
 change.
 
-Code: [`app/main.py`](app/main.py). Tier logic: [`modeling/tiers.py`](modeling/tiers.py)
+Code: [`api/main.py`](api/main.py). Tier logic: [`modeling/tiers.py`](modeling/tiers.py)
 (the `explore_tiers` function from notebook 09, extracted so both the API and
 the notebook use the same implementation instead of two copies drifting apart).
 
 ## Run it
 
 ```bash
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn api.main:app --reload --port 8000
 ```
 
-Needs `data/effnet_embeddings_full.npz` (the full-catalogue Discogs-EffNet
-embeddings from notebook 08) and the FMA metadata to already be in place —
-same data either of you already has for 08/09. **No Essentia import anywhere
+(The folder was `app/` until the root-level `app.py` — the PCA app — started
+shadowing it: `app.main` resolved to that file, so the old command stopped
+working.)
+
+Serves the fma_medium catalogue (`modeling/catalogue.py`, 24,896 tracks after
+removing re-uploads and silent files). Needs `data/effnet_embeddings_medium.npz`
+(Discogs-EffNet, recommendations), `data/clap_embeddings_medium.npz` (CLAP,
+text search) and the FMA metadata — see `TIM_SETUP.md` for where to get them. **No Essentia import anywhere
 in this path** — it runs in the main environment, not `.venv-essentia`. See
 `ESSENTIA_SETUP.md` if either of those data files are missing.
 
@@ -30,8 +35,16 @@ VITE_RECOMMENDER_API_URL=http://localhost:8000
 
 ## `GET /tracks?query=<text>`
 
-Case-insensitive substring match against title, artist, and genre. Returns up
-to 25 results; an empty query returns the first 25 catalogue tracks.
+Up to 25 results, each with a `matchedBy` field
+(`modeling.text_search.search_catalogue`):
+
+1. `"genre"` — the query is exactly a genre name ("jazz"): that genre's
+   tracks, ordered by how well they fit "<genre> music" according to CLAP.
+2. `"name"` — title or artist contains the query (case-insensitive).
+3. `"sound"` — the rest is filled with tracks that *sound* like the query
+   ("dreamy synth pads"), by CLAP text-to-audio similarity.
+
+An empty query returns the first 25 catalogue tracks.
 
 ```bash
 curl "http://localhost:8000/tracks?query=food"
@@ -58,7 +71,7 @@ curl "http://localhost:8000/tracks?query=food"
 ```bash
 curl -X POST http://localhost:8000/recommendations \
   -H "Content-Type: application/json" \
-  -d '{"track_id": "2", "adventure": 0.5, "limit": 3}'
+  -d '{"track_id": "2", "adventure": 0.5}'
 ```
 
 ```json
@@ -85,14 +98,17 @@ three tiers with an even three-way split — 0–0.33 Familiar, 0.33–0.67 Brid
 0.67–1.0 Adventurous (`tier_for_adventure` in `modeling/tiers.py`). That split
 point is arbitrary; nobody has tuned where the slider should actually hand off
 between tiers, unlike the rank bands themselves, which are notebook 09's
-measured settings.
+measured settings — scaled to the 25k catalogue as `MEDIUM_BANDS` in
+`modeling/tiers.py` so each tier covers the same cosine distances it did on
+fma_small.
 
 ## `GET /audio/{track_id}`
 
 Streams the FMA clip itself (`audio/mpeg`), with HTTP Range support so an
-`<audio>` element can seek. Backed by `modeling.rhythm.audio_path`, i.e. the
-same local `data/fma_small/` files 08/09 already use — nothing extra to set
-up. 404s if the track id isn't in the small subset.
+`<audio>` element can seek. Backed by `modeling.catalogue.local_audio_path`:
+the 128 kbps loudness-matched clip in `data/web_audio/` (the file the cloud
+serves) if present, else the original in `data/fma_medium/`. 404s if the
+track id isn't in the catalogue.
 
 ```bash
 curl -H "Range: bytes=0-1023" http://localhost:8000/audio/2 -D - -o /dev/null

@@ -16,19 +16,29 @@ Requirements: Python 3.11 or newer, `uv`, Node.js 20 or newer, and npm.
 
 ## 2. Provide the local data files
 
-Large/private data files are intentionally not tracked by Git. Ask Amin for `effnet_embeddings_full.npz` and place it at:
+Large/private data files are intentionally not tracked by Git. The app serves the 25k-track fma_medium catalogue and needs both embedding files:
 
 ```text
-<repository>/data/effnet_embeddings_full.npz
+<repository>/data/effnet_embeddings_medium.npz   # Discogs-EffNet, recommendations
+<repository>/data/clap_embeddings_medium.npz     # CLAP, text search
 ```
 
-The archive should contain `ids` and `embeddings`; the supplied full archive has 7,994 track IDs and 1,280-dimensional vectors.
+They live in the Hugging Face dataset `mrln77/tastebridge-audio` (folder `embeddings/`), along with the 128 kbps web clips. With access to it:
 
-FMA Small audio and metadata must also be available locally. The directory supplied to `FMA_DATA_DIR` must have this layout:
+```bash
+uv run hf download mrln77/tastebridge-audio --repo-type dataset \
+    --include "embeddings/*" --local-dir /tmp/tb && mv /tmp/tb/embeddings/*.npz data/
+```
+
+Both are rebuilt from the audio by `modeling/essentia_embed.py` and `modeling/clap_embed.py` (about 1.5 hours together). The list of re-uploads and silent tracks the catalogue removes, `data/processed/duplicates_medium.csv`, is in Git.
+
+Each archive contains `ids` and `embeddings`: 24,982 x 1,280 for EffNet, 24,980 x 512 for CLAP. The app uses the tracks present in both, minus duplicates: 24,896.
+
+FMA metadata, and either FMA Medium audio or the web clips in `data/web_audio/`, must also be available locally. The directory supplied to `FMA_DATA_DIR` must have this layout:
 
 ```text
 <FMA_DATA_DIR>/
-  fma_small/          # 000/000002.mp3, ...
+  fma_medium/         # 000/000002.mp3, ... (not needed if data/web_audio/ exists)
   fma_metadata/
     tracks.csv
 ```
@@ -37,11 +47,10 @@ FMA files are not in this Git branch. Use the team's approved shared storage or 
 
 ## 3. Start the EffNet API
 
-From the repository root, set the paths for your machine. Keep `FMA_DATA_DIR` pointed at the `data` directory that contains both `fma_small` and `fma_metadata`:
+From the repository root, set the paths for your machine. Keep `FMA_DATA_DIR` pointed at the `data` directory that contains both `fma_medium` and `fma_metadata`:
 
 ```bash
 export FMA_DATA_DIR="/absolute/path/to/capstone-matchas/data"
-export EFFNET_EMBEDDINGS_PATH="$PWD/data/effnet_embeddings_full.npz"
 export API_PUBLIC_BASE="http://localhost:8001"
 uv sync
 uv run uvicorn app_effnet:app --host 127.0.0.1 --port 8001
@@ -55,7 +64,7 @@ curl http://localhost:8001/health
 
 Expected fields include `"status":"ok"`, `"model":"Discogs-EffNet"`, `"tracks":7994`, and `"embedding_dimensions":1280`.
 
-The API provides `GET /tracks`, `POST /recommendations`, `GET /audio/{track_id}`, and `GET /taste-map`.
+The API provides `GET /tracks`, `POST /recommendations`, and `GET /audio/{track_id}`.
 
 ## 4. Start the EffNet frontend
 
@@ -74,4 +83,4 @@ The PCA app remains separate on ports 8000 and 5173.
 
 ## What uses EffNet
 
-Recommendations use the saved 1,280-dimensional Discogs-EffNet embeddings and cosine nearest-neighbour search. The Taste Map uses a 2D PCA projection of those embeddings strictly for visualization; recommendation ranking still uses the original full-dimensional EffNet vectors. No Essentia install or `.pb` model weights are needed when the precomputed embedding archive is available.
+Recommendations use the saved 1,280-dimensional Discogs-EffNet embeddings and cosine nearest-neighbour search. No Essentia install or `.pb` model weights are needed when the precomputed embedding archive is available.

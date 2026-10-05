@@ -1,70 +1,80 @@
 import { useEffect, useRef, useState } from "react";
 import {
-    AudioLines,
-    Check,
-    ChevronDown,
+    ArrowDown,
+    ArrowUp,
     Compass,
-    Disc3,
-    Heart,
+    GripVertical,
+    Info,
+    Bookmark,
+    BookmarkCheck,
     Library,
-    ListMusic,
-    Map as MapIcon,
     Pause,
-    Play,
-    Plus,
-    Search,
-    SlidersHorizontal,
     Shuffle,
+    SkipBack,
+    SkipForward,
+    Map as MapIcon,
     Volume2,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    getTasteMap,
     getRecommendations,
     isPreview,
     previewCatalog,
     searchTracks,
     type Recommendation,
-    type TasteMapPoint,
     type Track,
 } from "./api/recommendations";
-import TasteMapCanvas from "./components/TasteMapCanvas";
+import SearchBox from "./components/SearchBox";
+import SpaceBackdrop from "./components/SpaceBackdrop";
+import TasteTree from "./components/TasteTree";
+import Waveform from "./components/Waveform";
+import { NoteStars, PlayIcon, TastyLogo } from "./components/icons";
 import {
-    clearListeningPath,
+    clearJourney,
     clearPlayRequest,
-    recordPlayedTrack,
+    moveSaved,
+    plantSeed,
     requestPlayback,
+    revisitSeed,
     selectSeedTrack,
+    store,
+    toggleSaved as toggleSavedTrack,
     setPlaying,
     setShuffle,
     setShuffleOrder,
     type AppDispatch,
+    type JourneyNode,
     type RootState,
+    type SavedTrack,
+    type Tier,
 } from "./state/store";
 
-type Page = "discover" | "saved" | "map";
+type Page = "discover" | "saved" | "tree";
 
 function App() {
     const dispatch = useDispatch<AppDispatch>();
-    const { seedTrackId, currentTrackId, playRequestedId, playing, shuffleEnabled, shuffleOrder, listeningPath } =
+    const { seedTrackId, currentTrackId, playRequestedId, playing, shuffleEnabled, shuffleOrder } =
         useSelector((state: RootState) => state.playback);
+    const journey = useSelector((state: RootState) => state.journey);
+    const library = useSelector((state: RootState) => state.library);
+    const savedIds = new Set(library.map((item) => item.track.id));
     const [page, setPage] = useState<Page>("discover");
-    const [search, setSearch] = useState("");
-    const [searchOpen, setSearchOpen] = useState(false);
     const [tracks, setTracks] = useState<Track[]>(previewCatalog);
-    const [searchResults, setSearchResults] = useState<Track[]>([]);
-    const [adventure, setAdventure] = useState(0.35);
-    const [limit, setLimit] = useState(5);
+    const [adventure, setAdventure] = useState(0.5);
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [recommendationsLoading, setRecommendationsLoading] = useState(false);
-    const [tasteMapPoints, setTasteMapPoints] = useState<TasteMapPoint[]>([]);
-    const [tasteMapLoading, setTasteMapLoading] = useState(false);
-    const [tasteMapError, setTasteMapError] = useState("");
-    const [mapSelectedId, setMapSelectedId] = useState<string | null>(null);
-    const [saved, setSaved] = useState<string[]>(["demo-06"]);
     const [error, setError] = useState("");
     const [catalogReady, setCatalogReady] = useState(isPreview);
     const [audioDuration, setAudioDuration] = useState("");
+    const [position, setPosition] = useState(0);
+    const [length, setLength] = useState(0);
+    const [volume, setVolume] = useState(0.8);
+    // the list next/previous walk through: whatever list playback started from
+    // (empty = the current recommendations)
+    const [queue, setQueue] = useState<Track[]>([]);
+    const [librarySort, setLibrarySort] = useState<LibrarySort>(loadLibrarySort);
+    const [dragId, setDragId] = useState<string | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const selectedTrack = tracks.find((track) => track.id === currentTrackId)
@@ -73,9 +83,14 @@ function App() {
     const seedTrack = tracks.find((track) => track.id === seedTrackId)
         ?? previewCatalog.find((track) => track.id === seedTrackId)
         ?? previewCatalog[0];
-    const mapSelectedTrack = tasteMapPoints.find((track) => track.id === mapSelectedId)
-        ?? tasteMapPoints.find((track) => track.id === currentTrackId)
-        ?? null;
+    useEffect(() => {
+        if (audioRef.current) audioRef.current.volume = volume;
+    }, [volume]);
+
+    function seek(seconds: number) {
+        if (audioRef.current) audioRef.current.currentTime = seconds;
+        setPosition(seconds);
+    }
 
     const togglePlayback = async () => {
         const audio = audioRef.current;
@@ -95,6 +110,8 @@ function App() {
     useEffect(() => {
         audioRef.current?.pause();
         setAudioDuration("");
+        setPosition(0);
+        setLength(0);
         dispatch(setPlaying(false));
     }, [currentTrackId, dispatch]);
 
@@ -113,8 +130,16 @@ function App() {
         searchTracks("")
             .then((found) => {
                 if (!active) return;
-                setTracks(found);
-                if (found.length > 0) dispatch(selectSeedTrack(found[0].id));
+                const { nodes, currentKey } = store.getState().journey;
+                const resumed = nodes.find((node) => node.key === currentKey);
+                const journeyTracks = nodes.map((node) => node.track)
+                    .filter((track) => !found.some((item) => item.id === track.id));
+                setTracks([...found, ...journeyTracks]);
+                if (resumed) dispatch(selectSeedTrack(resumed.track.id));  // pick up the saved journey
+                else if (found.length > 0) {
+                    dispatch(plantSeed({ track: trackOnly(found[0]), from: "root", tier: null }));
+                    dispatch(selectSeedTrack(found[0].id));
+                }
                 setCatalogReady(true);
             })
             .catch((reason: unknown) => {
@@ -126,52 +151,11 @@ function App() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (page !== "map" || tasteMapPoints.length > 0) return;
-        let active = true;
-        setTasteMapLoading(true);
-        getTasteMap()
-            .then((points) => {
-                if (!active) return;
-                setTasteMapPoints(points);
-                setMapSelectedId(currentTrackId);
-                setTasteMapError("");
-                setTasteMapLoading(false);
-            })
-            .catch((reason: unknown) => {
-                if (!active) return;
-                setTasteMapError(reason instanceof Error ? reason.message : "Could not load the Taste Map.");
-                setTasteMapLoading(false);
-            });
-        return () => {
-            active = false;
-        };
-    }, [page, tasteMapPoints.length, currentTrackId]);
-
-    useEffect(() => {
-        if (!search.trim()) {
-            setSearchResults([]);
-            return;
-        }
-
-        let active = true;
-        searchTracks(search)
-            .then((found) => {
-                if (active) setSearchResults(found);
-            })
-            .catch((reason: unknown) => {
-                if (active) setError(reason instanceof Error ? reason.message : "Could not search tracks.");
-            });
-        return () => {
-            active = false;
-        };
-    }, [search]);
-
-    useEffect(() => {
         let active = true;
         if (!catalogReady) return () => { active = false; };
         setError("");
         setRecommendationsLoading(true);
-        getRecommendations(seedTrackId, adventure, limit)
+        getRecommendations(seedTrackId, adventure)
             .then((items) => {
                 if (!active) return;
                 setRecommendations(items);
@@ -185,7 +169,7 @@ function App() {
         return () => {
             active = false;
         };
-    }, [catalogReady, seedTrackId, adventure, limit, dispatch]);
+    }, [catalogReady, seedTrackId, adventure, dispatch]);
 
     useEffect(() => {
         if (shuffleEnabled && recommendations.length > 1) {
@@ -193,45 +177,122 @@ function App() {
         }
     }, [shuffleEnabled, recommendations, dispatch]);
 
-    const filteredRecommendations = page === "saved"
-        ? recommendations.filter((track) => saved.includes(track.id))
-        : recommendations;
     const visibleRecommendations = shuffleEnabled
-        ? orderTracks(filteredRecommendations, shuffleOrder)
-        : filteredRecommendations;
+        ? orderTracks(recommendations, shuffleOrder)
+        : recommendations;
+    const playQueue = queue.length > 0 ? queue : visibleRecommendations;
+    const libraryTracks = sortLibrary(library.map((item) => item.track), librarySort);
+    const manualOrder = librarySort.key === "manual";
 
-    function chooseTrack(track: Track) {
-        setTracks((current) => current.some((item) => item.id === track.id) ? current : [...current, track]);
-        dispatch(selectSeedTrack(track.id));
-        setSearch("");
-        setSearchOpen(false);
-        setPage("discover");
+    function chooseLibrarySort(key: SortKey) {
+        const next = { key, desc: key === librarySort.key && key !== "manual" ? !librarySort.desc : false };
+        setLibrarySort(next);
+        try {
+            localStorage.setItem(LIBRARY_SORT_KEY, JSON.stringify(next));
+        } catch {
+            // storage blocked: the choice just won't survive a reload
+        }
     }
 
-    function playRecommendedTrack(track: Track) {
+    function dropOnRow(index: number) {
+        if (dragId) dispatch(moveSaved({ trackId: dragId, to: index }));
+        setDragId(null);
+        setDragOverIndex(null);
+    }
+
+    useEffect(() => {
+        setQueue([]);  // a new seed: next/previous follow its recommendations
+    }, [seedTrackId]);
+
+    function rememberTrack(track: Track) {
+        setTracks((current) => current.some((item) => item.id === track.id) ? current : [...current, track]);
+    }
+
+    /** Make `track` the seed and record the step in the taste tree: a search jump
+     *  starts a new tree, anything else grows a branch from the current seed. */
+    function plant(track: Track, from: "root" | "branch") {
+        rememberTrack(track);
+        dispatch(plantSeed({ track: trackOnly(track), from, tier: tierFor(adventure) }));
+        dispatch(selectSeedTrack(track.id));
+    }
+
+    function revisit(node: JourneyNode) {
+        rememberTrack(node.track);
+        dispatch(revisitSeed(node.key));
+        dispatch(selectSeedTrack(node.track.id));
         setPage("discover");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function playTreeTrack(track: Track) {
         if (track.id === currentTrackId) {
             void togglePlayback();
             return;
         }
-        setTracks((current) => current.some((item) => item.id === track.id) ? current : [...current, track]);
+        rememberTrack(track);
         dispatch(requestPlayback(track.id));
     }
 
-    function playMapTrack(track: TasteMapPoint) {
-        setTracks((current) => current.some((item) => item.id === track.id) ? current : [...current, track]);
-        dispatch(requestPlayback(track.id));
-    }
-
-    function useMapTrackAsSeed(track: TasteMapPoint) {
-        setTracks((current) => current.some((item) => item.id === track.id) ? current : [...current, track]);
-        setMapSelectedId(track.id);
-        dispatch(selectSeedTrack(track.id));
+    function chooseTrack(track: Track) {
+        plant(track, "root");
         setPage("discover");
     }
 
+    /** Play `track` from `list`; next/previous then walk that list. */
+    function playFromList(track: Track, list: Track[]) {
+        setQueue(list);
+        if (track.id === currentTrackId) {
+            void togglePlayback();
+            return;
+        }
+        rememberTrack(track);
+        dispatch(requestPlayback(track.id));
+    }
+
+    /** Next (+1) or previous (-1) in the queue. Previous restarts the track if
+     *  it's more than 3 s in, like most players. */
+    function skip(direction: 1 | -1) {
+        if (direction < 0 && position > 3) {
+            seek(0);
+            return;
+        }
+        const index = playQueue.findIndex((track) => track.id === currentTrackId);
+        const target = index === -1 ? (direction > 0 ? playQueue[0] : undefined) : playQueue[index + direction];
+        if (!target) {
+            if (direction < 0) seek(0);
+            return;
+        }
+        rememberTrack(target);
+        dispatch(requestPlayback(target.id));
+    }
+
+    // the right panel always shows the seed, whatever is playing
+    const seedIsPlaying = currentTrackId === seedTrackId;
+
+    function playSeed() {
+        if (seedIsPlaying) {
+            void togglePlayback();
+            return;
+        }
+        setQueue([]);  // after the seed: its recommendations
+        dispatch(requestPlayback(seedTrackId));
+    }
+
+    function seekSeed(fraction: number) {
+        if (seedIsPlaying) seek(fraction * length);
+        else playSeed();
+    }
+
+    const hasNext = playQueue.length > 0 && playQueue.findIndex((track) => track.id === currentTrackId) < playQueue.length - 1;
+
     function exploreFromCurrentTrack() {
-        if (currentTrackId !== seedTrackId) dispatch(selectSeedTrack(currentTrackId));
+        if (currentTrackId !== seedTrackId) plant(selectedTrack, "branch");
+    }
+
+    function exploreFromTrack(track: Track) {
+        plant(track, "branch");
+        setPage("discover");
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function toggleRecommendationShuffle() {
@@ -242,18 +303,22 @@ function App() {
         dispatch(setShuffle({ enabled: true, order: shuffleTrackIds(visibleRecommendations) }));
     }
 
-    function toggleSaved(trackId: string) {
-        setSaved((current) => current.includes(trackId)
-            ? current.filter((id) => id !== trackId)
-            : [...current, trackId]);
+    /** Save or unsave a track. It's filed under the current seed (for the Taste
+     *  Tree), with its distance from that seed if it came from the recommendations. */
+    function toggleSaved(track: Track) {
+        const fromList = recommendations.find((item) => item.id === track.id);
+        dispatch(toggleSavedTrack({
+            track: { ...trackOnly(track), distance: fromList?.distance },
+            seedKey: journey.currentKey,
+        }));
     }
 
     return (
         <div className="app-shell">
             <aside className="sidebar">
                 <a className="wordmark" href="#discover" onClick={() => setPage("discover")}>
-                    <span className="wordmark-icon"><AudioLines size={19} strokeWidth={2.5} /></span>
-                    <span>tastebridge</span>
+                    <span className="wordmark-icon"><TastyLogo size={38} tone="white" /></span>
+                    <span>tasty</span>
                 </a>
 
                 <div className="side-label">Your space</div>
@@ -264,50 +329,21 @@ function App() {
                     <button className={page === "saved" ? "nav-item active" : "nav-item"} onClick={() => setPage("saved")}>
                         <Library size={18} /><span>Your library</span>
                     </button>
-                    <button className={page === "map" ? "nav-item active" : "nav-item"} onClick={() => setPage("map")}>
+                    <button className={page === "tree" ? "nav-item active" : "nav-item"} onClick={() => setPage("tree")}>
                         <MapIcon size={18} /><span>Taste Map</span>
                     </button>
                 </nav>
 
-                <div className="side-label playlist-label">Collections <button className="icon-button small" aria-label="Create collection" title="Create collection"><Plus size={16} /></button></div>
-                <button className="collection-row" onClick={() => setPage("saved")}>
-                    <span className="collection-art saved-art"><Heart size={15} fill="currentColor" /></span>
-                    <span><strong>Saved tracks</strong><small>{saved.length} tracks</small></span>
-                </button>
                 <div className="sidebar-bottom">
-                    <div className="mini-now-playing">
-                        <div className="mini-cover"><img src={selectedTrack.coverUrl} alt="" /></div>
-                        <div className="mini-track"><strong>{selectedTrack.title}</strong><span>{selectedTrack.artist}</span></div>
-                        <button className={saved.includes(selectedTrack.id) ? "icon-button saved" : "icon-button"} onClick={() => toggleSaved(selectedTrack.id)} aria-label="Save starting track" title="Save track"><Heart size={16} fill={saved.includes(selectedTrack.id) ? "currentColor" : "none"} /></button>
-                    </div>
                     <div className="sound-status"><span className={isPreview ? "status-dot preview" : "status-dot live"}></span>{isPreview ? "Preview catalogue" : "Recommender connected"}</div>
                 </div>
             </aside>
 
+            <SpaceBackdrop page={page} />
             <main className="main-content">
                 <header className="topbar">
-                    <div className="history-controls" aria-hidden="true"><span>‹</span><span>›</span></div>
-                    <div className="search-wrap">
-                        <Search size={17} />
-                        <input
-                            aria-label="Search tracks"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            onFocus={() => setSearchOpen(true)}
-                            onBlur={() => window.setTimeout(() => setSearchOpen(false), 140)}
-                            placeholder="Search a song to start from"
-                        />
-                        {searchOpen && search.trim() && searchResults.length > 0 && (
-                            <div className="search-results" role="listbox">
-                                {searchResults.slice(0, 5).map((track) => (
-                                    <button key={track.id} onMouseDown={() => chooseTrack(track)} role="option" aria-selected={track.id === currentTrackId}>
-                                        <img src={track.coverUrl} alt="" /><span><strong>{track.title}</strong><small>{track.artist} · {track.genre}</small></span>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <button className="profile-button"><span className="profile-avatar">T</span><span>Listener</span><ChevronDown size={14} /></button>
+                    <SearchBox onChoose={chooseTrack} currentTrackId={currentTrackId} placeholder="Search a song, artist or genre, or describe a sound" />
+                    <div className="profile-button"><span className="profile-avatar">T</span><span>Listener</span></div>
                 </header>
 
                 {isPreview && <div className="preview-banner"><span className="status-dot preview"></span><strong>Preview mode</strong><span>Sample tracks and responses are shown; they are not neural-network results.</span></div>}
@@ -315,147 +351,233 @@ function App() {
                 <div className="content-wrap">
                     <section className="page-intro">
                         <div>
-                            <div className="eyebrow"><span className="eyebrow-mark"></span>{page === "map" ? "Discogs-EffNet projection" : "Sound-led discovery"}</div>
-                            <h1>{page === "map" ? "Taste Map" : page === "saved" ? "Your saved tracks" : "Find a new way in."}</h1>
-                            <p>{page === "map" ? "Explore where tracks sit in the EffNet sound space and trace what you have played." : page === "saved" ? "The tracks you want to come back to." : "Start with a track you love. Let the sound take you somewhere new."}</p>
+                            <div className="eyebrow">{page === "tree" ? "Your journey" : page === "saved" ? "Your library" : "Sound-led discovery"}</div>
+                            <h1>{page === "tree" ? "Taste Map" : page === "saved" ? "Your saved tracks" : "Find a new way in"}</h1>
+                            <p>{page === "tree" ? "Every seed you explored, the tracks you saved along the way, and where you went next. Pick any seed to branch off again" : page === "saved" ? "The tracks you want to come back to" : "Start with a seed track that you love. Let the sound take you somewhere new"}</p>
                         </div>
                     </section>
 
                     {page === "discover" && (
                         <>
-                            <section className="discovery-grid" aria-label="Discovery controls">
-                                <div className="seed-feature">
-                                    <img className="seed-cover" src={selectedTrack.coverUrl} alt={`Cover art for ${selectedTrack.title}`} />
-                                    <div className="seed-shade"></div>
-                                    <div className="seed-topline"><span className="overline">{currentTrackId === seedTrackId ? "Starting track" : "Now playing"}</span><span className="seed-id">{selectedTrack.id}</span></div>
-                                    <div className="seed-details">
-                                        <div><div className="seed-genre">{selectedTrack.genre} <span>·</span> {audioDuration || selectedTrack.duration}</div><h2>{selectedTrack.title}</h2><p>{selectedTrack.artist}</p></div>
-                                        <button className="play-button" onClick={togglePlayback} aria-label={playing ? "Pause audio" : isPreview ? "Play demo audio" : "Play track"} title={playing ? "Pause" : isPreview ? "Play demo audio" : "Play track"} disabled={!selectedTrack.audioUrl}>{playing ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}</button>
+                            <div className="discover-layout">
+                                <section className="recommendations-section">
+                                    <div className="section-heading"><div><div className="eyebrow">Similar to seed track: {seedTrack.title}</div></div><div className="recommendation-actions"><button className={shuffleEnabled ? "icon-button shuffle-button active" : "icon-button shuffle-button"} onClick={toggleRecommendationShuffle} aria-label={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"} aria-pressed={shuffleEnabled} title={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"}><Shuffle size={16} /></button><button className="text-button" onClick={exploreFromCurrentTrack} disabled={currentTrackId === seedTrackId}><NoteStars size={15} /> Seed this track</button><InfoTip label="Seed this track" align="right" text="Makes the track that's playing your new seed: the playlist refreshes with tracks that sound like it, and the step is added to your Taste Map. Each row's notes icon does the same for that track." /></div></div>
+                                    <div className="list-heading"><span>Track</span><span>Genre</span><span className="distance-heading">Taste distance <InfoTip label="Taste distance" text="How different a track sounds from the seed, in zorbs (cosine distance × 100). Not a score of how much you'll like it." /></span><span></span><span></span></div>
+                                    {error && <div className="error-state" role="alert">{error}</div>}
+                                    {!error && recommendationsLoading && <div className="empty-state" role="status">Finding tracks similar to {seedTrack.title}...</div>}
+                                    {!error && !recommendationsLoading && visibleRecommendations.map((track) => <RecommendationRow key={`${track.id}-${track.rank}`} track={track} saved={savedIds.has(track.id)} playing={playing && currentTrackId === track.id} onPlay={() => playFromList(track, visibleRecommendations)} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId} />)}
+                                    {!error && !recommendationsLoading && recommendations.length === 0 && <div className="empty-state">No recommendations for this selection yet.</div>}
+                                </section>
+                                <aside className="seed-panel" aria-label="Seed track and adventure level">
+                                    <div className="seed-feature">
+                                        <img className="seed-cover" src={seedTrack.coverUrl} alt={`Cover art for ${seedTrack.title}`} />
+                                        <div className="seed-shade"></div>
+                                        <div className="seed-heading">
+                                            <span className="seed-label"><NoteStars size={12} /> Seed track</span>
+                                            <h2>{seedTrack.title}</h2>
+                                            <p>{seedTrack.artist}</p>
+                                            <span className="seed-genre">{seedTrack.genre} · {seedIsPlaying && audioDuration ? audioDuration : seedTrack.duration}</span>
+                                        </div>
+                                        <div className="seed-controls">
+                                            <span className="play-box"><button className="play-button" onClick={playSeed} aria-label={seedIsPlaying && playing ? "Pause the seed track" : "Play the seed track"} title={seedIsPlaying && playing ? "Pause" : "Play the seed track"} disabled={!seedTrack.audioUrl}>{seedIsPlaying && playing ? <Pause size={17} fill="currentColor" /> : <PlayIcon size={17} />}</button></span>
+                                            <SearchBox onChoose={chooseTrack} currentTrackId={currentTrackId} placeholder="Search" className="search-wrap panel-search" />
+                                        </div>
+                                        <Waveform url={seedTrack.audioUrl} progress={seedIsPlaying && length ? position / length : 0} onSeek={seekSeed} className="panel-wave" />
                                     </div>
-                                    <div className="cover-caption"><Disc3 size={14} /> SEED TRACK <span>01</span></div>
-                                </div>
 
-                                <div className="adventure-panel">
-                                    <div className="panel-heading"><div><div className="eyebrow">Your listening radius</div><h2>Set the mood.</h2></div><SlidersHorizontal size={19} /></div>
-                                    <p className="panel-copy">Stay close to the sound you know, or let the recommendations stretch further.</p>
-                                    <div className="adventure-value"><span>ADVENTURE</span><strong>{Math.round(adventure * 100)}<small>%</small></strong></div>
-                                    <input className="adventure-slider" type="range" min="0" max="100" step="1" value={Math.round(adventure * 100)} onChange={(event) => setAdventure(Number(event.target.value) / 100)} aria-label="Adventure level" style={{ "--slider-progress": `${adventure * 100}%` } as React.CSSProperties} />
-                                    <div className="range-labels"><span>Familiar</span><span>Adventurous</span></div>
-                                    <div className="panel-divider"></div>
-                                    <div className="result-count"><div><span className="overline">Your next listens</span><strong>{limit} tracks</strong></div><select value={limit} onChange={(event) => setLimit(Number(event.target.value))} aria-label="Number of recommendations"><option value={5}>5 tracks</option><option value={7}>7 tracks</option><option value={10}>10 tracks</option></select></div>
-                                </div>
-                            </section>
-
-                            <section className="recommendations-section">
-                                <div className="section-heading"><div><div className="eyebrow"><span className="eyebrow-mark"></span>Similar to {seedTrack.title}</div><h2>Follow this thread</h2></div><div className="recommendation-actions"><button className={shuffleEnabled ? "icon-button shuffle-button active" : "icon-button shuffle-button"} onClick={toggleRecommendationShuffle} aria-label={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"} aria-pressed={shuffleEnabled} title={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"}><Shuffle size={16} /></button><button className="text-button" onClick={exploreFromCurrentTrack} disabled={currentTrackId === seedTrackId}>Explore this track <span>↗</span></button></div></div>
-                                <div className="list-heading"><span>#</span><span>Track</span><span>Style</span><span>Distance</span><span></span></div>
-                                {error && <div className="error-state" role="alert">{error}</div>}
-                                {!error && recommendationsLoading && <div className="empty-state" role="status">Finding tracks similar to {seedTrack.title}...</div>}
-                                {!error && !recommendationsLoading && visibleRecommendations.map((track) => <RecommendationRow key={`${track.id}-${track.rank}`} track={track} saved={saved.includes(track.id)} playing={playing && currentTrackId === track.id} onPlay={() => playRecommendedTrack(track)} onToggleSaved={() => toggleSaved(track.id)} />)}
-                                {!error && !recommendationsLoading && recommendations.length === 0 && <div className="empty-state">No recommendations for this selection yet.</div>}
-                                <div className="list-footnote"><span>Cosine distance</span> is a model measure, not a score of how much you will like a track.</div>
-                            </section>
+                                    <div className="adventure-panel">
+                                        <div className="adventure-value"><span>Your discovery journey</span><strong>{Math.round(adventure * 100)}<small>%</small></strong></div>
+                                        <input className="adventure-slider" type="range" min="0" max="100" step="50" value={Math.round(adventure * 100)} onChange={(event) => setAdventure(Number(event.target.value) / 100)} aria-label="Adventure level" style={{ "--slider-progress": `${adventure * 100}%` } as React.CSSProperties} />
+                                        <div className="range-labels"><span>Home</span><span>Bridge</span><span>Adventure</span></div>
+                                    </div>
+                                </aside>
+                            </div>
                         </>
                     )}
 
-                    {page === "map" && (
-                        <section className="taste-map-section" aria-label="Taste Map">
-                            <div className="taste-map-heading">
+                    {page === "tree" && (
+                        <section className="taste-tree-section" aria-label="Taste Map">
+                            <div className="taste-tree-heading">
                                 <div>
-                                    <div className="eyebrow"><span className="eyebrow-mark"></span>8,000-track sound space</div>
-                                    <h2>Explore the sound space</h2>
+                                    <div className="eyebrow">{journeyStats(journey.nodes, library)}</div>
+                                    <h2>Where your taste went</h2>
                                 </div>
-                                <div className="map-legend">
-                                    <span><i className="legend-dot current"></i>Now playing</span>
-                                    <span><i className="legend-dot seed"></i>Recommendation seed</span>
-                                    <span><i className="legend-line"></i>Listening path</span>
+                                <div className="tree-legend">
+                                    <span><i className="tier-familiar"></i>Home</span>
+                                    <span><i className="tier-bridge"></i>Bridge</span>
+                                    <span><i className="tier-adventurous"></i>Adventure</span>
+                                    <button className="text-button" onClick={() => dispatch(clearJourney())} disabled={journey.nodes.length < 2}>Start over</button>
                                 </div>
                             </div>
-                            {tasteMapLoading && <div className="empty-state" role="status">Building Taste Map coordinates…</div>}
-                            {tasteMapError && <div className="error-state" role="alert">{tasteMapError}</div>}
-                            {!tasteMapLoading && !tasteMapError && tasteMapPoints.length > 0 && (
-                                <div className="taste-map-layout">
-                                    <div className="taste-map-main">
-                                        <TasteMapCanvas
-                                            points={tasteMapPoints}
-                                            listeningPath={listeningPath}
-                                            currentTrackId={currentTrackId}
-                                            seedTrackId={seedTrackId}
-                                            recommendationIds={recommendations.map((track) => track.id)}
-                                            selectedId={mapSelectedId}
-                                            onSelect={(point) => setMapSelectedId(point.id)}
-                                        />
-                                        <div className="taste-map-caption">
-                                            <span>{tasteMapPoints.length.toLocaleString()} tracks plotted</span>
-                                            <span>2D PCA projection for display; recommendations still use full EffNet embeddings.</span>
-                                        </div>
-                                    </div>
-                                    <aside className="taste-map-detail">
-                                        {mapSelectedTrack ? (
-                                            <>
-                                                <img src={mapSelectedTrack.coverUrl} alt="" />
-                                                <span className="overline">Selected track</span>
-                                                <h3>{mapSelectedTrack.title}</h3>
-                                                <p>{mapSelectedTrack.artist} · {mapSelectedTrack.genre}</p>
-                                                <button className="text-button" onClick={() => playMapTrack(mapSelectedTrack)} disabled={!mapSelectedTrack.audioUrl}>Play track <span>▶</span></button>
-                                                <button className="explore-map-button" onClick={() => useMapTrackAsSeed(mapSelectedTrack)}>Use as recommendation seed</button>
-                                            </>
-                                        ) : <div className="empty-state">Select a point to inspect a track.</div>}
-                                        <div className="trail-heading">
-                                            <strong>Listening path</strong>
-                                            <button className="text-button" onClick={() => dispatch(clearListeningPath())} disabled={listeningPath.length === 0}>Clear</button>
-                                        </div>
-                                        {listeningPath.length === 0 ? <p className="trail-empty">Play tracks and their order will appear here.</p> : (
-                                            <ol className="trail-list">
-                                                {listeningPath.map((trackId, index) => {
-                                                    const track = tasteMapPoints.find((point) => point.id === trackId);
-                                                    return <li key={`${trackId}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{track?.title ?? `Track ${trackId}`}</strong><small>{track?.artist ?? trackId}</small></div></li>;
-                                                })}
-                                            </ol>
-                                        )}
-                                    </aside>
-                                </div>
-                            )}
+                            {journey.nodes.length === 0
+                                ? <div className="empty-state">Pick a starting track and your tree will grow from it.</div>
+                                : <TasteTree nodes={journey.nodes} saved={library} currentKey={journey.currentKey} nowPlayingId={currentTrackId} playing={playing} onRevisit={revisit} onPlay={playTreeTrack} onUnsave={toggleSaved} />}
+                            {journey.nodes.length === 1 && <p className="tree-hint"><Bookmark size={13} /> Save tracks you like and <NoteStars size={13} /> seed them on Discover: your tree grows from both.</p>}
                         </section>
                     )}
 
                     {page === "saved" && (
                         <section className="recommendations-section saved-section">
-                            <div className="section-heading"><div><div className="eyebrow"><span className="eyebrow-mark"></span>Your collection</div><h2>Kept for later</h2></div><span className="saved-count">{saved.length} SAVED</span></div>
-                            <div className="list-heading"><span>#</span><span>Track</span><span>Style</span><span>Distance</span><span></span></div>
-                            {visibleRecommendations.map((track) => <RecommendationRow key={`${track.id}-${track.rank}`} track={track} saved playing={playing && currentTrackId === track.id} onPlay={() => playRecommendedTrack(track)} onToggleSaved={() => toggleSaved(track.id)} />)}
-                            {visibleRecommendations.length === 0 && <div className="empty-state">Save a recommendation with the heart button and it will appear here.</div>}
+                            <div className="library-toolbar">
+                                <div className="sort-control" role="group" aria-label="Sort your Library">
+                                    <span>Sort by</span>
+                                    {SORT_OPTIONS.map(([key, label]) => (
+                                        <button key={key} className={librarySort.key === key ? "active" : undefined} onClick={() => chooseLibrarySort(key)}
+                                            aria-pressed={librarySort.key === key}
+                                            title={key === "manual" ? "Your own order: drag the handles" : `Sort by ${label.toLowerCase()} (click again to reverse)`}>
+                                            {label}
+                                            {librarySort.key === key && key !== "manual" && (librarySort.desc ? <ArrowDown size={11} /> : <ArrowUp size={11} />)}
+                                        </button>
+                                    ))}
+                                </div>
+                                {manualOrder && library.length > 1 && <span className="library-hint">Drag <GripVertical size={11} /> to reorder</span>}
+                            </div>
+                            <div className="list-heading library-columns"><span>Track</span><span>Genre</span><span>Location</span><span>Year created</span><span className="distance-heading">BPM <InfoTip label="BPM" align="right" text="Beats per minute, estimated from the audio. Very fast or half-time tracks can read double or half." /></span><span></span><span></span></div>
+                            {libraryTracks.map((track, index) => (
+                                <RecommendationRow key={track.id} variant="library" track={track} saved playing={playing && currentTrackId === track.id}
+                                    onPlay={() => playFromList(track, libraryTracks)} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId}
+                                    reorder={manualOrder ? {
+                                        dragging: dragId === track.id,
+                                        over: dragOverIndex === index && dragId !== track.id,
+                                        onDragStart: () => setDragId(track.id),
+                                        onDragEnter: () => setDragOverIndex(index),
+                                        onDrop: () => dropOnRow(index),
+                                        onDragEnd: () => { setDragId(null); setDragOverIndex(null); },
+                                        onMove: (delta) => dispatch(moveSaved({ trackId: track.id, to: index + delta })),
+                                    } : undefined} />
+                            ))}
+                            {library.length === 0 && <div className="empty-state">Save a recommendation with the bookmark button and it will appear here.</div>}
                         </section>
                     )}
                 </div>
 
-                <footer className="page-footer"><span>TASTEBRIDGE / MUSIC DISCOVERY</span><span>{isPreview ? "DEMO DATA" : "CONNECTED TO RECOMMENDER"}</span></footer>
+                <footer className="page-footer"><span>TASTY / MUSIC DISCOVERY</span><span>{isPreview ? "DEMO DATA" : "CONNECTED TO RECOMMENDER"}</span></footer>
             </main>
 
             <div className="player-bar">
-                <div className="player-track"><img src={selectedTrack.coverUrl} alt="" /><div><strong>{selectedTrack.title}</strong><span>{selectedTrack.artist}</span></div><button className="icon-button" onClick={() => toggleSaved(selectedTrack.id)} aria-label="Save current track"><Heart size={16} fill={saved.includes(selectedTrack.id) ? "currentColor" : "none"} /></button></div>
-                <div className="player-center"><button className="player-play" onClick={togglePlayback} aria-label={playing ? "Pause audio" : "Play track"} disabled={!selectedTrack.audioUrl}>{playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}</button><div className="fake-progress"><span></span></div><small>{isPreview ? "DEMO AUDIO" : "FMA AUDIO"}</small></div>
-                <div className="player-volume"><ListMusic size={16} /><Volume2 size={17} /><div className="volume-line"><span></span></div></div>
+                <div className="player-track"><img src={selectedTrack.coverUrl} alt="" /><div><strong>{selectedTrack.title}</strong><span>{selectedTrack.artist}</span></div><button className="icon-button explore-button" onClick={exploreFromCurrentTrack} disabled={currentTrackId === seedTrackId} aria-label={`Seed ${selectedTrack.title}`} title="Seed this track"><NoteStars size={16} /></button><button className={savedIds.has(selectedTrack.id) ? "icon-button saved" : "icon-button"} onClick={() => toggleSaved(selectedTrack)} aria-label={savedIds.has(selectedTrack.id) ? "Remove from Library" : "Save to Library"} title={savedIds.has(selectedTrack.id) ? "In your Library" : "Save to Library"}>{savedIds.has(selectedTrack.id) ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}</button></div>
+                <div className="player-center">
+                    <button className="icon-button skip-button" onClick={() => skip(-1)} aria-label="Previous track" title="Previous"><SkipBack size={16} fill="currentColor" /></button>
+                    <span className="play-box"><button className="player-play" onClick={togglePlayback} aria-label={playing ? "Pause audio" : "Play track"} disabled={!selectedTrack.audioUrl}>{playing ? <Pause size={15} fill="currentColor" /> : <PlayIcon size={15} />}</button></span>
+                    <button className="icon-button skip-button" onClick={() => skip(1)} disabled={!hasNext} aria-label="Next track" title="Next"><SkipForward size={16} fill="currentColor" /></button>
+                    <Waveform url={selectedTrack.audioUrl} progress={length ? position / length : 0} onSeek={(fraction) => seek(fraction * length)} className="player-wave" />
+                    <small>{formatTime(position)} / {length ? formatTime(length) : "--:--"}</small>
+                </div>
+                <div className="player-volume"><Volume2 size={17} /><input className="player-slider player-volume-slider" type="range" min="0" max="1" step="0.01" value={volume} onChange={(event) => setVolume(Number(event.target.value))} aria-label="Volume" style={{ "--slider-progress": `${volume * 100}%` } as React.CSSProperties} /></div>
             </div>
-            <audio ref={audioRef} src={selectedTrack.audioUrl} preload="metadata" onLoadedMetadata={(event) => { const seconds = Math.round(event.currentTarget.duration); setAudioDuration(`${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`); }} onPlay={() => { dispatch(setPlaying(true)); dispatch(recordPlayedTrack(currentTrackId)); }} onPause={() => dispatch(setPlaying(false))} onEnded={() => dispatch(setPlaying(false))} />
+            <audio ref={audioRef} src={selectedTrack.audioUrl} preload="metadata" onLoadedMetadata={(event) => { event.currentTarget.volume = volume; setLength(event.currentTarget.duration); setAudioDuration(formatTime(event.currentTarget.duration)); }} onTimeUpdate={(event) => setPosition(event.currentTarget.currentTime)} onPlay={() => { dispatch(setPlaying(true)); }} onPause={() => dispatch(setPlaying(false))} onEnded={() => { dispatch(setPlaying(false)); skip(1); }} />
         </div>
     );
 }
 
-function RecommendationRow({ track, saved, playing, onPlay, onToggleSaved }: {
-    track: Recommendation;
+function tierFor(adventure: number): Tier {
+    // mirrors the server's tier_for_adventure
+    return adventure < 1 / 3 ? "Familiar" : adventure < 2 / 3 ? "Bridge" : "Adventurous";
+}
+
+/** Just the Track fields -- a Recommendation also carries rank, distance, factors. */
+function trackOnly({ id, title, artist, genre, duration, coverUrl, audioUrl, location, dateCreated, bpm }: Track): Track {
+    return { id, title, artist, genre, duration, coverUrl, audioUrl, location, dateCreated, bpm };
+}
+
+function journeyStats(nodes: JourneyNode[], library: SavedTrack[]) {
+    const keys = new Set(nodes.map((node) => node.key));
+    const saved = library.filter((item) => item.seedKey && keys.has(item.seedKey)).length;
+    return `${nodes.length} seed${nodes.length === 1 ? "" : "s"} · ${saved} saved`;
+}
+
+type SortKey = "manual" | "genre" | "bpm" | "year";
+type LibrarySort = { key: SortKey; desc: boolean };
+
+const SORT_OPTIONS: [SortKey, string][] = [["manual", "Manual"], ["genre", "Genre"], ["bpm", "BPM"], ["year", "Year"]];
+const LIBRARY_SORT_KEY = "tasty.librarySort.v1";
+
+function loadLibrarySort(): LibrarySort {
+    try {
+        const stored = JSON.parse(localStorage.getItem(LIBRARY_SORT_KEY) ?? "null");
+        if (stored && SORT_OPTIONS.some(([key]) => key === stored.key)) return stored as LibrarySort;
+    } catch {
+        // fall through to the default
+    }
+    return { key: "manual", desc: false };
+}
+
+/** Library order: manual = as stored; otherwise by the field, missing values last either way. */
+function sortLibrary(tracks: Track[], { key, desc }: LibrarySort): Track[] {
+    if (key === "manual") return tracks;
+    const value = (track: Track): string | number | null =>
+        key === "genre" ? track.genre || null : key === "bpm" ? track.bpm ?? null : track.dateCreated?.slice(0, 4) ?? null;
+    return [...tracks].sort((a, b) => {
+        const va = value(a);
+        const vb = value(b);
+        if (va === null || vb === null) return va === vb ? 0 : va === null ? 1 : -1;
+        const order = typeof va === "number" && typeof vb === "number" ? va - vb : String(va).localeCompare(String(vb));
+        return (desc ? -order : order) || a.title.localeCompare(b.title);
+    });
+}
+
+function formatTime(seconds: number) {
+    const whole = Math.max(0, Math.round(seconds));
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+}
+
+/** An "i" that explains something on hover or keyboard focus. */
+function InfoTip({ label, text, align = "center" }: { label: string; text: string; align?: "center" | "right" }) {
+    return (
+        <span className={align === "right" ? "info-tip align-right" : "info-tip"} tabIndex={0} aria-label={`${label}: ${text}`} data-tip={text}>
+            <Info size={12} />
+        </span>
+    );
+}
+
+type Reorder = {
+    dragging: boolean;
+    over: boolean;
+    onDragStart: () => void;
+    onDragEnter: () => void;
+    onDrop: () => void;
+    onDragEnd: () => void;
+    onMove: (delta: number) => void;
+};
+
+function RecommendationRow({ track, saved, playing, isSeed, onPlay, onToggleSaved, onExplore, variant = "discover", reorder }: {
+    variant?: "discover" | "library";
+    reorder?: Reorder;
+    track: Track & { distance?: number };
     saved: boolean;
     playing: boolean;
+    isSeed: boolean;
     onPlay: () => void;
     onToggleSaved: () => void;
+    onExplore: () => void;
 }) {
     return (
-        <div className="track-row">
-            <span className="track-rank">{String(track.rank).padStart(2, "0")}</span>
-            <div className="track-cell"><button className="track-select" onClick={onPlay} aria-label={`Play ${track.title} by ${track.artist}`} disabled={!track.audioUrl}><img className="track-cover" src={track.coverUrl} alt="" /><span className="track-copy"><strong>{track.title}</strong><span>{track.artist}</span></span></button><button className="row-play" onClick={onPlay} aria-label={`${playing ? "Pause" : "Play"} ${track.title}`} title={playing ? "Pause" : "Play track"} disabled={!track.audioUrl}>{playing ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}</button></div>
+        <div className={["track-row", variant === "library" && "library-columns", reorder?.dragging && "dragging", reorder?.over && "drag-over"].filter(Boolean).join(" ")}
+            draggable={Boolean(reorder)}
+            onDragStart={reorder ? (event) => { event.dataTransfer.effectAllowed = "move"; reorder.onDragStart(); } : undefined}
+            onDragEnter={reorder?.onDragEnter}
+            onDragOver={reorder ? (event) => event.preventDefault() : undefined}
+            onDrop={reorder ? (event) => { event.preventDefault(); reorder.onDrop(); } : undefined}
+            onDragEnd={reorder?.onDragEnd}>
+            <div className="track-cell">{reorder && (
+                <span className="drag-handle" tabIndex={0} role="button" aria-label={`Move ${track.title} (arrow keys)`} title="Drag to reorder"
+                    onKeyDown={(event) => {
+                        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                            event.preventDefault();
+                            reorder.onMove(event.key === "ArrowUp" ? -1 : 1);
+                        }
+                    }}><GripVertical size={14} /></span>
+            )}<span className="play-box small"><button className="row-play" onClick={onPlay} aria-label={`${playing ? "Pause" : "Play"} ${track.title}`} title={playing ? "Pause" : "Play track"} disabled={!track.audioUrl}>{playing ? <Pause size={13} fill="currentColor" /> : <PlayIcon size={13} />}</button></span><button className="track-select" onClick={onPlay} aria-label={`Play ${track.title} by ${track.artist}`} disabled={!track.audioUrl}><img className="track-cover" src={track.coverUrl} alt="" /><span className="track-copy"><strong>{track.title}</strong><span>{track.artist}</span></span></button></div>
             <span className="track-genre">{track.genre}</span>
-            <span className="track-distance">{track.distance.toFixed(3)}</span>
-            <button className={saved ? "icon-button heart-button is-saved" : "icon-button heart-button"} onClick={onToggleSaved} aria-label={saved ? `Remove ${track.title} from saved` : `Save ${track.title}`} title={saved ? "Saved" : "Save track"}>{saved ? <Check size={16} /> : <Heart size={16} />}</button>
+            {variant === "library" ? <>
+                {track.location
+                    ? <span className="track-location">{track.location}</span>
+                    : <span className="track-location uncharted" title="FMA has no location for this artist">Uncharted</span>}
+                <span className="track-date">{track.dateCreated ? track.dateCreated.slice(0, 4) : "–"}</span>
+                <span className="track-bpm">{track.bpm ?? "–"}</span>
+            </> : <span className="track-distance">{track.distance === undefined ? "–" : <>{Math.round(track.distance * 100)} <small>zorbs away</small></>}</span>}
+            <button className="icon-button explore-button" onClick={onExplore} disabled={isSeed} aria-label={`Seed ${track.title}`} title="Seed this track"><NoteStars size={17} /></button>
+            <button className={saved ? "icon-button heart-button is-saved" : "icon-button heart-button"} onClick={onToggleSaved} aria-label={saved ? `Remove ${track.title} from your Library` : `Save ${track.title} to your Library`} title={saved ? "In your Library" : "Save to Library"}>{saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}</button>
         </div>
     );
 }

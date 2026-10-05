@@ -1,0 +1,10 @@
+# The hosted app's runtime only -- torch is installed separately (CPU build) in the Dockerfile.
+fastapi==0.141.1
+uvicorn==0.53.0
+httpx==0.28.1
+huggingface-hub==1.31.0
+numpy==2.5.3
+pandas==3.0.5
+pycountry==26.2.16
+scikit-learn==1.9.1
+transformers==5.17.0

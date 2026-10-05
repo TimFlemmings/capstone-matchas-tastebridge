@@ -6,16 +6,19 @@ export type Track = {
     duration: string;
     coverUrl: string;
     audioUrl?: string;
+    /** The artist's location as FMA lists it, e.g. "Bristol, UK" (about 2/3 of tracks have one). */
+    location?: string | null;
+    /** When the track was added to FMA, YYYY-MM-DD. */
+    dateCreated?: string | null;
+    /** Tempo estimated from the audio (can read double or half on some tracks). */
+    bpm?: number | null;
+    /** Search results only: why this track matched -- its name, its genre, or how it sounds. */
+    matchedBy?: "name" | "genre" | "sound";
 };
 
 export type Recommendation = Track & {
     rank: number;
     distance: number;
-};
-
-export type TasteMapPoint = Track & {
-    x: number;
-    y: number;
 };
 
 const covers = {
@@ -48,21 +51,40 @@ const localFallbackApiBase =
         ? "http://localhost:8000"
         : undefined;
 
+// "" (built with VITE_RECOMMENDER_API_URL=/) means the API is this same site -- the hosted app
 const apiBase = configuredApiBase ?? localFallbackApiBase;
 
-export const isPreview = !apiBase;
+export const isPreview = apiBase === undefined;
+
+/** fetch, but failures come back as messages a listener can read. */
+async function apiFetch(path: string, what: string, init?: RequestInit): Promise<Response> {
+    let response: Response;
+    try {
+        response = await fetch(`${apiBase}${path}`, init);
+    } catch {
+        // fetch only throws when no response arrived at all: server down, wrong port, or CORS
+        throw new Error(`Can't reach the Tasty server at ${apiBase || window.location.origin}. Is the API running?`);
+    }
+    if (!response.ok) {
+        const detail = await response
+            .json()
+            .then((body: { detail?: unknown }) => (typeof body.detail === "string" ? body.detail : ""))
+            .catch(() => "");
+        throw new Error(detail || `${what} failed (${response.status}).`);
+    }
+    return response;
+}
 export const previewCatalog = previewTracks;
 
 export async function searchTracks(query: string): Promise<Track[]> {
-    if (!apiBase) {
+    if (isPreview) {
         const normalized = query.trim().toLowerCase();
         return previewTracks.filter((track) =>
             `${track.title} ${track.artist} ${track.genre}`.toLowerCase().includes(normalized),
         );
     }
 
-    const response = await fetch(`${apiBase}/tracks?query=${encodeURIComponent(query)}`);
-    if (!response.ok) throw new Error(`Track search failed (${response.status})`);
+    const response = await apiFetch(`/tracks?query=${encodeURIComponent(query)}`, "Track search");
     const payload = (await response.json()) as { tracks: Track[] };
     return payload.tracks;
 }
@@ -70,9 +92,10 @@ export async function searchTracks(query: string): Promise<Track[]> {
 export async function getRecommendations(
     trackId: string,
     adventure: number,
-    limit: number,
 ): Promise<Recommendation[]> {
-    if (!apiBase) {
+    if (isPreview) {
+        // offline preview only -- with a backend, the server decides the count
+        const limit = 15;
         const candidates = previewTracks.filter((track) => track.id !== trackId);
         const maxOffset = Math.max(0, candidates.length - limit);
         const offset = Math.round(adventure * maxOffset);
@@ -83,26 +106,11 @@ export async function getRecommendations(
         }));
     }
 
-    const response = await fetch(`${apiBase}/recommendations`, {
+    const response = await apiFetch("/recommendations", "Recommendation request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ track_id: trackId, adventure, limit }),
+        body: JSON.stringify({ track_id: trackId, adventure }),
     });
-    if (!response.ok) throw new Error(`Recommendation request failed (${response.status})`);
     const payload = (await response.json()) as { recommendations: Recommendation[] };
     return payload.recommendations;
-}
-
-export async function getTasteMap(): Promise<TasteMapPoint[]> {
-    if (!apiBase) {
-        return previewTracks.map((track, index) => {
-            const angle = (index / previewTracks.length) * Math.PI * 2;
-            return { ...track, x: 0.5 + Math.cos(angle) * 0.38, y: 0.5 + Math.sin(angle) * 0.38 };
-        });
-    }
-
-    const response = await fetch(`${apiBase}/taste-map`);
-    if (!response.ok) throw new Error(`Taste map failed (${response.status})`);
-    const payload = (await response.json()) as { points: TasteMapPoint[] };
-    return payload.points;
 }

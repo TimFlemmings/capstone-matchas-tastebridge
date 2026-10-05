@@ -1,4 +1,49 @@
 import { configureStore, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { Track } from "../api/recommendations";
+
+export type Tier = "Familiar" | "Bridge" | "Adventurous";
+
+/** One seed you explored from. `parentKey` is the seed you were on when you
+ *  sprouted this one (null: the start of a tree -- the first track, or a search
+ *  jump). `tier` is where the slider was for that step. */
+export type JourneyNode = {
+    key: string;
+    track: Track;
+    parentKey: string | null;
+    tier: Tier | null;
+};
+
+/** A track in the Library. `seedKey` is the journey node that was the seed
+ *  when it was saved -- the Taste Tree hangs it under that seed. `distance` is
+ *  its distance from that seed, when it was saved from the recommendations. */
+export type SavedTrack = {
+    track: Track & { distance?: number };
+    seedKey: string | null;
+};
+
+export type JourneyState = {
+    nodes: JourneyNode[];
+    currentKey: string | null;
+};
+
+const JOURNEY_STORAGE_KEY = "tasty.journey.v2";
+const LIBRARY_STORAGE_KEY = "tasty.library.v1";
+
+function loadStored<T>(key: string, valid: (value: unknown) => boolean, fallback: T): T {
+    try {
+        const stored = JSON.parse(localStorage.getItem(key) ?? "null");
+        if (valid(stored)) return stored as T;
+    } catch {
+        // private window, blocked storage, or an old format -- start fresh
+    }
+    return fallback;
+}
+
+const loadJourney = () => loadStored<JourneyState>(JOURNEY_STORAGE_KEY,
+    (value) => Array.isArray((value as JourneyState | null)?.nodes), { nodes: [], currentKey: null });
+const loadLibrary = () => loadStored<SavedTrack[]>(LIBRARY_STORAGE_KEY, Array.isArray, []);
+
+const newKey = (trackId: string) => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}-${trackId}`;
 
 export type PlaybackState = {
     seedTrackId: string;
@@ -7,7 +52,6 @@ export type PlaybackState = {
     playing: boolean;
     shuffleEnabled: boolean;
     shuffleOrder: string[];
-    listeningPath: string[];
 };
 
 const initialState: PlaybackState = {
@@ -17,19 +61,22 @@ const initialState: PlaybackState = {
     playing: false,
     shuffleEnabled: false,
     shuffleOrder: [],
-    listeningPath: [],
 };
+
+function seedPlayback(state: PlaybackState, trackId: string) {
+    state.seedTrackId = trackId;
+    if (state.currentTrackId === trackId) return;
+    state.currentTrackId = trackId;
+    state.playing = false;
+    state.playRequestedId = null;
+}
 
 const playbackSlice = createSlice({
     name: "playback",
     initialState,
     reducers: {
         selectSeedTrack(state, action: PayloadAction<string>) {
-            state.seedTrackId = action.payload;
-            if (state.currentTrackId === action.payload) return;
-            state.currentTrackId = action.payload;
-            state.playing = false;
-            state.playRequestedId = null;
+            seedPlayback(state, action.payload);
         },
         selectPlaybackTrack(state, action: PayloadAction<string>) {
             state.currentTrackId = action.payload;
@@ -54,21 +101,65 @@ const playbackSlice = createSlice({
         setShuffleOrder(state, action: PayloadAction<string[]>) {
             state.shuffleOrder = action.payload;
         },
-        recordPlayedTrack(state, action: PayloadAction<string>) {
-            if (state.listeningPath.at(-1) !== action.payload) {
-                state.listeningPath.push(action.payload);
+    },
+});
+
+const journeySlice = createSlice({
+    name: "journey",
+    initialState: loadJourney,
+    reducers: {
+        /** `from: "root"` starts a new tree; `"branch"` grows from the current seed
+         *  (or steps onto that branch if it's already there). */
+        plantSeed(state, action: PayloadAction<{ track: Track; from: "root" | "branch"; tier: Tier | null }>) {
+            const { track, from, tier } = action.payload;
+            const parentKey = from === "branch" ? state.currentKey : null;
+            const existing = state.nodes.find((node) => node.parentKey === parentKey && node.track.id === track.id
+                && (parentKey !== null || node.key === state.currentKey));
+            if (existing) {
+                state.currentKey = existing.key;
+                return;
             }
+            const key = newKey(track.id);
+            state.nodes.push({ key, track, parentKey, tier: parentKey === null ? null : tier });
+            state.currentKey = key;
         },
-        clearListeningPath(state) {
-            state.listeningPath = [];
+        revisitSeed(state, action: PayloadAction<string>) {
+            if (state.nodes.some((node) => node.key === action.payload)) state.currentKey = action.payload;
+        },
+        clearJourney(state) {
+            const current = state.nodes.find((node) => node.key === state.currentKey);
+            const key = current ? newKey(current.track.id) : null;
+            state.nodes = current && key ? [{ ...current, key, parentKey: null, tier: null }] : [];
+            state.currentKey = key;
         },
     },
 });
 
+const librarySlice = createSlice({
+    name: "library",
+    initialState: loadLibrary,
+    reducers: {
+        /** Save `track` (newest first), or unsave it if it's already in the Library. */
+        toggleSaved(state, action: PayloadAction<SavedTrack>) {
+            const index = state.findIndex((item) => item.track.id === action.payload.track.id);
+            if (index >= 0) state.splice(index, 1);
+            else state.unshift(action.payload);
+        },
+        /** Manual order: move the track with id `trackId` to position `to`. */
+        moveSaved(state, action: PayloadAction<{ trackId: string; to: number }>) {
+            const from = state.findIndex((item) => item.track.id === action.payload.trackId);
+            if (from < 0) return;
+            const [item] = state.splice(from, 1);
+            state.splice(Math.max(0, Math.min(action.payload.to, state.length)), 0, item);
+        },
+    },
+});
+
+export const { clearJourney, plantSeed, revisitSeed } = journeySlice.actions;
+export const { moveSaved, toggleSaved } = librarySlice.actions;
+
 export const {
-    clearListeningPath,
     clearPlayRequest,
-    recordPlayedTrack,
     requestPlayback,
     selectPlaybackTrack,
     selectSeedTrack,
@@ -78,7 +169,16 @@ export const {
 } = playbackSlice.actions;
 
 export const store = configureStore({
-    reducer: { playback: playbackSlice.reducer },
+    reducer: { playback: playbackSlice.reducer, journey: journeySlice.reducer, library: librarySlice.reducer },
+});
+
+store.subscribe(() => {
+    try {
+        localStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify(store.getState().journey));
+        localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(store.getState().library));
+    } catch {
+        // storage full or blocked: the journey and Library just won't survive a reload
+    }
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -28,7 +28,32 @@ DEFAULT_MAX_SAME_GENRE_SHARE = {"Bridge": 0.25, "Adventurous": 0.2}
 DEFAULT_MAX_SISTER_GENRE_SHARE = {"Bridge": 0.4, "Adventurous": 0.2}
 DEFAULT_WIDEN_TO = {"Bridge": DEFAULT_BANDS["adventurous"][0], "Adventurous": 3000}
 DEFAULT_EXCLUDE_SAME_DECADE = {"Adventurous"}
+
+# The same bands for the 25k fma_medium catalogue (`modeling.catalogue`). The
+# defaults above were tuned by ear on fma_small's 7,994 tracks; in a catalogue
+# 3x the size, a given rank sits ~3x closer to the seed, so the old numbers
+# would make Bridge and Adventurous audibly tamer. Each boundary is moved to the
+# rank where the *same cosine distance* now falls (median over 300 fma_small
+# seeds): 15->40, 30->80, 150->420, 500->1400, 2000->6000, 3000->9000.
+MEDIUM_BANDS = {"familiar": (0, 40), "bridge": (80, 420), "adventurous": (1400, 6000)}
+MEDIUM_WIDEN_TO = {"Bridge": MEDIUM_BANDS["adventurous"][0], "Adventurous": 9000}
 DEFAULT_PREFER_DIFFERENT_COUNTRY = {"Adventurous"}
+
+# How many picks the app serves per request. Fixed server-side (the request
+# carries no `limit`): the genre-share caps are fractions of this, so at 15
+# Bridge keeps 6 slots and Adventurous 9 for genres other than the seed's own
+# and its sister genres.
+RECOMMENDATION_COUNT = 15
+
+# How the distant-genre slots are filled (see _cap_genre_diversity):
+#   "rank"       -- the n closest distant-genre tracks, whatever their genre
+#                   (rounds 1-3). The nearest big genres take every slot.
+#   "nearest"    -- genres take turns, each contributing its closest track;
+#                   genres ordered by how close their closest track is.
+#   "enrichment" -- same turns, but genres ordered by how over-represented
+#                   they are around the seed vs. their catalogue share.
+DISTANT_ORDERS = ("rank", "nearest", "enrichment")
+DEFAULT_DISTANT_ORDER = "enrichment"
 
 
 def genre_sister_map(rec: EffNetRecommender, tracks: pd.DataFrame, k: int = 2) -> dict:
@@ -78,7 +103,8 @@ def _different_decade(cf: ConnectingFactors, seed_id, candidate_id):
 
 def _cap_genre_diversity(tracks, cf, pool_idx, candidate_ids, seed_id, seed_genre, n,
                           max_same_share, max_sister_share, allowed_set, rng,
-                          widen_to=None, prefer_different_country=False, seed_country=None):
+                          widen_to=None, prefer_different_country=False, seed_country=None,
+                          distant_order="rank", require_different_decade=False):
     """Split pool_idx into same-genre / sister-genre (cf.genre_centroids) /
     distant-genre buckets relative to seed_genre. Same- and sister-genre
     picks only ever come from pool_idx itself, each capped at
@@ -93,7 +119,16 @@ def _cap_genre_diversity(tracks, cf, pool_idx, candidate_ids, seed_id, seed_genr
     candidates whose resolved country matches seed_country are pushed behind
     ones that differ or are unknown -- a soft preference (reordering, not a
     cut), since geography coverage is only ~67% and a hard requirement would
-    starve tightly-clustered seeds."""
+    starve tightly-clustered seeds.
+
+    distant_order picks how the distant slots are shared out -- see
+    DISTANT_ORDERS. With "nearest"/"enrichment" every distant genre found in
+    the pool *or* out to widen_to is a candidate, so a small genre whose
+    closest track sits past the band still gets its turn. Anything found
+    past the band passes the same connection gate and, with
+    require_different_decade, the same decade filter as the pool did."""
+    if distant_order not in DISTANT_ORDERS:
+        raise ValueError(f"distant_order must be one of {DISTANT_ORDERS}, got {distant_order!r}")
     pool_idx = list(pool_idx)
     if seed_genre is None or not pool_idx:
         # no genre to compare against (the external seed has none) -- fall
@@ -127,18 +162,51 @@ def _cap_genre_diversity(tracks, cf, pool_idx, candidate_ids, seed_id, seed_genr
     n_sister = min(max_sister, len(sister_idx))
     needed_distant = n - n_same - n_sister
 
-    if len(distant_idx) < needed_distant and widen_to is not None and pool_idx and widen_to > pool_idx[-1]:
-        for j in range(pool_idx[-1] + 1, min(widen_to, len(candidate_ids))):
+    end = min(widen_to, len(candidate_ids)) if widen_to is not None else pool_idx[-1] + 1
+    genres = cf.genre_top.reindex(candidate_ids[:max(end, pool_idx[-1] + 1)]).to_numpy()
+    near_genres = {seed_genre} | sister_genres
+
+    def eligible_beyond_band(j):
+        cid = candidate_ids[j]
+        if require_different_decade and seed_id is not None and not _different_decade(cf, seed_id, cid):
+            return False
+        if allowed_set is not None and seed_id is not None:
+            return bool(set(cf.factors_between(seed_id, cid)) & allowed_set)
+        return True
+
+    if distant_order == "rank":
+        for j in range(pool_idx[-1] + 1, end):
             if len(distant_idx) >= needed_distant:
                 break
-            if _genre_top(tracks, candidate_ids[j]) in ({seed_genre} | sister_genres):
+            if genres[j] not in near_genres and eligible_beyond_band(j):
+                distant_idx.append(j)  # appended in rank order (closest-first), since j increases
+        distant_pick = deprioritize_same_country(distant_idx)[:needed_distant]
+    else:
+        by_genre = {}  # distant genre -> its eligible candidates, closest-first
+        for i in distant_idx:
+            by_genre.setdefault(genres[i] if pd.notna(genres[i]) else None, []).append(i)
+        for j in range(pool_idx[-1] + 1, end):
+            g = genres[j] if pd.notna(genres[j]) else None
+            if g in near_genres or len(by_genre.get(g, ())) >= needed_distant:
                 continue
-            if allowed_set is not None and seed_id is not None:
-                if not (set(cf.factors_between(seed_id, candidate_ids[j])) & allowed_set):
-                    continue
-            distant_idx.append(j)  # appended in rank order (closest-first), since j increases
+            if eligible_beyond_band(j):
+                by_genre.setdefault(g, []).append(j)
+        by_genre.pop(None, None)  # no genre_top: nothing to take turns as
 
-    n_distant = min(needed_distant, len(distant_idx))
+        if distant_order == "nearest":
+            order = sorted(by_genre, key=lambda g: by_genre[g][0])
+        else:
+            local = pd.Series(genres[:end]).value_counts(normalize=True)
+            overall = cf.genre_top.value_counts(normalize=True)
+            order = sorted(by_genre, key=lambda g: (-local.get(g, 0.0) / overall[g], by_genre[g][0]))
+
+        queues = [deprioritize_same_country(by_genre[g]) for g in order]
+        distant_pick, turn = [], 0
+        while len(distant_pick) < needed_distant and any(len(q) > turn for q in queues):
+            distant_pick += [q[turn] for q in queues if len(q) > turn][:needed_distant - len(distant_pick)]
+            turn += 1
+
+    n_distant = len(distant_pick)
     shortfall = n - (n_same + n_sister + n_distant)
     if shortfall > 0:  # backfill: sister first (still "connected"), then same, as a last resort
         extra = min(shortfall, len(sister_idx) - n_sister)
@@ -149,7 +217,6 @@ def _cap_genre_diversity(tracks, cf, pool_idx, candidate_ids, seed_id, seed_genr
 
     same_pick = list(rng.choice(same_idx, size=n_same, replace=False)) if n_same else []
     sister_pick = deprioritize_same_country(sister_idx)[:n_sister]
-    distant_pick = deprioritize_same_country(distant_idx)[:n_distant]
     chosen = same_pick + sister_pick + distant_pick
     return chosen if chosen else pool_idx[: min(n, len(pool_idx))]
 
@@ -160,7 +227,7 @@ def explore_tiers(rec: EffNetRecommender, cf: ConnectingFactors, tracks: pd.Data
                    adventurous=DEFAULT_BANDS["adventurous"], n=5,
                    gate_factors=None, max_same_genre_share=None, max_sister_genre_share=None,
                    widen_to=None, exclude_same_decade=None, prefer_different_country=None,
-                   only=None, seed=0):
+                   distant_order=None, only=None, seed=0):
     """Familiar/Bridge/Adventurous picks for one seed.
 
     Returns {label: [(track_id, distance, rank, factors), ...]}. Pass either
@@ -188,6 +255,7 @@ def explore_tiers(rec: EffNetRecommender, cf: ConnectingFactors, tracks: pd.Data
     # the pick order rather than excluded (soft preference, ~67% coverage)
     prefer_different_country = (DEFAULT_PREFER_DIFFERENT_COUNTRY if prefer_different_country is None
                                 else set(prefer_different_country))
+    distant_order = DEFAULT_DISTANT_ORDER if distant_order is None else distant_order
 
     if seed_vec is None:
         row = rec._position(seed_id)
@@ -235,7 +303,8 @@ def explore_tiers(rec: EffNetRecommender, cf: ConnectingFactors, tracks: pd.Data
                                          same_share, sister_share, allowed_set, rng,
                                          widen_to=widen_to.get(label),
                                          prefer_different_country=label in prefer_different_country,
-                                         seed_country=seed_country)
+                                         seed_country=seed_country, distant_order=distant_order,
+                                         require_different_decade=label in exclude_same_decade)
         else:
             pick = list(rng.choice(pool_for_pick, size=min(n, len(pool_for_pick)), replace=False)) if pool_for_pick else []
         pick = sorted(pick)
@@ -245,10 +314,10 @@ def explore_tiers(rec: EffNetRecommender, cf: ConnectingFactors, tracks: pd.Data
 
 
 def tier_for_adventure(adventure: float) -> str:
-    """Map the frontend's single 0..1 slider onto one of the three tiers.
+    """Map the frontend's 0..1 slider onto one of the three tiers.
 
-    Even split for now -- notebook 09 tuned the bands themselves, not where
-    a continuous dial should switch between them.
+    The slider only stops at 0 / 0.5 / 1 (Familiar / Bridge / Adventurous);
+    the even split just keeps other API callers' in-between values sensible.
     """
     if not 0.0 <= adventure <= 1.0:
         raise ValueError(f"adventure must be between 0 and 1, got {adventure}")
