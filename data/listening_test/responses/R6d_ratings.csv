@@ -1,0 +1,13 @@
+rater,pair_id,similarity_1_5,connects
+R6d,T02,4,instrumentation mood rhythm
+R6d,T05,2,instrumentation
+R6d,T13,2,mood
+R6d,T14,2,mood
+R6d,T19,2,production
+R6d,T25,1,nothing
+R6d,T26,3,energy production mood
+R6d,T30,1,nothing
+R6d,T32,3,instrumentation mood
+R6d,T34,3,mood instrumentation
+R6d,T37,2,energy
+R6d,T38,4,instrumentation mood timbre
