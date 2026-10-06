@@ -18,12 +18,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
     getRecommendations,
+    getTracksById,
     isPreview,
     previewCatalog,
     searchTracks,
     type Recommendation,
     type Track,
 } from "./api/recommendations";
+import JourneyMap from "./components/JourneyMap";
+import Onboarding from "./components/Onboarding";
 import SearchBox from "./components/SearchBox";
 import SpaceBackdrop from "./components/SpaceBackdrop";
 import TasteTree from "./components/TasteTree";
@@ -37,6 +40,7 @@ import {
     requestPlayback,
     revisitSeed,
     selectSeedTrack,
+    startJourney,
     store,
     toggleSaved as toggleSavedTrack,
     setPlaying,
@@ -44,6 +48,8 @@ import {
     setShuffleOrder,
     type AppDispatch,
     type JourneyNode,
+    type Link,
+    type Origin,
     type RootState,
     type SavedTrack,
     type Tier,
@@ -71,7 +77,12 @@ function App() {
     const [volume, setVolume] = useState(0.8);
     // the list next/previous walk through: whatever list playback started from
     // (empty = the current recommendations)
-    const [queue, setQueue] = useState<Track[]>([]);
+    // which list next/previous walk: always read live, so moving the slider (or
+    // re-sorting the Library) takes effect straight away
+    const [queue, setQueue] = useState<"recommendations" | "library">("recommendations");
+    // the seed picker: "first" on a first visit, "again" from the sidebar link
+    const [onboarding, setOnboarding] = useState<"first" | "again" | null>(null);
+    const [mapView, setMapView] = useState<"tree" | "map">("tree");
     const [librarySort, setLibrarySort] = useState<LibrarySort>(loadLibrarySort);
     const [dragId, setDragId] = useState<string | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -128,7 +139,7 @@ function App() {
 
         let active = true;
         // the catalogue's first page, plus the default starting track (it isn't on that page)
-        Promise.all([searchTracks(""), searchTracks(DEFAULT_SEED.title).catch(() => [] as Track[])])
+        Promise.all([searchTracks(""), getTracksById([DEFAULT_SEED.id]).catch(() => [] as Track[])])
             .then(([catalogue, matches]) => {
                 if (!active) return;
                 const defaultSeed = matches.find((track) => track.id === DEFAULT_SEED.id);
@@ -140,8 +151,9 @@ function App() {
                 setTracks([...found, ...journeyTracks]);
                 if (resumed) dispatch(selectSeedTrack(resumed.track.id));  // pick up the saved journey
                 else if (found.length > 0) {
-                    dispatch(plantSeed({ track: trackOnly(found[0]), from: "root", tier: null }));
+                    dispatch(plantSeed({ track: trackOnly(found[0]), from: "root", tier: null, origin: { via: "default" } }));
                     dispatch(selectSeedTrack(found[0].id));
+                    setOnboarding("first");
                 }
                 setCatalogReady(true);
             })
@@ -183,8 +195,8 @@ function App() {
     const visibleRecommendations = shuffleEnabled
         ? orderTracks(recommendations, shuffleOrder)
         : recommendations;
-    const playQueue = queue.length > 0 ? queue : visibleRecommendations;
     const libraryTracks = sortLibrary(library.map((item) => item.track), librarySort);
+    const playQueue = queue === "library" ? libraryTracks : visibleRecommendations;
     const manualOrder = librarySort.key === "manual";
 
     function chooseLibrarySort(key: SortKey) {
@@ -204,7 +216,7 @@ function App() {
     }
 
     useEffect(() => {
-        setQueue([]);  // a new seed: next/previous follow its recommendations
+        setQueue("recommendations");  // a new seed: next/previous follow its recommendations
     }, [seedTrackId]);
 
     function rememberTrack(track: Track) {
@@ -213,9 +225,9 @@ function App() {
 
     /** Make `track` the seed and record the step in the taste tree: a search jump
      *  starts a new tree, anything else grows a branch from the current seed. */
-    function plant(track: Track, from: "root" | "branch") {
+    function plant(track: Track, from: "root" | "branch", origin?: Origin) {
         rememberTrack(track);
-        dispatch(plantSeed({ track: trackOnly(track), from, tier: tierFor(adventure) }));
+        dispatch(plantSeed({ track: trackOnly(track), from, tier: tierFor(adventure), link: linkTo(track), origin }));
         dispatch(selectSeedTrack(track.id));
     }
 
@@ -236,13 +248,27 @@ function App() {
         dispatch(requestPlayback(track.id));
     }
 
-    function chooseTrack(track: Track) {
-        plant(track, "root");
+    /** The picker's choice: a first visit replaces the default start, later picks start a new tree. */
+    function chooseStart(track: Track, origin: Origin) {
+        if (onboarding === "first") {
+            rememberTrack(track);
+            dispatch(startJourney({ track: trackOnly(track), origin }));
+            dispatch(selectSeedTrack(track.id));
+        } else {
+            plant(track, "root", origin);
+        }
+        setOnboarding(null);
+        setPage("discover");
+        window.scrollTo({ top: 0 });
+    }
+
+    function chooseTrack(track: Track, query: string) {
+        plant(track, "root", { via: "search", query });
         setPage("discover");
     }
 
-    /** Play `track` from `list`; next/previous then walk that list. */
-    function playFromList(track: Track, list: Track[]) {
+    /** Play `track` from a list; next/previous then walk that list (as it is at the time). */
+    function playFromList(track: Track, list: "recommendations" | "library") {
         setQueue(list);
         if (track.id === currentTrackId) {
             void togglePlayback();
@@ -277,7 +303,7 @@ function App() {
             void togglePlayback();
             return;
         }
-        setQueue([]);  // after the seed: its recommendations
+        setQueue("recommendations");  // after the seed: its recommendations
         dispatch(requestPlayback(seedTrackId));
     }
 
@@ -306,6 +332,12 @@ function App() {
         dispatch(setShuffle({ enabled: true, order: shuffleTrackIds(visibleRecommendations) }));
     }
 
+    /** Why `track` came up for the current seed, if it's in the recommendations. */
+    function linkTo(track: Track): Link | undefined {
+        const fromList = recommendations.find((item) => item.id === track.id);
+        return fromList ? { factors: fromList.connectingFactors ?? [], distance: fromList.distance } : undefined;
+    }
+
     /** Save or unsave a track. It's filed under the current seed (for the Taste
      *  Tree), with its distance from that seed if it came from the recommendations. */
     function toggleSaved(track: Track) {
@@ -313,6 +345,7 @@ function App() {
         dispatch(toggleSavedTrack({
             track: { ...trackOnly(track), distance: fromList?.distance },
             seedKey: journey.currentKey,
+            link: linkTo(track),
         }));
     }
 
@@ -324,8 +357,12 @@ function App() {
                     <span>tasty</span>
                 </a>
 
+                <button className="start-new-link" onClick={() => setOnboarding("again")}><NoteStars size={15} /> Start somewhere new</button>
                 <div className="side-label">Your space</div>
                 <nav className="primary-nav" aria-label="Main navigation">
+                    <button className="nav-item start-new-nav" onClick={() => setOnboarding("again")} aria-label="Start somewhere new" title="Start somewhere new">
+                        <NoteStars size={18} /><span>Start somewhere new</span>
+                    </button>
                     <button className={page === "discover" ? "nav-item active" : "nav-item"} onClick={() => setPage("discover")}>
                         <Compass size={18} /><span>Discover</span>
                     </button>
@@ -343,6 +380,10 @@ function App() {
             </aside>
 
             <SpaceBackdrop page={page} />
+            {onboarding && (
+                <Onboarding firstVisit={onboarding === "first"} defaultTitle={seedTrack.title} nowPlayingId={currentTrackId} playing={playing}
+                    onChoose={chooseStart} onDismiss={() => setOnboarding(null)} onPreview={playTreeTrack} />
+            )}
             <main className="main-content">
                 <header className="topbar">
                     <SearchBox onChoose={chooseTrack} currentTrackId={currentTrackId} placeholder="Search a song, artist or genre, or describe a sound" />
@@ -365,10 +406,10 @@ function App() {
                             <div className="discover-layout">
                                 <section className="recommendations-section">
                                     <div className="section-heading"><div><div className="eyebrow">Similar to seed track: {seedTrack.title}</div></div><div className="recommendation-actions"><button className={shuffleEnabled ? "icon-button shuffle-button active" : "icon-button shuffle-button"} onClick={toggleRecommendationShuffle} aria-label={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"} aria-pressed={shuffleEnabled} title={shuffleEnabled ? "Turn off shuffle" : "Shuffle recommendations"}><Shuffle size={16} /></button><button className="text-button" onClick={exploreFromCurrentTrack} disabled={currentTrackId === seedTrackId}><NoteStars size={15} /> Seed this track</button><InfoTip label="Seed this track" align="right" text="Makes the track that's playing your new seed: the playlist refreshes with tracks that sound like it, and the step is added to your Taste Map. Each row's notes icon does the same for that track." /></div></div>
-                                    <div className="list-heading"><span>Track</span><span>Genre</span><span className="distance-heading">Taste distance <InfoTip label="Taste distance" text="How different a track sounds from the seed, in zorbs (cosine distance × 100). Not a score of how much you'll like it." /></span><span></span><span></span></div>
+                                    <div className="list-heading"><span>Track</span><span>Genre</span><span className="distance-heading">Taste distance <InfoTip label="Taste distance" text="How far a track's sound is from your seed, in bridgons. The bigger the number, the bigger the leap: under 30 stays close to home, 40 and up takes you somewhere new. It's about sound, not a score of how much you'll like it." /></span><span></span><span></span></div>
                                     {error && <div className="error-state" role="alert">{error}</div>}
                                     {!error && recommendationsLoading && <div className="empty-state" role="status">Finding tracks similar to {seedTrack.title}...</div>}
-                                    {!error && !recommendationsLoading && visibleRecommendations.map((track) => <RecommendationRow key={`${track.id}-${track.rank}`} track={track} saved={savedIds.has(track.id)} playing={playing && currentTrackId === track.id} onPlay={() => playFromList(track, visibleRecommendations)} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId} />)}
+                                    {!error && !recommendationsLoading && visibleRecommendations.map((track) => <RecommendationRow key={`${track.id}-${track.rank}`} track={track} saved={savedIds.has(track.id)} playing={playing && currentTrackId === track.id} onPlay={() => playFromList(track, "recommendations")} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId} />)}
                                     {!error && !recommendationsLoading && recommendations.length === 0 && <div className="empty-state">No recommendations for this selection yet.</div>}
                                 </section>
                                 <aside className="seed-panel" aria-label="Seed track and adventure level">
@@ -412,8 +453,15 @@ function App() {
                                     <button className="text-button" onClick={() => dispatch(clearJourney())} disabled={journey.nodes.length < 2}>Start over</button>
                                 </div>
                             </div>
+                            <div className="sort-control map-view-toggle" role="group" aria-label="Taste Map view">
+                                <span>View</span>
+                                <button className={mapView === "tree" ? "active" : undefined} aria-pressed={mapView === "tree"} onClick={() => setMapView("tree")}>Tree</button>
+                                <button className={mapView === "map" ? "active" : undefined} aria-pressed={mapView === "map"} onClick={() => setMapView("map")}>Map</button>
+                            </div>
                             {journey.nodes.length === 0
                                 ? <div className="empty-state">Pick a starting track and your tree will grow from it.</div>
+                                : mapView === "map"
+                                ? <JourneyMap nodes={journey.nodes} saved={library} currentKey={journey.currentKey} nowPlayingId={currentTrackId} onRevisit={revisit} onPlay={playTreeTrack} />
                                 : <TasteTree nodes={journey.nodes} saved={library} currentKey={journey.currentKey} nowPlayingId={currentTrackId} playing={playing} onRevisit={revisit} onPlay={playTreeTrack} onUnsave={toggleSaved} />}
                             {journey.nodes.length === 1 && <p className="tree-hint"><Bookmark size={13} /> Save tracks you like and <NoteStars size={13} /> seed them on Discover: your tree grows from both.</p>}
                         </section>
@@ -438,7 +486,7 @@ function App() {
                             <div className="list-heading library-columns"><span>Track</span><span>Genre</span><span>Location</span><span>Year created</span><span className="distance-heading">BPM <InfoTip label="BPM" align="right" text="Beats per minute, estimated from the audio. Very fast or half-time tracks can read double or half." /></span><span></span><span></span></div>
                             {libraryTracks.map((track, index) => (
                                 <RecommendationRow key={track.id} variant="library" track={track} saved playing={playing && currentTrackId === track.id}
-                                    onPlay={() => playFromList(track, libraryTracks)} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId}
+                                    onPlay={() => playFromList(track, "library")} onToggleSaved={() => toggleSaved(track)} onExplore={() => exploreFromTrack(track)} isSeed={track.id === seedTrackId}
                                     reorder={manualOrder ? {
                                         dragging: dragId === track.id,
                                         over: dragOverIndex === index && dragId !== track.id,
@@ -474,7 +522,7 @@ function App() {
 }
 
 /** Where a first visit starts. Visitors with a saved journey resume their own seed. */
-const DEFAULT_SEED = { id: "13668", title: "No Time For Lookin' Back" };  // by This One
+const DEFAULT_SEED = { id: "13668", title: "No Time For Lookin' Back" };  // by This One; used when the picker is skipped
 
 function tierFor(adventure: number): Tier {
     // mirrors the server's tier_for_adventure
@@ -581,7 +629,7 @@ function RecommendationRow({ track, saved, playing, isSeed, onPlay, onToggleSave
                     : <span className="track-location uncharted" title="FMA has no location for this artist">Uncharted</span>}
                 <span className="track-date">{track.dateCreated ? track.dateCreated.slice(0, 4) : "–"}</span>
                 <span className="track-bpm">{track.bpm ?? "–"}</span>
-            </> : <span className="track-distance">{track.distance === undefined ? "–" : <>{Math.round(track.distance * 100)} <small>zorbs away</small></>}</span>}
+            </> : <span className="track-distance">{track.distance === undefined ? "–" : <>{Math.round(track.distance * 100)} <small>bridgons away</small></>}</span>}
             <button className="icon-button explore-button" onClick={onExplore} disabled={isSeed} aria-label={`Seed ${track.title}`} title="Seed this track"><NoteStars size={17} /></button>
             <button className={saved ? "icon-button heart-button is-saved" : "icon-button heart-button"} onClick={onToggleSaved} aria-label={saved ? `Remove ${track.title} from your Library` : `Save ${track.title} to your Library`} title={saved ? "In your Library" : "Save to Library"}>{saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}</button>
         </div>

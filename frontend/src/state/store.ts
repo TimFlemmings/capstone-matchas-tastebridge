@@ -6,11 +6,25 @@ export type Tier = "Familiar" | "Bridge" | "Adventurous";
 /** One seed you explored from. `parentKey` is the seed you were on when you
  *  sprouted this one (null: the start of a tree -- the first track, or a search
  *  jump). `tier` is where the slider was for that step. */
+/** Why a track came up for a seed: the recommender's connecting factors
+ *  ("genre", "era", ...) and its taste distance (cosine, 0..1) from that seed. */
+export type Link = { factors: string[]; distance?: number };
+
+/** How a journey (a tree on the Taste Map) began. */
+export type Origin =
+    | { via: "default" }                  // the app's starting track
+    | { via: "search"; query: string }    // a search
+    | { via: "genre"; genre: string }     // a genre in the picker
+    | { via: "starter" }                  // one of the picker's starting points
+    | { via: "surprise" };                // "Surprise me"
+
 export type JourneyNode = {
     key: string;
     track: Track;
     parentKey: string | null;
     tier: Tier | null;
+    link?: Link;  // to the parent seed; missing for roots and journeys saved before links existed
+    origin?: Origin;  // roots only
 };
 
 /** A track in the Library. `seedKey` is the journey node that was the seed
@@ -19,6 +33,7 @@ export type JourneyNode = {
 export type SavedTrack = {
     track: Track & { distance?: number };
     seedKey: string | null;
+    link?: Link;  // to that seed, when it was saved from the recommendations
 };
 
 export type JourneyState = {
@@ -110,8 +125,8 @@ const journeySlice = createSlice({
     reducers: {
         /** `from: "root"` starts a new tree; `"branch"` grows from the current seed
          *  (or steps onto that branch if it's already there). */
-        plantSeed(state, action: PayloadAction<{ track: Track; from: "root" | "branch"; tier: Tier | null }>) {
-            const { track, from, tier } = action.payload;
+        plantSeed(state, action: PayloadAction<{ track: Track; from: "root" | "branch"; tier: Tier | null; link?: Link; origin?: Origin }>) {
+            const { track, from, tier, link, origin } = action.payload;
             const parentKey = from === "branch" ? state.currentKey : null;
             const existing = state.nodes.find((node) => node.parentKey === parentKey && node.track.id === track.id
                 && (parentKey !== null || node.key === state.currentKey));
@@ -120,11 +135,19 @@ const journeySlice = createSlice({
                 return;
             }
             const key = newKey(track.id);
-            state.nodes.push({ key, track, parentKey, tier: parentKey === null ? null : tier });
+            state.nodes.push(parentKey === null
+                ? { key, track, parentKey, tier: null, origin }
+                : { key, track, parentKey, tier, link });
             state.currentKey = key;
         },
         revisitSeed(state, action: PayloadAction<string>) {
             if (state.nodes.some((node) => node.key === action.payload)) state.currentKey = action.payload;
+        },
+        /** A fresh journey starting at `track` (the first-visit onboarding pick). */
+        startJourney(state, action: PayloadAction<{ track: Track; origin?: Origin }>) {
+            const key = newKey(action.payload.track.id);
+            state.nodes = [{ key, track: action.payload.track, parentKey: null, tier: null, origin: action.payload.origin }];
+            state.currentKey = key;
         },
         clearJourney(state) {
             const current = state.nodes.find((node) => node.key === state.currentKey);
@@ -155,7 +178,7 @@ const librarySlice = createSlice({
     },
 });
 
-export const { clearJourney, plantSeed, revisitSeed } = journeySlice.actions;
+export const { clearJourney, plantSeed, revisitSeed, startJourney } = journeySlice.actions;
 export const { moveSaved, toggleSaved } = librarySlice.actions;
 
 export const {

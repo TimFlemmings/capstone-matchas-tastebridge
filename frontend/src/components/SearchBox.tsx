@@ -3,8 +3,9 @@ import { Search } from "lucide-react";
 import { searchTracks, type Track } from "../api/recommendations";
 
 /** A search field with its own results dropdown. Picking a result calls `onChoose`. */
-export default function SearchBox({ onChoose, placeholder, className = "search-wrap", currentTrackId }: {
-    onChoose: (track: Track) => void;
+export default function SearchBox({ onChoose, placeholder, className = "search-wrap", currentTrackId, autoFocus = false }: {
+    autoFocus?: boolean;
+    onChoose: (track: Track, query: string) => void;
     placeholder: string;
     className?: string;
     currentTrackId?: string;
@@ -38,7 +39,7 @@ export default function SearchBox({ onChoose, placeholder, className = "search-w
     }, [query]);
 
     function choose(track: Track) {
-        onChoose(track);
+        onChoose(track, query.trim());
         setQuery("");
         setOpen(false);
     }
@@ -48,6 +49,7 @@ export default function SearchBox({ onChoose, placeholder, className = "search-w
             <Search size={15} />
             <input
                 aria-label="Search tracks"
+                autoFocus={autoFocus}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onFocus={() => setOpen(true)}

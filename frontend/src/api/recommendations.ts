@@ -19,7 +19,11 @@ export type Track = {
 export type Recommendation = Track & {
     rank: number;
     distance: number;
+    /** Why it connects to the seed: "genre", "genre_lineage", "related_genre", "era", "geography". */
+    connectingFactors?: string[];
 };
+
+export type MapPoint = { id: string; x: number; y: number };
 
 const covers = {
     signal: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=900&q=85",
@@ -89,6 +93,14 @@ export async function searchTracks(query: string): Promise<Track[]> {
     return payload.tracks;
 }
 
+/** Tracks by id, in the order given; ids the catalogue doesn't have are left out. */
+export async function getTracksById(ids: string[]): Promise<Track[]> {
+    if (isPreview) return previewTracks.filter((track) => ids.includes(track.id));
+    const response = await apiFetch(`/tracks/by-id?ids=${ids.map(encodeURIComponent).join(",")}`, "Track lookup");
+    const payload = (await response.json()) as { tracks: Track[] };
+    return payload.tracks;
+}
+
 export async function getRecommendations(
     trackId: string,
     adventure: number,
@@ -113,4 +125,13 @@ export async function getRecommendations(
     });
     const payload = (await response.json()) as { recommendations: Recommendation[] };
     return payload.recommendations;
+}
+
+/** 2D positions for these tracks, laid out by their own sound (a projection
+ *  fitted to just this set, so the spread shows how they differ). */
+export async function getJourneyMap(ids: string[]): Promise<MapPoint[]> {
+    if (isPreview) return ids.map((id, index) => ({ id, x: 0.2 + 0.6 * ((index * 0.37) % 1), y: 0.2 + 0.6 * ((index * 0.61) % 1) }));
+    const response = await apiFetch(`/journey-map?ids=${ids.map(encodeURIComponent).join(",")}`, "Taste Map layout");
+    const payload = (await response.json()) as { points: MapPoint[] };
+    return payload.points;
 }

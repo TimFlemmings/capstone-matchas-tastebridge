@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
+import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -170,6 +171,55 @@ def search_tracks(request: Request, query: str = Query(default="", max_length=20
         item["matchedBy"] = matched_by  # "name" | "genre" | "sound"
         results.append(item)
     return {"tracks": results}
+
+
+@app.get("/tracks/by-id")
+def tracks_by_id(request: Request, ids: str = Query(..., max_length=500)):
+    """Several tracks by id (comma-separated), in that order; unknown ids are skipped."""
+    tracks: pd.DataFrame = request.app.state.tracks
+    catalogue = request.app.state.catalogue
+    found = []
+    for raw in ids.split(",")[:50]:
+        try:
+            track_id = catalogue.resolve(int(raw))
+        except (ValueError, TrackUnavailable):
+            continue
+        found.append(track_payload(track_id, tracks.loc[track_id]))
+    return {"tracks": found}
+
+
+@app.get("/journey-map")
+def journey_map(request: Request, ids: str = Query(..., max_length=2000)):
+    """2D positions for a listener's own tracks (Taste Map). The projection is
+    fitted to just these tracks' embeddings, so the picture spreads out to show
+    how they differ, rather than squeezing them into a corner of the full
+    25k-track space. Both axes share one scale, so distances stay comparable."""
+    recommender: EffNetRecommender = request.app.state.recommender
+    catalogue = request.app.state.catalogue
+    wanted = []
+    for raw in ids.split(",")[:200]:
+        try:
+            track_id = catalogue.resolve(int(raw))
+        except (ValueError, TrackUnavailable):
+            continue
+        if track_id not in wanted:
+            wanted.append(track_id)
+    if not wanted:
+        return {"points": []}
+    vectors = recommender.embedding_.iloc[[recommender._position(t) for t in wanted]].to_numpy()
+    centred = vectors - vectors.mean(axis=0)
+    if len(wanted) == 1:
+        xy = np.zeros((1, 2))
+    else:
+        _, _, axes = np.linalg.svd(centred, full_matrices=False)
+        xy = centred @ axes[:2].T
+        if xy.shape[1] == 1:
+            xy = np.column_stack([xy[:, 0], np.zeros(len(xy))])
+    span = float(np.ptp(xy, axis=0).max()) or 1.0
+    xy = (xy - xy.min(axis=0)) / span                 # one shared scale, 0..1 on the wider axis
+    xy += (1 - np.ptp(xy, axis=0)) / 2                # centre the narrower axis
+    xy = 0.08 + 0.84 * xy                             # keep clear of the edges
+    return {"points": [{"id": str(t), "x": round(float(x), 4), "y": round(float(y), 4)} for t, (x, y) in zip(wanted, xy)]}
 
 
 def resolve_track(request: Request, track_id: str) -> int:

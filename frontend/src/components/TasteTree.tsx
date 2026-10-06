@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { BookmarkCheck, Pause } from "lucide-react";
 import type { Track } from "../api/recommendations";
-import type { JourneyNode, SavedTrack } from "../state/store";
+import type { JourneyNode, Origin, SavedTrack } from "../state/store";
+import { linkParts } from "../connections";
 import { NoteStars, PlayIcon } from "./icons";
 
 type Actions = {
@@ -29,13 +30,34 @@ export default function TasteTree({ nodes, saved, ...actions }: Actions & { node
         return map;
     }, [saved]);
 
+    const roots = childrenOf.get(null) ?? [];
     return (
         <ol className="journey-tree">
-            {(childrenOf.get(null) ?? []).map((root) => (
-                <Branch key={root.key} node={root} childrenOf={childrenOf} savedBySeed={savedBySeed} {...actions} />
+            {roots.map((root, index) => (
+                <Fragment key={root.key}>
+                    {/* several journeys: say how each one began, so a later tree doesn't look like a stray */}
+                    {roots.length > 1 && (
+                        <li className="journey-heading">
+                            <strong>Journey {index + 1}</strong> · {describeOrigin(root.origin, index)}
+                        </li>
+                    )}
+                    <Branch node={root} childrenOf={childrenOf} savedBySeed={savedBySeed} {...actions} />
+                </Fragment>
             ))}
         </ol>
     );
+}
+
+function describeOrigin(origin: Origin | undefined, index: number): string {
+    switch (origin?.via) {
+        case "default": return "started with the app's first track";
+        case "search": return origin.query ? `jumped here from a search for “${origin.query}”` : "jumped here from a search";
+        case "genre": return `picked from ${origin.genre}`;
+        case "starter": return "picked from the starting points";
+        case "surprise": return "a surprise pick";
+        // journeys from before the app recorded how they began
+        default: return index === 0 ? "where you started" : "jumped here from a search or a pick";
+    }
 }
 
 function Branch({ node, childrenOf, savedBySeed, ...actions }: Actions & {
@@ -71,6 +93,7 @@ function Branch({ node, childrenOf, savedBySeed, ...actions }: Actions & {
                     <span className="journey-seed-copy">
                         <span className="journey-seed-labels">
                             <span className={`tier-chip tier-${tier}`}>{node.tier === "Familiar" ? "Home" : node.tier === "Adventurous" ? "Adventure" : node.tier ?? "Start"}</span>
+                            {linkParts(node.link).length > 0 && <span className="link-text">{linkParts(node.link).join(" · ")}</span>}
                             {isCurrent && <span className="here-chip"><NoteStars size={10} /> Current seed</span>}
                         </span>
                         <strong>{node.track.title}</strong>
@@ -82,10 +105,13 @@ function Branch({ node, childrenOf, savedBySeed, ...actions }: Actions & {
 
             {savedHere.length > 0 && (
                 <ul className="journey-saved" aria-label={`Saved while exploring ${node.track.title}`}>
-                    {savedHere.map(({ track }) => (
+                    {savedHere.map(({ track, link }) => (
                         <li key={track.id}>
                             <img src={track.coverUrl} alt="" />
-                            <span><strong>{track.title}</strong><small>{track.artist} · {track.genre}</small></span>
+                            <span>
+                                <strong>{track.title}</strong><small>{track.artist} · {track.genre}</small>
+                                {linkParts(link).length > 0 && <span className="link-chips">{linkParts(link).map((part) => <i key={part}>{part}</i>)}</span>}
+                            </span>
                             {playButton(track, true)}
                             <button className="icon-button is-saved" onClick={() => onUnsave(track)}
                                 aria-label={`Remove ${track.title} from your Library`} title="Remove from Library">

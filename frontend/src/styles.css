@@ -1226,8 +1226,9 @@ select:focus-visible {
 .taste-tree-section {
     padding-top: 28px;
     --tier-start: var(--muted);
-    --tier-familiar: var(--quiet);
-    --tier-bridge: var(--accent-2);
+    /* Home / Bridge / Adventure: blue, pink, lemon -- apart in hue and brightness */
+    --tier-familiar: #5cb4ff;
+    --tier-bridge: #ff6fb5;
     --tier-adventurous: var(--accent);
 }
 
@@ -2089,5 +2090,541 @@ select:focus-visible {
 
     .library-hint {
         display: none;
+    }
+}
+
+/* ---- onboarding: pick a seed track ---- */
+.onboarding-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgb(0 0 0 / 62%);
+    backdrop-filter: blur(6px);
+}
+
+.onboarding-card {
+    width: min(640px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow: auto;
+    border: 1px solid #2e2e2e;
+    border-radius: 22px;
+    background: #181818;
+    box-shadow: 0 30px 80px #000a;
+}
+
+.onboarding-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 24px 14px;
+    text-align: center;
+    background: radial-gradient(circle at 50% 0%, rgb(198 251 143 / 16%), transparent 70%), #151515;
+}
+
+/* brand lockup: logo to the left of the name */
+.onboarding-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.onboarding-brand span {
+    color: var(--accent);
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.6px;
+    line-height: 1;
+}
+
+.onboarding-hero h2 {
+    margin: 0 0 3px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.onboarding-hero p {
+    max-width: 460px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.onboarding-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+}
+
+.onboarding-close:hover {
+    color: var(--ink);
+    background: #262626;
+}
+
+.onboarding-body {
+    display: grid;
+    gap: 14px;
+    padding: 14px 24px 6px;
+}
+
+.search-wrap.onboarding-search {
+    width: auto;
+    padding: 10px 14px;
+    border-radius: 12px;
+}
+
+.onboarding-body h3 {
+    margin: 0 0 8px;
+    color: var(--quiet);
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+}
+
+.genre-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.genre-chips button {
+    padding: 7px 12px;
+    border: 1px solid #333333;
+    border-radius: 20px;
+    color: var(--muted);
+    background: #1f1f1f;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.genre-chips button:hover {
+    color: var(--ink);
+    border-color: #4a4a4a;
+}
+
+.genre-chips button.active {
+    border-color: transparent;
+    color: var(--accent-ink);
+    background: var(--accent-gradient);
+}
+
+.onboarding-list {
+    display: grid;
+    gap: 0;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.onboarding-track {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 4px 8px 4px 6px;
+    border-radius: 12px;
+}
+
+.onboarding-track:hover {
+    background: #222222;
+}
+
+.onboarding-track img {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.onboarding-track-copy {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    gap: 2px;
+}
+
+.onboarding-track-copy strong,
+.onboarding-track-copy small {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.onboarding-track-copy strong {
+    font-size: 12px;
+}
+
+.onboarding-track-copy small {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.onboarding-start {
+    flex: none;
+    padding: 7px 13px;
+    border: 0;
+    border-radius: 20px;
+    color: var(--accent-ink);
+    background: var(--accent-gradient);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.onboarding-note {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.onboarding-footer {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 24px;
+    border-top: 1px solid #262626;
+    background: #181818;
+}
+
+.onboarding-surprise {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 15px;
+    border: 1px solid #3a3a3a;
+    border-radius: 20px;
+    color: var(--ink);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.onboarding-surprise:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* sidebar: reopen the picker */
+.start-new-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 28px;
+    padding: 10px 12px;
+    border: 1px dashed #333333;
+    border-radius: 10px;
+    color: var(--muted);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.start-new-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+@media (max-width: 700px) {
+    .onboarding-overlay {
+        padding: 10px;
+    }
+
+    .onboarding-card {
+        max-height: calc(100vh - 20px);
+    }
+
+    .onboarding-hero {
+        padding: 14px 18px 12px;
+    }
+
+    .onboarding-body {
+        padding: 12px 18px 6px;
+    }
+
+    .onboarding-footer {
+        padding: 12px 18px;
+    }
+
+    .start-new-link {
+        display: none;
+    }
+}
+
+/* ---- Taste Map connections: link labels (A), chips (B), map view (D) ---- */
+.link-text {
+    overflow: hidden;
+    color: var(--muted);
+    font-family: "DM Mono", monospace;
+    font-size: 7.5px;
+    letter-spacing: .5px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+}
+
+.link-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+}
+
+.link-chips i {
+    padding: 1px 6px;
+    border: 1px solid #343434;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 8.5px;
+    font-style: normal;
+}
+
+.map-view-toggle {
+    margin-bottom: 14px;
+}
+
+.journey-map {
+    border: 1px solid #2a2a2a;
+    border-radius: 18px;
+    background: rgb(22 22 22 / 82%);
+    overflow: hidden;
+}
+
+.journey-map-scroll {
+    max-height: 72vh;
+    overflow: auto;
+}
+
+.journey-map svg {
+    display: block;
+    min-width: 100%;
+}
+
+.map-step path {
+    fill: none;
+    stroke: var(--tier-start);
+    stroke-width: 2.2;
+}
+
+.map-step.tier-familiar path { stroke: var(--tier-familiar); }
+.map-step.tier-bridge path { stroke: var(--tier-bridge); }
+.map-step.tier-adventurous path { stroke: var(--tier-adventurous); }
+
+.map-step text {
+    fill: var(--ink);
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    letter-spacing: .4px;
+    paint-order: stroke;
+    stroke: #161616;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+}
+
+.map-saved-link {
+    stroke: #5a5a5a;
+    stroke-width: 1.2;
+    stroke-dasharray: 3 4;
+}
+
+.map-seed,
+.map-saved {
+    cursor: pointer;
+}
+
+.map-seed circle {
+    fill: #1c1c1c;
+    stroke: var(--ink);
+    stroke-width: 2;
+}
+
+.map-seed.current circle {
+    fill: url(#map-accent);
+    stroke: #111111;
+}
+
+.map-label.seed {
+    fill: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: #161616;
+    stroke-width: 4px;
+}
+
+.map-seed:hover circle,
+.map-seed:focus-visible circle {
+    stroke: var(--accent);
+}
+
+.map-saved circle {
+    fill: var(--accent-2);
+    opacity: .85;
+}
+
+.map-saved.playing circle {
+    fill: var(--accent);
+    opacity: 1;
+}
+
+.map-label.saved {
+    fill: #c9c9c9;
+    font-size: 11px;
+    font-weight: 500;
+    paint-order: stroke;
+    stroke: #161616;
+    stroke-width: 3px;
+}
+
+.map-saved:hover .map-label {
+    fill: var(--ink);
+}
+
+.journey-map-key {
+    display: grid;
+    gap: 10px;
+    padding: 12px 16px 14px;
+    border-top: 1px solid #262626;
+    color: var(--muted);
+    font-size: 10.5px;
+}
+
+.key-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.key-legend span,
+.key-steps li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.journey-map-key i {
+    flex: none;
+    display: inline-block;
+}
+
+.key-note {
+    color: var(--quiet);
+}
+
+.key-line {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--tier-start);
+}
+
+.key-line.tier-familiar { background: var(--tier-familiar); }
+.key-line.tier-bridge { background: var(--tier-bridge); }
+.key-line.tier-adventurous { background: var(--tier-adventurous); }
+
+.key-steps {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 10px 0 0;
+    border-top: 1px dashed #2a2a2a;
+    list-style: none;
+}
+
+.key-steps li {
+    flex-wrap: wrap;
+}
+
+.key-step-route strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.key-step-why {
+    color: var(--muted);
+    font-family: "DM Mono", monospace;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.key-seed {
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+}
+
+.key-saved {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-2);
+}
+
+.key-dotted {
+    width: 16px;
+    border-top: 1.5px dashed #6a6a6a;
+}
+
+.map-step-hit {
+    stroke: transparent !important;
+    stroke-width: 14 !important;
+    cursor: help;
+}
+
+/* ---- Taste Map: a heading per journey when there's more than one ---- */
+.journey-heading {
+    padding-top: 4px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.journey-heading strong {
+    color: var(--accent);
+    font-family: "DM Mono", monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.journey-heading:not(:first-child) {
+    padding-top: 22px;
+    border-top: 1px dashed #2e2e2e;
+}
+
+/* phones: the picker gets a top-bar icon (the sidebar link is hidden there) */
+.nav-item.start-new-nav {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .nav-item.start-new-nav {
+        display: flex;
     }
 }
