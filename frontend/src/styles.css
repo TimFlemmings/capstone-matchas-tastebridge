@@ -154,22 +154,6 @@ select:focus-visible {
     height: 24px;
 }
 
-.sidebar-bottom {
-    margin-top: auto;
-}
-
-.sound-status {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 13px 2px 0;
-    color: var(--quiet);
-    font-family: "DM Mono", monospace;
-    font-size: 9px;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-}
-
 .status-dot {
     width: 7px;
     height: 7px;
@@ -982,7 +966,6 @@ select:focus-visible {
         width: 24px;
     }
 .side-label,
-.sidebar-bottom,
 .primary-nav .nav-item span {
         display: none;
     }

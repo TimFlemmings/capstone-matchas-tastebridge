@@ -374,9 +374,6 @@ function App() {
                     </button>
                 </nav>
 
-                <div className="sidebar-bottom">
-                    <div className="sound-status"><span className={isPreview ? "status-dot preview" : "status-dot live"}></span>{isPreview ? "Preview catalogue" : "Recommender connected"}</div>
-                </div>
             </aside>
 
             <SpaceBackdrop page={page} />
@@ -502,7 +499,7 @@ function App() {
                     )}
                 </div>
 
-                <footer className="page-footer"><span>TASTY / MUSIC DISCOVERY</span><span>{isPreview ? "DEMO DATA" : "CONNECTED TO RECOMMENDER"}</span></footer>
+                <footer className="page-footer"><span>TASTY / MUSIC DISCOVERY</span></footer>
             </main>
 
             <div className="player-bar">
