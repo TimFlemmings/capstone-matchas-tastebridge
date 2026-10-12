@@ -1,5 +1,5 @@
 ---
-title: Tasty (demo)
+title: Tastey (demo)
 emoji: 🎧
 colorFrom: pink
 colorTo: gray
@@ -9,7 +9,7 @@ pinned: false
 short_description: Music discovery from familiar to adventurous
 ---
 
-# Tasty (demo)
+# Tastey (demo)
 
 Pick a seed track and slide from **Familiar** through **Bridge** to **Adventurous**:
 recommendations come from Discogs-EffNet audio embeddings over ~25k Free Music

@@ -67,7 +67,7 @@ async function apiFetch(path: string, what: string, init?: RequestInit): Promise
         response = await fetch(`${apiBase}${path}`, init);
     } catch {
         // fetch only throws when no response arrived at all: server down, wrong port, or CORS
-        throw new Error(`Can't reach the Tasty server at ${apiBase || window.location.origin}. Is the API running?`);
+        throw new Error(`Can't reach the Tastey server at ${apiBase || window.location.origin}. Is the API running?`);
     }
     if (!response.ok) {
         const detail = await response

@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-/** The tasty mark: a vinyl record as a planet, with a ring around it. */
+/** The tastey mark: a vinyl record as a planet, with a ring around it. */
 export function TastyLogo({ size = 28, tone = "gradient" }: { size?: number; tone?: "gradient" | "white" }) {
     const id = useId();
     const gradient = `${id}-gradient`;

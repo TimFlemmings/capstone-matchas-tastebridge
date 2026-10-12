@@ -354,7 +354,7 @@ function App() {
             <aside className="sidebar">
                 <a className="wordmark" href="#discover" onClick={() => setPage("discover")}>
                     <span className="wordmark-icon"><TastyLogo size={38} tone="white" /></span>
-                    <span>tasty</span>
+                    <span>tastey</span>
                 </a>
 
                 <button className="start-new-link" onClick={() => setOnboarding("again")}><NoteStars size={15} /> Start somewhere new</button>
@@ -499,7 +499,7 @@ function App() {
                     )}
                 </div>
 
-                <footer className="page-footer"><span>TASTY / MUSIC DISCOVERY</span></footer>
+                <footer className="page-footer"><span>TASTEY / MUSIC DISCOVERY</span></footer>
             </main>
 
             <div className="player-bar">

@@ -84,7 +84,7 @@ export default function Onboarding({ firstVisit, defaultTitle, nowPlayingId, pla
                 <header className="onboarding-hero">
                     <div className="onboarding-brand">
                         <TastyLogo size={30} tone="white" />
-                        <span id="onboarding-brand-name">tasty</span>
+                        <span id="onboarding-brand-name">tastey</span>
                     </div>
                     <div className="onboarding-intro">
                         {!firstVisit && <h2 id="onboarding-title">Start somewhere new</h2>}
