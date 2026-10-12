@@ -1,3 +1,5 @@
+> Working notes on the `heard` feature model (MFCC + rhythm + harmonic–percussive ratio), written for Tim during the project. Formerly `FOR_TIM.md`, which notebooks 06 and 09 still refer to by that name. `heard` was later superseded by Discogs-EffNet (notebook 08).
+
 # The `heard` model — how to run it and what to evaluate
 
 Tim, this answers your three questions in order.

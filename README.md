@@ -1,153 +1,88 @@
-# ds-modeling-pipeline
+<p align="center"><img src="brand/tastey-vinyl-colour.png" width="96" alt="Tastey logo: a vinyl record drawn as a planet"></p>
 
-Here you find a Skeleton project for building a simple model in a python script or notebook and log the results on MLFlow.
+# TasteBridge · the Tastey app
 
-There are two ways to do it: 
-* In Jupyter Notebooks:
-    We train a simple model in the [jupyter notebook](notebooks/EDA-and-modeling.ipynb), where we select only some features and do minimal cleaning. The hyperparameters of feature engineering and modeling will be logged with MLflow
+**Music discovery where you choose how far to travel from your taste.** Pick one seed track, then turn a dial from **Home** (sounds like it) through **Bridge** (related, but new) to **Adventure** (somewhere else entirely). Every pick shows how far it is from where you started, and why it connects.
 
-* With Python scripts:
-    The [main script](modeling/train.py) will go through exactly the same process as the jupyter notebook and also log the hyperparameters with MLflow
+**Try it:** https://mrln77-tastey-demo.hf.space · no sign-in, no listening history needed.
 
-Data used is the [coffee quality dataset](https://github.com/jldbc/coffee-quality-database).
+TasteBridge is the project; **Tastey** is the app. It's a neue fische Data Science capstone built on ~25,000 open-licence tracks from the [Free Music Archive](https://github.com/mdeff/fma).
 
-## Requirements
+---
 
-- [uv](https://docs.astral.sh/uv/) (it installs the right Python for you — no pyenv, conda or pip needed)
+## How it works
 
-Install uv once per machine:
+1. **A fingerprint per track.** Each 30-second clip is turned into 1,280 numbers by [Discogs-EffNet](https://essentia.upf.edu/models.html), a model pre-trained to recognise musical styles. Tracks that sound alike have similar fingerprints.
+2. **One ranking per seed.** For a seed track, the whole catalogue is ranked by cosine distance to its fingerprint.
+3. **Three slices of that ranking.** The dial picks 15 tracks from one band of ranks:
 
-```bash
-# macOS / Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
+    | Dial | Ranks | Extra rules |
+    |---|---|---|
+    | Home | 1–40 | the nearest tracks, seed's own artist excluded |
+    | Bridge | 81–420 | prefers the same era; caps on the seed's genre so other genres get a turn |
+    | Adventure | 1,401–6,000 | must share a genre, era or region link but come from another decade; prefers other countries |
 
-# Windows (PowerShell)
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+    The gaps between bands keep the levels clearly different. In Bridge and Adventure, other genres take turns, each contributing its closest track, so a small genre (Jazz for a Hip-Hop seed, say) still gets a slot.
+4. **Taste distance in bridgons.** Each pick shows its distance from the seed as cosine distance × 100: under 30 stays close to home, 40 and up takes you somewhere new.
+5. **Describe a sound.** Search also understands descriptions like "dreamy synth pads", via [CLAP](https://huggingface.co/laion/larger_clap_general) text–audio embeddings.
 
-### Setup
+The rules live in [`modeling/tiers.py`](modeling/tiers.py); the bands were tuned by ear in notebook 09.
 
-```bash
-make setup
+## Results
 
-# or directly
-uv sync --all-groups
-```
+We judged similarity **by ear**: raters heard two clips blind (no names, no genres) and scored how alike they sounded from 1 to 5, with random pairs mixed in as a control.
 
-That creates `.venv/`, downloads a suitable Python (`>=3.11`) if you don't have one, and installs
-every dependency pinned in `uv.lock` so the whole team gets identical versions.
+| Finding | Number |
+|---|---|
+| Baseline (FMA's 518 features) vs random, round 1 | 2.96 vs 1.87 / 5 (p = 0.002) |
+| Agreement with listeners: EffNet vs our own `heard` features | ρ = 0.73 vs 0.33 |
+| Live dial, round 4 (pre-registered; 6 seeds, 42 pairs, 6 raters) | Home 3.60 · Bridge 3.35 · Adventure 1.71 · random 1.72 / 5 |
+| Do listeners hear the dial's order? | yes: ρ = −0.63, p < 0.0001 |
 
-Dependencies are declared in `pyproject.toml`: the runtime set under `[project.dependencies]`
-(what deployment of the model or a dashboard needs) and the development tools — JupyterLab,
-pytest, black, nbdime — under the `dev` group. Use `uv sync` for runtime only, or
-`uv sync --all-groups` for everything.
+Home and Bridge beat random; Adventure doesn't yet. It travels too far and loses its link to the seed, which is the next thing to fix.
 
-See [UV_SETUP.md](UV_SETUP.md) for the full guide: adding and upgrading packages, pinning the
-Python version, and troubleshooting.
+## The app
 
-The MLFLOW URI should **not be stored on git**, you have two options, to save it locally in the `.mlflow_uri` file:
+- **Start:** a first-visit picker with search, genre chips, starting points, Surprise me or Skip.
+- **Discover:** the playlist, a pinned seed panel with its waveform, and the dial. *Seed this track* moves the journey on.
+- **Library:** saved tracks with genre, location, year and BPM; sort manually or by any of them.
+- **Taste Map:** your journey as a Tree or a Map, each step labelled with why it connects (same genre, era or region, and the distance).
 
-```BASH
-echo http://127.0.0.1:5000/ > .mlflow_uri
-```
+Your journey and Library are stored only in your own browser; the server keeps nothing per person.
 
-This will create a local file where the uri is stored which will not be added on github (`.mlflow_uri` is in the `.gitignore` file). Alternatively you can export it as an environment variable with
+## Repository map
 
-```bash
-export MLFLOW_URI=http://127.0.0.1:5000/
-```
+| Path | What's there |
+|---|---|
+| [`app_effnet.py`](app_effnet.py) | The app's FastAPI server (what the live site runs) |
+| [`modeling/`](modeling/) | Recommender: `tiers.py` (the dial), `catalogue.py` (25k-track catalogue), `effnet_recommender.py`, `connecting_factors.py`, `text_search.py`, plus the feature and embedding pipelines |
+| [`frontend/`](frontend/) | React + Vite app |
+| [`notebooks/`](notebooks/) | The analysis, in order (below) |
+| [`deploy/`](deploy/) | Builds and pushes the Hugging Face Space |
+| [`brand/`](brand/) | Logo files |
+| [`data/processed/`](data/processed/) | Small derived files the app and notebooks need; everything large stays out of Git |
+| [`api/main.py`](api/main.py), [`API.md`](API.md) | A lighter API with the same recommender, documented with examples |
+| [`app.py`](app.py) | The earlier 8,000-track PCA prototype |
+| [`docs/`](docs/) | Working notes |
 
-This links to your local mlflow, if you want to use a different one, then change the set uri.
+**Notebooks:** 01 EDA · 01A random recommender · 02–04 baselines (518 features, PCA-146, MFCC) · 02/03 listening test and results · 04 new features (`heard`) · 05 multi-seed taste · 05a tiered evaluation · 06 `heard` check · 07 tiers and EchoNest cross-check · 08 Discogs-EffNet · 09 dial tuning · 10 taste map · 11 the 25k catalogue's 45 checks.
 
-The code in the [config.py](modeling/config.py) will try to read it locally and if the file doesn't exist will look in the env var.. IF that is not set the URI will be empty in your code.
+## Run it locally
 
-## Usage
+See **[SETUP.md](SETUP.md)**. In short: `uv sync`, fetch the embeddings from the project's Hugging Face dataset, start `app_effnet.py`, then the front end.
 
-### Creating an MLFlow experiment
-
-You can do it via the GUI or via [command line](https://www.mlflow.org/docs/latest/tracking.html#managing-experiments-and-runs-with-the-tracking-service-api) if you use the local mlflow:
-
-```bash
-uv run mlflow experiments create --experiment-name 0-template-ds-modeling
-```
-
-Check your local mlflow
-
-```bash
-uv run mlflow ui
-```
-
-and open the link [http://127.0.0.1:5000](http://127.0.0.1:5000)
-
-This will throw an error if the experiment already exists. **Save the experiment name in the [config file](modeling/config.py).**
-
-In order to train the model and store test data in the data folder and the model in models run:
+## Deploy
 
 ```bash
-uv run python -m modeling.train
-
-# or
-make train
+uv run python deploy/build_space.py --push mrln77/tastey-demo
 ```
 
-In order to test that predict works on a test set you created run:
+It rebuilds the bundle from your current code and uploads it to the [Space](https://huggingface.co/spaces/mrln77/tastey-demo), which rebuilds in 2–3 minutes. Embeddings and audio stay in the private dataset `mrln77/tastebridge-audio`, read with the Space's `HF_TOKEN` secret; tracks without a licence on record are left out.
 
-```bash
-uv run python -m modeling.predict models/linear data/X_test.csv data/y_test.csv
+## Data and licences
 
-# or
-make predict
-```
+Music and metadata: the [Free Music Archive](https://freemusicarchive.org/) dataset ([FMA](https://github.com/mdeff/fma), fma_medium), each track under its artist's Creative Commons licence. The raw listening-test rating files are kept out of the repository.
 
-## About MLFLOW -- delete this when using the template
+## Limitations
 
-MLFlow is a tool for tracking ML experiments. You can run it locally or remotely. It stores all the information about experiments in a database.
-And you can see the overview via the GUI or access it via APIs. Sending data to mlflow is done via APIs. And with mlflow you can also store models on S3 where you version them and tag them as production for serving them in production.
-![mlflow workflow](images/0_general_tracking_mlflow.png)
-
-### MLFlow GUI
-
-You can group model trainings in experiments. The granularity of what an experiment is up to your usecase. Recommended is to have an experiment per data product, as for all the runs in an experiment you can compare the results.
-![gui](images/1_gui.png)
-
-### Code to send data to MLFlow
-
-In order to send data about your model you need to set the connection information, via the tracking uri and also the experiment name (otherwise the default one is used). One run represents a model, and all the rest is metadata. For example if you want to save train MSE, test MSE and validation MSE you need to name them as 3 different metrics.
-If you are doing CV you can set the tracking as nested.
-![mlflow code](images/2_code.png)
-
-### MLFlow metadata
-
-There is no constraint between runs to have the same metadata tracked. I.e. for one run you can track different tags, different metrics, and different parameters (in cv some parameters might not exist for some runs so this .. makes sense to be flexible).
-
-- tags can be anything you want.. like if you do CV you might want to tag the best model as "best"
-- params are perfect for hypermeters and also for information about the data pipeline you use, if you scaling vs normalization and so on
-- metrics.. should be numeric values as these can get plotted
-
-![mlflow metadata](images/3_metadata.png)
-
-## Development Notes
-
-### Handling Merge Conflicts in Jupyter Notebooks
-
-When working collaboratively, merge conflicts may occur in `.ipynb` files because notebooks are stored as JSON.  
-To simplify resolving these conflicts, this project uses **nbdime** (already included in the `dev` dependency group).
-
-#### Enable once
-After setting up your environment, enable nbdime for Git:
-```bash
-nbdime config-git --enable
-```
-
-#### When a merge conflict occurs
-Run the following command to open the merge tool:
-```bash
-nbdime mergetool
-```
-A browser window will open showing both notebook versions side by side.
-Select the correct cells, save, and then complete the merge:
-```bash
-git add <notebook>.ipynb
-git commit -m "Resolve notebook merge conflict"
-```
-That’s it — clean merges for notebooks!
+Small listening-test samples (6 raters in round 4); Adventure not yet better than random; the Taste Map not yet tested by ear; mood poorly captured; open music only, no mainstream catalogue.

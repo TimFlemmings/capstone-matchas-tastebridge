@@ -54,7 +54,7 @@ catalogue is heavily clustered around 2009-2016 (std ~4.4 years), so even a
 +-1 year window matches 27% of *random* pairs, and +-10 years matches 94%.
 Widening this past ~2-3 years makes "era" nearly meaningless as a filter.
 
-Tempo/rhythm was considered and left out: FOR_TIM.md's own measurement found
+Tempo/rhythm was considered and left out: docs/heard_model_notes.md's own measurement found
 raw tempo carries almost no signal (eta^2 = 0.019 against genre, the weakest
 of the rhythm block, undermined by octave-ambiguity in the estimate) -- not a
 reliable basis for "these two connect because they're a similar tempo."

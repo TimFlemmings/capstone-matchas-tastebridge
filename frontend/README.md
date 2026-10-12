@@ -1,44 +1,42 @@
-# Tastebridge Frontend
+# Tastey front end
 
-The React/Vite interface is intentionally separate from the Python recommender. It currently runs against clearly labeled preview data. Set `VITE_RECOMMENDER_API_URL` to use a compatible service; only `src/api/recommendations.ts` owns the HTTP integration.
+The React + Vite app. It does no ranking itself: it sends the seed and the dial position to the server and shows what comes back. All HTTP calls live in [`src/api/recommendations.ts`](src/api/recommendations.ts).
 
 ## Run
 
-```bash
-npm install
-npm run dev
-```
-
-## EffNet App
-
-For complete setup instructions, including the required local embedding and FMA files, see [`TIM_SETUP.md`](../TIM_SETUP.md).
-
-The separate EffNet backend serves the 25k fma_medium catalogue from `data/effnet_embeddings_medium.npz` (recommendations) and `data/clap_embeddings_medium.npz` (text search) plus local FMA data. Set `FMA_DATA_DIR` for your machine (and `EFFNET_EMBEDDINGS_PATH` / `CLAP_EMBEDDINGS_PATH` if the files live elsewhere), then start it from the repository root:
+Start the server first (see [`SETUP.md`](../SETUP.md)), then:
 
 ```bash
-uv run uvicorn app_effnet:app --host 0.0.0.0 --port 8001
+npm ci
+cp .env.effnet.example .env.effnet     # VITE_RECOMMENDER_API_URL=http://localhost:8001
+npm run dev:effnet                     # http://localhost:5174
 ```
 
-In another terminal, start the same interface against that backend:
+Plain `npm run dev` (port 5173) talks to `http://localhost:8000`, the lighter [`api/main.py`](../api/main.py), unless `VITE_RECOMMENDER_API_URL` says otherwise. Opened from any other address with no API set, the app falls back to a clearly labelled **preview mode**: 8 sample tracks with demo audio, handy for layout work. `npm run build` type-checks and builds to `dist/`. The hosted app is built with `VITE_RECOMMENDER_API_URL=/`, meaning "the same site that serves this page" (see `deploy/build_space.py`).
 
-```bash
-npm run dev:effnet --prefix frontend
-```
+## Where things are
 
-Open `http://localhost:5174`. The existing PCA app remains on ports 8000 and 5173.
+| File | What it does |
+|---|---|
+| `src/App.tsx` | Pages (Discover, Library, Taste Map), the player, the play queue, saving and seeding |
+| `src/state/store.ts` | Redux state: playback, the journey (Taste Map), the Library; journey and Library saved to `localStorage` |
+| `src/api/recommendations.ts` | The API client, `Track` / `Recommendation` types, preview data |
+| `src/components/Onboarding.tsx` | First-visit picker and "Start somewhere new" |
+| `src/components/TasteTree.tsx`, `JourneyMap.tsx` | Taste Map: Tree view and Map view |
+| `src/components/Waveform.tsx` | Waveform seek bar, decoded from the clip in the browser |
+| `src/components/SearchBox.tsx` | Search with its results dropdown |
+| `src/components/SpaceBackdrop.tsx`, `icons.tsx` | Background art, the logo, play and seed icons |
+| `src/connections.ts` | Turns the server's connecting factors into words ("same era", "24 bridgons") |
+| `src/styles.css` | All styles; colours are CSS variables at the top (`--accent`, `--accent-2`, `--accent-gradient`) |
 
-For the local FMA-backed API, start Uvicorn from the repository root:
+## API it expects
 
-```bash
-uv run uvicorn app:app --reload --port 8000
-```
+| Endpoint | Returns |
+|---|---|
+| `GET /tracks?query=<text>` | `{ tracks: Track[] }`: by name, genre, or a described sound |
+| `GET /tracks/by-id?ids=1,2,3` | `{ tracks: Track[] }` in that order |
+| `POST /recommendations` `{ track_id, adventure }` | `{ recommendations: Recommendation[] }`: 15 picks; `adventure` 0, 0.5 or 1 for Home, Bridge, Adventure |
+| `GET /journey-map?ids=…` | `{ points: [{ id, x, y }] }`: 2D layout for the Map view |
+| `GET /audio/{id}` | the clip, with Range support for seeking |
 
-By default, the API looks for a sibling `capstone-matchas/data` directory and its `models/` directory. Override `FMA_DATA_DIR`, `FMA_AUDIO_DIR`, `FMA_METADATA_DIR`, or `FMA_MODELS_DIR` when your data is stored elsewhere. The API builds its 8,000-track PCA recommender during startup and serves the matching MP3 at `/audio/{track_id}`.
-
-## API contract
-
-The adapter expects `GET /tracks?query=<text>` to return `{ "tracks": Track[] }`, and `POST /recommendations` to accept `{ "track_id": string, "adventure": number }` and return `{ "recommendations": Recommendation[] }`. The server decides how many picks to return (15); the request carries no count.
-
-Track fields are `id`, `title`, `artist`, `genre`, `duration`, `coverUrl`, and an optional `previewUrl`. Recommendation fields add `rank` and `distance`. The UI forwards the adventure value and renders the returned ordering; it does not implement model ranking.
-
-When a track's `previewUrl` is present, the play buttons stream and play it directly via an `<audio>` element (with HTTP Range support, so seeking works). Without it, the play buttons are disabled — this is how the app behaves in preview mode, since the sample catalogue has no real audio behind it.
+A `Track` has `id`, `title`, `artist`, `genre`, `duration`, `coverUrl`, `audioUrl`, and where known `location`, `dateCreated` and `bpm`. A `Recommendation` adds `rank`, `distance` and `connectingFactors`. Cover images are placeholders, since FMA ships no artwork.

@@ -5,6 +5,11 @@ recommender from notebooks 08/09. It implements exactly the contract
 `frontend/README.md` already specified — nothing on the frontend needed to
 change.
 
+The live app runs the fuller server in [`app_effnet.py`](app_effnet.py)
+(the same recommender, plus the endpoints the Taste Map and onboarding use);
+this lighter API is handy for scripting and testing. Setup for both:
+[`SETUP.md`](SETUP.md).
+
 Code: [`api/main.py`](api/main.py). Tier logic: [`modeling/tiers.py`](modeling/tiers.py)
 (the `explore_tiers` function from notebook 09, extracted so both the API and
 the notebook use the same implementation instead of two copies drifting apart).
@@ -19,10 +24,10 @@ uv run uvicorn api.main:app --reload --port 8000
 shadowing it: `app.main` resolved to that file, so the old command stopped
 working.)
 
-Serves the fma_medium catalogue (`modeling/catalogue.py`, 24,896 tracks after
-removing re-uploads and silent files). Needs `data/effnet_embeddings_medium.npz`
+Serves the fma_medium catalogue (`modeling/catalogue.py`, 24,781 tracks after
+removing truncated files, re-uploads and silent clips). Needs `data/effnet_embeddings_medium.npz`
 (Discogs-EffNet, recommendations), `data/clap_embeddings_medium.npz` (CLAP,
-text search) and the FMA metadata — see `TIM_SETUP.md` for where to get them. **No Essentia import anywhere
+text search) and the FMA metadata — see [`SETUP.md`](SETUP.md) for where to get them. **No Essentia import anywhere
 in this path** — it runs in the main environment, not `.venv-essentia`. See
 `ESSENTIA_SETUP.md` if either of those data files are missing.
 
@@ -93,14 +98,14 @@ curl -X POST http://localhost:8000/recommendations \
 ```
 
 `track_id` is an FMA track id, sent and returned as a string (frontend's
-`Track.id` type). `adventure` is 0.0–1.0 and currently maps onto notebook 09's
-three tiers with an even three-way split — 0–0.33 Familiar, 0.33–0.67 Bridge,
-0.67–1.0 Adventurous (`tier_for_adventure` in `modeling/tiers.py`). That split
-point is arbitrary; nobody has tuned where the slider should actually hand off
-between tiers, unlike the rank bands themselves, which are notebook 09's
-measured settings — scaled to the 25k catalogue as `MEDIUM_BANDS` in
-`modeling/tiers.py` so each tier covers the same cosine distances it did on
-fma_small.
+`Track.id` type). `adventure` is 0.0–1.0 and maps onto the three tiers with an
+even three-way split (`tier_for_adventure` in `modeling/tiers.py`): 0–0.33 is
+Familiar, 0.33–0.67 Bridge, 0.67–1.0 Adventurous. The app's slider only stops at
+0, 0.5 and 1, labelled **Home**, **Bridge** and **Adventure**; the code keeps the
+names Familiar and Adventurous. The rank bands are notebook 09's settings,
+rescaled to the 25k catalogue as `MEDIUM_BANDS` (Home 1–40, Bridge 81–420,
+Adventure 1,401–6,000) so each tier covers the same cosine distances it did on
+the original 8,000 tracks. Every request returns 15 picks.
 
 ## `GET /audio/{track_id}`
 
