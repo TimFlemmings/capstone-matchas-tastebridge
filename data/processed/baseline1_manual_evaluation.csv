@@ -1,0 +1,51 @@
+seed_track_id;seed_artist;seed_title;seed_genre;recommended_track_id;recommended_artist;recommended_title;recommended_genre;cosine_similarity;manual_similarity_1_5;connection_type;connection_type
+140;Alec K. Redfearn & the Eyesores;Queen Of The Wires;Folk;44805;Monk Turner + Fascinoma;Start Again;Pop;0.5495273225835039;3;"mood; energy; production; harmony";
+140;Alec K. Redfearn & the Eyesores;Queen Of The Wires;Folk;6803;Watcha Clan;Balkan Qoulou;International;0.5196407307692211;2;"unclear; cross-genre";weaker connection but would put in a similar playlist
+140;Alec K. Redfearn & the Eyesores;Queen Of The Wires;Folk;77564;Bryyn;Abba Ingee;Pop;0.517595490827723;4;"mood; energy; harmony; vocals";
+140;Alec K. Redfearn & the Eyesores;Queen Of The Wires;Folk;110451;Papascandy;Linton;International;0.5060106388264785;2;"mood; unclear; cross-genre";weaker connection but would put in a similar playlist
+140;Alec K. Redfearn & the Eyesores;Queen Of The Wires;Folk;52953;Marissa Nadler;Your Heart Is A Twisted Vine;Folk;0.4921487824340247;4;"energy; mood; vocals; production";
+54033;alright lover;Snow Wave;Pop;145556;This Mess is Mine;Roommates (Piano Version by AGPB);Folk;0.5003349148875551;4;"mood; energy; production";
+54033;alright lover;Snow Wave;Pop;63456;Big Blood;Away pt. II;Folk;0.4539943026215275;3;"rhythm; energy; mood; production; instrumentation";
+54033;alright lover;Snow Wave;Pop;14571;Ergo Phizmiz;Through the Doors of the Circus;Instrumental;0.44194004084617355;2;energy;weaker connection but would put in a similar playlist
+54033;alright lover;Snow Wave;Pop;114070;Blue Dot Sessions;Grand Fell;Instrumental;0.43051071072891856;3;"energy; mood";
+54033;alright lover;Snow Wave;Pop;134388;Scott Holmes;Magical Moments;Pop;0.4272523080728874;3;energy;
+59876;Boy Friend;Lovedropper;Rock;35544;Garmisch;Facing the Sea;Pop;0.4784526089827743;3;"mood; energy; harmony; vocals";
+59876;Boy Friend;Lovedropper;Rock;141617;Barbarix;The Secret Garden;Electronic;0.47143376162621264;3;"harmony; cross-genre; mood";
+59876;Boy Friend;Lovedropper;Rock;36959;Garmisch;Facing the Sea (Album Version);Pop;0.4665630063041709;3;"mood; energy; harmony; vocals";
+59876;Boy Friend;Lovedropper;Rock;64009;Gosprom;Nevesta (Flayve Remix);Pop;0.42135899313712644;3;"vocals; mood";
+59876;Boy Friend;Lovedropper;Rock;44950;SONGO 21;Amor Y Felicidad;International;0.4172106966485637;1;unclear;
+42234;Zlatne Uste Balkan Brass Band;Lacin Cocek;International;136137;Philippa Dowding and Allister Thompson;Spring;Folk;0.5866167124737076;1;unclear;
+42234;Zlatne Uste Balkan Brass Band;Lacin Cocek;International;36273;Demiran Ćerimović and His Orkestar;Competition Rehearsal, Song 2;International;0.5535619036732975;5;"mood; energy; production; instrumentation; timbre";
+42234;Zlatne Uste Balkan Brass Band;Lacin Cocek;International;36277;Demiran Ćerimović and His Orkestar;Restaurant Concert, Song 2;International;0.5510632552721502;4;"energy; mood; timbre; instrumentation";
+42234;Zlatne Uste Balkan Brass Band;Lacin Cocek;International;44821;Black Bear Combo;Otrov;International;0.5190193560935115;4;"mood; timbre; instrumentation";
+42234;Zlatne Uste Balkan Brass Band;Lacin Cocek;International;44820;Black Bear Combo;Rhumbus;International;0.468812732831388;4;"mood; timbre; instrumentation";
+68893;Broke For Free;Sidewalk Chalk;Electronic;133028;SPCZ;Eternal Glide;Electronic;0.5741405150037309;3;mood;
+68893;Broke For Free;Sidewalk Chalk;Electronic;72071;Decktonic;Spectrum;Electronic;0.5534987941121401;2;unclear;
+68893;Broke For Free;Sidewalk Chalk;Electronic;131796;Pranavibes;Tempête;Instrumental;0.5318149563540081;2;"unclear; cross-genre";
+68893;Broke For Free;Sidewalk Chalk;Electronic;100552;Megatone;First Space Voyage;Electronic;0.5273868114329908;1;"unclear; cross-genre";weaker connection but would put in a similar playlist
+68893;Broke For Free;Sidewalk Chalk;Electronic;51301;John Badger & The Moustache Riders of Doom;Skeletons Fighting Over A Pickled Herring;Experimental;0.5030160242935605;3;harmony;
+43883;Myo;crickets;Experimental;66482;Qkcofse;Phase a Couple Rooms;Experimental;0.8159339744494876;3;"mood; timbre; instrumentation";
+43883;Myo;crickets;Experimental;112668;ODOR BABY;45;Experimental;0.7904980635769912;3;"mood; timbre; instrumentation; energy";
+43883;Myo;crickets;Experimental;38907;File Under Toner;take me to the movies;Experimental;0.7855989021039257;3;"mood; timbre; instrumentation; energy";
+43883;Myo;crickets;Experimental;38905;File Under Toner;si los curas;Experimental;0.7676269559621816;3;"mood; timbre; instrumentation; energy";
+43883;Myo;crickets;Experimental;48368;Cloudkicker;A Hymn to the Projectile;Rock;0.7670580812812455;1;"unclear; cross-genre";weaker connection. Maybe the distortion. but would put in a similar playlist
+123978;BenJamin Banger;Fuck Yall, Im Goin Pop;Hip-Hop;1069;Lucky Dragons;Un Lagrima en la Discoteca;Experimental;0.4989218309868857;2;unclear;
+123978;BenJamin Banger;Fuck Yall, Im Goin Pop;Hip-Hop;115850;Dead Peoples Records;11am;Experimental;0.4919208444749732;2;unclear;
+123978;BenJamin Banger;Fuck Yall, Im Goin Pop;Hip-Hop;92283;DJ Spooky;Antarctic Dawn (Bonus Track);Electronic;0.48132430838751117;2;unclear;
+123978;BenJamin Banger;Fuck Yall, Im Goin Pop;Hip-Hop;997;Kevin Shields;Nothing's Ever Ending;Experimental;0.48002758573487503;1;"unclear; cross-genre";
+123978;BenJamin Banger;Fuck Yall, Im Goin Pop;Hip-Hop;114279;Azureflux;Bipolar Bear;Electronic;0.4799024829299291;3;"mood; energy";
+149701;Sro;Answering M;Electronic;107048;Elvin Brandhi;Mønstah;Pop;0.5565189763589055;2;"unclear; cross-genre";
+149701;Sro;Answering M;Electronic;130986;Jaan Patterson;Doctor, what has Cesuacantho to do with this?;Experimental;0.5136190058550127;2;"timbre; instrumentation";
+149701;Sro;Answering M;Electronic;29720;Codex Machine;S.P.Y.;Hip-Hop;0.505183385394953;2;unclear;
+149701;Sro;Answering M;Electronic;12690;Bo Marley + Disrupt + Volfoniq;L'Anchoïade;International;0.494136968959924;3;"Instrumentation; mood; timbre; energy";
+149701;Sro;Answering M;Electronic;126773;Gorowski;Emu In The Bass;Electronic;0.4807908840770676;2;"Instrumentation; mood; timbre";
+63471;Mutilation Rites;Goliath;Rock;145199;Conduit;Opening the Mouth/ Salt;Rock;0.5853234971604607;3;"mood; harmony; timbre";would playlist together
+63471;Mutilation Rites;Goliath;Rock;86417;One Master;The Destroyer (Parts 1 and 2);Rock;0.5608666465613255;3;"mood; energy; harmony; vocals";
+63471;Mutilation Rites;Goliath;Rock;54942;Dolorvotre;Brilliant Brightness;Rock;0.5544320057674483;3;"mood; energy; vocals";
+63471;Mutilation Rites;Goliath;Rock;73521;Hounds Of Hate;Brotherhood Of Night;Rock;0.5412606747887627;3;mood;
+63471;Mutilation Rites;Goliath;Rock;3833;Lightning Bolt;Track 01;Rock;0.5362388400628064;3;"mood; energy; harmony; timbre";
+17608;Alash Ensemble;Bai-Taiga;International;43028;Huun Huur Tu;Samagaldai;International;0.7500273884785607;4;"mood; energy; harmony; vocals; instrumentation; timbre";
+17608;Alash Ensemble;Bai-Taiga;International;116706;Howie Mitchell;Henry Martin;Folk;0.6270280357425988;3;"mood; energy; cross-genre; harmony";
+17608;Alash Ensemble;Bai-Taiga;International;68840;Howie Mitchell;John's Laughing Place;Folk;0.6218955108334921;3;"mood; cross-genre";
+17608;Alash Ensemble;Bai-Taiga;International;39663;Quiet Hooves;Til It Stops Talkin;Pop;0.5923377464004048;3;"mood; energy; cross-genre";weaker connection but would put in a similar playlist
+17608;Alash Ensemble;Bai-Taiga;International;68841;Howie Mitchell;Old Molly Hare;Folk;0.5917383698072958;3;"timbre; mood; energy";would playlist together

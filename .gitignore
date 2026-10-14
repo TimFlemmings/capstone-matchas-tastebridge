@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.pyc
+.venv/
+.ipynb_checkpoints/
 *$py.class
 
 # C extensions
@@ -103,7 +106,11 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
 .venv
+node_modules/
+*.tsbuildinfo
+frontend/.env.effnet
 env/
 venv/
 ENV/
@@ -130,6 +137,9 @@ dmypy.json
 
 
 data/*.csv
+data/*.npz
+data/embeddings_partial/
+data/web_audio/
 models/*.sav
 mlruns
 models/*
@@ -137,3 +147,21 @@ models/*
 #config file has sensitive data
 .mlflow_uri
 mlflow.db
+
+#exclude large files
+data/raw/
+*.mp3
+*.wav
+
+#local symlinks onto data/raw/, so modeling code can use the layout the
+#feature/pca-recommendation branch expects without duplicating the data
+data/fma_metadata
+data/fma_small
+data/fma_medium
+
+#separate python 3.11 env + pretrained weights for the essentia/discogs-effnet
+#experiment (essentia-tensorflow has no py3.13 wheel yet)
+.venv-essentia/
+models/essentia/*.pb
+
+.DS_Store
