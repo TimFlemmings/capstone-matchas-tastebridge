@@ -1,0 +1,14 @@
+rater,pair_id,similarity_1_5,connects
+R5d,T01,5,instrumentation energy rhythm
+R5d,T02,5,instrumentation harmony rhythm
+R5d,T05,3,instrumentation
+R5d,T06,2,mood
+R5d,T12,1,nothing
+R5d,T14,2,instrumentation
+R5d,T21,1,nothing
+R5d,T28,4,mood rhythm
+R5d,T30,1,nothing
+R5d,T34,3,mood
+R5d,T37,1,nothing
+R5d,T38,4,mood energy harmony rhythm
+R5d,T41,4,energy mood

@@ -1,0 +1,18 @@
+rater,pair_id,similarity_1_5,connects
+R4b,Q09,1,nothing
+R4b,Q10,4,rhythm timbre mood energy production vocals
+R4b,Q11,5,rhythm timbre mood instrumentation energy production harmony vocals
+R4b,Q14,4,rhythm mood energy instrumentation
+R4b,Q25,1,nothing
+R4b,Q27,4,rhythm production
+R4b,Q30,1,
+R4b,Q36,3,vocals production
+R4b,Q42,2,mood
+R4b,Q45,4,rhythm instrumentation mood energy
+R4b,Q53,2,energy
+R4b,Q56,3,rhythm mood energy
+R4b,Q57,1,nothing
+R4b,Q58,5,rhythm timbre vocals mood energy instrumentation production
+R4b,Q67,4,rhythm mood energy
+R4b,Q68,2,energy
+R4b,Q71,4,rhythm mood energy instrumentation production timbre

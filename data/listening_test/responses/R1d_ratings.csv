@@ -1,0 +1,14 @@
+rater,pair_id,similarity_1_5,connects
+R1d,T02,5,instrumentation vocals rhythm production energy mood
+R1d,T03,4,rhythm instrumentation energy production harmony
+R1d,T04,1,nothing
+R1d,T05,1,nothing
+R1d,T14,1,nothing
+R1d,T24,3,timbre
+R1d,T27,2,mood
+R1d,T30,3,vocals production
+R1d,T34,2,mood
+R1d,T35,3,nothing harmony
+R1d,T37,3,mood
+R1d,T38,3,energy vocals rhythm
+R1d,T40,3,vocals

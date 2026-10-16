@@ -1,0 +1,22 @@
+rater,pair_id,similarity_1_5,connects
+R5,P05,5,timbre instrumentation harmony energy
+R5,P08,1,nothing
+R5,P19,1,nothing
+R5,P20,1,nothing
+R5,P25,3,energy mood
+R5,P36,3,instrumentation harmony
+R5,P39,4,rhythm energy mood harmony
+R5,P45,4,energy production
+R5,P47,1,nothing
+R5,P49,3,rhythm
+R5,P53,1,
+R5,P55,5,mood energy instrumentation vocals
+R5,P59,5,energy instrumentation vocals
+R5,P61,1,energy
+R5,P62,2,mood harmony vocals
+R5,P66,3,mood
+R5,P67,5,rhythm instrumentation energy
+R5,P71,1,vocals
+R5,P72,1,nothing
+R5,P75,4,energy mood instrumentation rhythm production vocals
+R5,P76,1,nothing

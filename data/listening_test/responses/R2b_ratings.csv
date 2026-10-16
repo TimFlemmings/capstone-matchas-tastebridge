@@ -1,0 +1,18 @@
+rater,pair_id,similarity_1_5,connects
+R2b,Q01,4,mood rhythm
+R2b,Q10,3,mood energy
+R2b,Q14,5,harmony mood
+R2b,Q20,2,nothing
+R2b,Q28,1,nothing
+R2b,Q32,4,rhythm
+R2b,Q38,4,instrumentation
+R2b,Q41,5,mood energy harmony
+R2b,Q45,5,mood rhythm instrumentation
+R2b,Q48,1,nothing
+R2b,Q51,5,instrumentation mood rhythm energy
+R2b,Q53,1,nothing
+R2b,Q54,1,nothing
+R2b,Q59,4,energy
+R2b,Q64,2,nothing
+R2b,Q67,5,instrumentation production energy mood rhythm
+R2b,Q68,1,nothing
