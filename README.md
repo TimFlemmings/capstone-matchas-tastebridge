@@ -41,6 +41,8 @@ We judged similarity **by ear**: raters heard two clips blind (no names, no genr
 
 Home and Bridge beat random; Adventure doesn't yet. It travels too far and loses its link to the seed, which is the next thing to fix.
 
+Full write-ups with figures: [round 4, the dial](reports/round4/RESULTS.md) · [why the app moved from `heard` to EffNet](reports/effnet_vs_heard/README.md). Every round's design, pre-registration and anonymised ratings are in [`data/listening_test/`](data/listening_test/).
+
 ## The app
 
 - **Start:** a first-visit picker with search, genre chips, starting points, Surprise me or Skip.
@@ -61,11 +63,14 @@ Your journey and Library are stored only in your own browser; the server keeps n
 | [`deploy/`](deploy/) | Builds and pushes the Hugging Face Space |
 | [`brand/`](brand/) | Logo files |
 | [`data/processed/`](data/processed/) | Small derived files the app and notebooks need; everything large stays out of Git |
+| [`data/listening_test/`](data/listening_test/) | The listening tests: pair keys, pre-registrations (rounds 2–4) and every round's ratings, raters as anonymous codes |
+| [`reports/`](reports/) | Written-up results with figures (round 4, EffNet vs `heard`) |
+| `modeling/round2.py` … `round4_analysis.py`, `embedding_vs_ear.py`, `effnet_vs_heard.py` | Build each listening-test round and score models against the ratings |
 | [`api/main.py`](api/main.py), [`API.md`](API.md) | A lighter API with the same recommender, documented with examples |
 | [`app.py`](app.py) | The earlier 8,000-track PCA prototype |
-| [`docs/`](docs/) | Working notes |
+| [`docs/`](docs/), [`HANDOFF.md`](HANDOFF.md) | Working notes and the project's history so far |
 
-**Notebooks:** 01 EDA · 01A random recommender · 02–04 baselines (518 features, PCA-146, MFCC) · 02/03 listening test and results · 04 new features (`heard`) · 05 multi-seed taste · 05a tiered evaluation · 06 `heard` check · 07 tiers and EchoNest cross-check · 08 Discogs-EffNet · 09 dial tuning · 10 taste map · 11 the 25k catalogue's 45 checks.
+**Notebooks:** 01 EDA (and `01_eda_baseline`) · 01A random recommender · 02–04 baselines (518 features, PCA-146, MFCC) · 02/03 listening test and results · 04 new features (`heard`) · 05 multi-seed taste · 05a tiered evaluation · 06 `heard` check · 07 tiers and EchoNest cross-check · 08 Discogs-EffNet · 09 dial tuning · 10 taste map · 11 the 25k catalogue's 45 checks.
 
 ## Run it locally
 
@@ -81,7 +86,7 @@ It rebuilds the bundle from your current code and uploads it to the [Space](http
 
 ## Data and licences
 
-Music and metadata: the [Free Music Archive](https://freemusicarchive.org/) dataset ([FMA](https://github.com/mdeff/fma), fma_medium), each track under its artist's Creative Commons licence. The raw listening-test rating files are kept out of the repository.
+Music and metadata: the [Free Music Archive](https://freemusicarchive.org/) dataset ([FMA](https://github.com/mdeff/fma), fma_medium), each track under its artist's Creative Commons licence. Listening-test ratings are stored with raters as anonymous codes (R1, R2b, …), no names or emails.
 
 ## Limitations
 

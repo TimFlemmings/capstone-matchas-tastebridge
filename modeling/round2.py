@@ -28,7 +28,7 @@ returns drop into `data/listening_test/responses/` beside the old ones and
     uv run python -m modeling.round2 --seeds 8        # a longer round
     uv run python -m modeling.round2 --raters 6
 
-Read `FOR_TIM.md` before running it: what this cannot do is settle `heard`
+Read `docs/heard_model_notes.md` before running it: what this cannot do is settle `heard`
 against `heard_wide`, which needs a forced choice rather than a rating.
 """
 

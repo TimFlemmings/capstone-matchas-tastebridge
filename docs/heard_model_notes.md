@@ -198,39 +198,52 @@ The full ledger is in `notebooks/03_listening_test_results.ipynb`, and
 
 ---
 
-## What is actually missing — where you can help most
+## Round two ran, and the space change did not survive it
 
-**The eighty pairs in the listening test were generated from the OLD 518-column
-space.** The rhythm and ratio columns did not exist when the test was built. So
-the test *chose* `heard`; it has not *tested* it. Nobody has yet heard what this
-model recommends.
+The eighty pairs in round one were generated from the OLD 518-column space,
+because the rhythm and ratio columns did not exist yet. So that test *chose*
+`heard` and never *tested* it. Round two closed that hole: twelve fresh seeds,
+one per genre, six pairs each drawn from both spaces plus depth and random, with
+the failure threshold committed before any rating came back
+(`data/listening_test/ROUND2_PREREGISTRATION.md`). Four of six raters are in.
 
-That is the single biggest hole in the project.
+**The headline replicated and got stronger.** Model picks 3.45 against a random
+floor of 1.27, p = 0.00004 — round one's gap was 1.09, this is 2.18. Raters
+agree with each other at 0.81 against 0.53.
 
-If you want to close it, the design matters, because the obvious version is
-statistically hopeless. Comparing two correlations measured on the same pairs
-needs enormous amounts of data. Comparing two models head to head does not:
+**The space change did not.** Correlating distance against the human score on
+round two's independent pairs gives `all` −0.46 and `heard` −0.43 — tied, and on
+the raw pairs the old space is clearly ahead at −0.50 against −0.33. On the
+pre-registered measure `heard` leads by 0.36 of a point at p = 0.43. **Not
+validated.** `heard` stays because 154 columns and 57 dimensions beat 518 and
+144 on simplicity, and we no longer claim it is better to a listener.
 
-- **Forced choice, not rating.** Show a seed plus one recommendation from `all`
-  and one from `heard`. Ask which is closer. Counting wins is a binomial test.
-  Roughly **85 comparisons** detects a 65/35 split; **47** detects 70/30. Six
-  raters at 20 each is 120 — the same effort as round one, and this time it
-  gives a clear answer.
-- **Fresh seeds**, not the ten already used. Reusing them reintroduces the same
-  problem.
-- **Coin-flip which side is A**, or raters learn to always click one side.
-- **Blind** — no artist, title, genre or score, same as round one.
-- **Write the failure threshold down before running it.** Something like: *"if
-  `heard` wins fewer than 55% of at least 100 comparisons, we do not consider
-  the change validated."* Commit it with a date. Without that, every possible
-  result gets explained away afterwards, and we both know it.
+**And the finding that matters most to you.** Looking only at top-five pairs —
+what a user actually sees — *neither* space correlates with what people heard:
+−0.15 and +0.03. The correlation in every table comes from random pairs being
+far and scored low. **The model separates related from unrelated; it does not
+rank among the related.** If your EffNet embedding fixes that, it is a much
+bigger claim than a genre-agreement number, and it is testable.
 
-Expect `heard` to win — the old space correlated zero with the ear. But expect a
-**smaller margin than the table above shows**, because the same data chose it,
-and a selected effect is always larger than the real one.
+### So: round three, EffNet against `heard`
 
-`notebooks/02_listening_test.ipynb` already builds pairs, cuts clips, matches
-volume and assigns raters. Most of it is reusable as is.
+This is the thing worth doing together, and the machinery exists.
+
+`modeling/round2.py` builds the packages — clips, volume matching, blind ids,
+coin-flipped order, rater assignment, the rating form. Point it at a third space
+and it produces the same thing for EffNet. What I need from you is a column
+table for the catalogue, one row per track id, the 1,280 dimensions as columns,
+registered in `modeling/features.py` as a named space. Then packages go out the
+same afternoon and `modeling.listening --blind-spots` reads the returns.
+
+Two things learned the hard way, so round three avoids them:
+
+- **Draw depth pairs from every space under test, not just one.** Round two took
+  them only from `heard`, which penalised `heard` in exactly the comparison it
+  was meant to settle. My error.
+- **Exclude same-artist pairs.** 13 of 72 in round two were the same artist
+  twice — trivially similar, and they inflate whichever space drew them. Round
+  one happened to have none.
 
 ---
 
@@ -288,17 +301,25 @@ uv run python -m modeling.listening --csv  # rebuilds all_ratings.csv
 
 ### Numbers worth having in your head
 
-| | |
-|---|---|
-| model pairs, human score | 2.96 / 5 |
-| rank 50 and 200 | 3.07 / 5 — indistinguishable from the top five, p = 0.65 |
-| random pairs | 1.87 / 5 — the model beats it at p = 0.002 |
-| rater agreement | r = 0.53 individually; the six-rater average is reliable at 0.87 |
-| ceiling on any model | ~0.93, because listeners disagree with each other |
+| | round one (6 raters, 125) | round two (4 raters so far) |
+|---|---|---|
+| model pairs, human score | 2.96 / 5 | 3.45 / 5 |
+| random pairs | 1.87 / 5 | 1.27 / 5 |
+| the gap, which is the comparable part | 1.09, p = 0.002 | **2.18, p = 0.00004** |
+| rank 50 and 200 | 3.07 — same as the top five, p = 0.65 | 2.00 clean — lower, n = 9 |
+| rater agreement | r = 0.53 | r = 0.81 |
+
+Compare the **gap**, not the raw scores: a different group on a different day
+uses the 1–5 scale differently, which is exactly what the random pairs are there
+to reveal. Round two's raters were harsher on both ends.
 
 `2.96` is worth repeating honestly: on the rubric the raters were given, 3 means
 *"a recognisable connection, with substantial differences"*. It works. It is not
 yet good.
+
+The round two deep figure is the one to watch. In round one, depth held up and
+that was the dial's whole justification. In `heard`, on nine clean pairs, it did
+not. Two raters are still out.
 
 ---
 

@@ -13,7 +13,7 @@ and the project docs, when work moved from Claude in VS Code to Claude in Cowork
 2. **Sep 23–25 — listening test, round one.** 6 raters, 80 blind pairs.
    Listeners' answers led to rhythm features (`modeling/rhythm.py`) and the
    drum/instrument ratio (`modeling/separation.py`). Space reduced from 518 to
-   154 columns (`heard`, 57 PCA components). README and `FOR_TIM.md` written.
+   154 columns (`heard`, 57 PCA components). README and `docs/heard_model_notes.md` written.
 3. **Sep 26–29 — round two.** On fresh seeds the round-one result did not hold
    (old −0.46 vs heard −0.43). The claim that `heard` sounds better was
    withdrawn; it ships on size grounds only.
@@ -32,6 +32,6 @@ and the project docs, when work moved from Claude in VS Code to Claude in Cowork
 
 ## Running it
 
-See `FOR_TIM.md`: `uv sync` → `modeling.rhythm` → `modeling.separation` →
+See `docs/heard_model_notes.md`: `uv sync` → `modeling.rhythm` → `modeling.separation` →
 `modeling.train_pca --feature-set heard --n-components 0.90` →
 `modeling.recommender --track-id 2`.
