@@ -88,6 +88,11 @@ It rebuilds the bundle from your current code and uploads it to the [Space](http
 
 Music and metadata: the [Free Music Archive](https://freemusicarchive.org/) dataset ([FMA](https://github.com/mdeff/fma), fma_medium), each track under its artist's Creative Commons licence. Listening-test ratings are stored with raters as anonymous codes (R1, R2b, …), no names or emails.
 
+## Team
+
+- **Tim** ([@TimFlemmings](https://github.com/TimFlemmings))
+- **Amin** ([@amintorabi7](https://github.com/amintorabi7))
+
 ## Limitations
 
 Small listening-test samples (6 raters in round 4); Adventure not yet better than random; the Taste Map not yet tested by ear; mood poorly captured; open music only, no mainstream catalogue.
