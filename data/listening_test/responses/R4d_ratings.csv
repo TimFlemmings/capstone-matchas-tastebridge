@@ -1,0 +1,14 @@
+rater,pair_id,similarity_1_5,connects
+R4d,T02,4,rhythm mood energy
+R4d,T05,1,nothing
+R4d,T09,1,nothing
+R4d,T14,2,mood
+R4d,T17,1,nothing
+R4d,T20,3,instrumentation mood timbre
+R4d,T30,1,nothing
+R4d,T31,4,mood energy instrumentation production
+R4d,T33,2,energy
+R4d,T34,,mood energy instrumentation
+R4d,T36,2,timbre instrumentation
+R4d,T37,1,nothing
+R4d,T38,3,mood rhythm instrumentation energy

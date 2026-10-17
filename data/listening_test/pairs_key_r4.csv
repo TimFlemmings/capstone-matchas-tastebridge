@@ -1,0 +1,43 @@
+kind,seed,other,rank,distance,pair_id,track_a,track_b,seed_artist,seed_title,seed_genre,other_artist,other_title,other_genre,in_core,round
+home,122729,123378,2.0,0.2449,T01,123378,122729,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Ada Jones and Billy Watkins,By the Beautiful Sea,Old-Time / Historic,False,4
+home,110924,6856,8.0,0.1702,T02,6856,110924,Humble Tripe,The Giving,Folk,Lior,Autumn Flow,Folk,True,4
+home,92367,143054,1.0,0.2023,T03,143054,92367,Out Of Orion (Ox3),Pitch Black,Electronic,Mystery Mammal,Mo Mo Modem,Electronic,False,4
+adventure,78100,75918,1584.0,0.3197,T04,75918,78100,Ash On Dust,Diaspora,Instrumental,Jan Morgenstern,Hare Force,Classical,False,4
+adventure,110924,4186,1402.0,0.3855,T05,4186,110924,Humble Tripe,The Giving,Folk,The Shamblers,Monster Truck,Rock,True,4
+adventure,129475,118738,1484.0,0.4405,T06,118738,129475,The Defibulators,Hee-Haw In Heaven,Country,The Golden Dawn,Enjoy the nature,Folk,False,4
+random,154433,129344,,,T07,154433,129344,Milton Arias,Poldoro,Jazz,A New Silent Corporation,WOTGG,Rock,False,4
+bridge,122729,123376,247.0,0.4326,T08,122729,123376,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Great White Way Orchestra,Yes! We Have No Bananas,Old-Time / Historic,False,4
+adventure,154433,51938,1403.0,0.4765,T09,51938,154433,Milton Arias,Poldoro,Jazz,Paul Bailey Ensemble,"Retrace Our Steps, Act I",Classical,False,4
+home,78100,75897,1.0,0.0771,T10,78100,75897,Ash On Dust,Diaspora,Instrumental,Jan Morgenstern,Chasing Shadows,Classical,False,4
+random,78100,128532,,,T11,78100,128532,Ash On Dust,Diaspora,Instrumental,IV-IN,Lone,Electronic,False,4
+random,129475,19130,,,T12,19130,129475,The Defibulators,Hee-Haw In Heaven,Country,"Paul ""Wine"" Jones","Pucker Up, Butter Cup",Blues,False,4
+adventure,92367,44355,1419.0,0.3946,T13,44355,92367,Out Of Orion (Ox3),Pitch Black,Electronic,Gurdonark,Library,Experimental,False,4
+bridge,110924,108881,101.0,0.2454,T14,110924,108881,Humble Tripe,The Giving,Folk,Plusplus,Dieter Rams,Instrumental,True,4
+home,154433,115474,3.0,0.1884,T15,115474,154433,Milton Arias,Poldoro,Jazz,Blue Dot Sessions,Farsical - Thematic,Instrumental,False,4
+adventure,129475,4540,1487.0,0.4407,T16,129475,4540,The Defibulators,Hee-Haw In Heaven,Country,Wildbirds and Peacedrums,Doubt/Hope,Blues,False,4
+adventure,122729,17678,1422.0,0.608,T17,122729,17678,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Jonathan Biss,"Chopin: Three Mazurkas, Op. 59",Classical,False,4
+adventure,110924,11671,1501.0,0.3912,T18,11671,110924,Humble Tripe,The Giving,Folk,Cordero,Abre La Ventana,International,False,4
+bridge,129475,133625,87.0,0.311,T19,133625,129475,The Defibulators,Hee-Haw In Heaven,Country,EZTV,Blue Buzz,Rock,False,4
+bridge,129475,81085,99.0,0.3162,T20,81085,129475,The Defibulators,Hee-Haw In Heaven,Country,Jacco Gardner,Summer's Game,Folk,False,4
+random,110924,111850,,,T21,111850,110924,Humble Tripe,The Giving,Folk,Wilted Woman,^^ The preceding error dump is for ERROR: Message 'stopRecording' not understood.,Experimental,False,4
+home,122729,122884,1.0,0.127,T22,122729,122884,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Roland Hayes,Vesti la Guibba,Old-Time / Historic,False,4
+bridge,92367,36961,82.0,0.3061,T23,92367,36961,Out Of Orion (Ox3),Pitch Black,Electronic,Garmisch,Requiem for Wolf,Pop,False,4
+bridge,154433,130933,81.0,0.3032,T24,154433,130933,Milton Arias,Poldoro,Jazz,Blue Dot Sessions,That River Wide,Instrumental,False,4
+adventure,122729,11419,1439.0,0.6088,T25,11419,122729,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Daniel Veesey,"Sonata No. 07 in D Major, Op. 10 No. 3 - IV. Rondo Allegro",Classical,False,4
+home,129475,51711,8.0,0.2345,T26,129475,51711,The Defibulators,Hee-Haw In Heaven,Country,Urge Overkill,Somebody Else's Body,Rock,False,4
+home,78100,140952,2.0,0.0914,T27,140952,78100,Ash On Dust,Diaspora,Instrumental,Dexter Britain,Transpire,Classical,False,4
+bridge,122729,122699,344.0,0.4708,T28,122729,122699,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,Ted Weems & His Orchestra,Covered Wagon Days,Old-Time / Historic,False,4
+bridge,92367,54437,87.0,0.3072,T29,92367,54437,Out Of Orion (Ox3),Pitch Black,Electronic,Secret Archives of the Vatican,Hunters Moon,International,False,4
+random,92367,42810,,,T30,92367,42810,Out Of Orion (Ox3),Pitch Black,Electronic,Waylon Thornton and the Heavy Hands,Too Cool For School,Rock,True,4
+bridge,78100,92888,114.0,0.1601,T31,92888,78100,Ash On Dust,Diaspora,Instrumental,The Fucked Up Beat,Sings the Destitute Children of Great Bend,Experimental,False,4
+home,110924,5140,6.0,0.1639,T32,110924,5140,Humble Tripe,The Giving,Folk,Ed Askew,Little Infinite Love Song,Folk,False,4
+bridge,154433,111166,94.0,0.3084,T33,154433,111166,Milton Arias,Poldoro,Jazz,Fantastic Swimmers,Pool without water,Experimental,False,4
+bridge,110924,81358,126.0,0.2539,T34,110924,81358,Humble Tripe,The Giving,Folk,Maya Solovéy,We Three Kings,Experimental,True,4
+adventure,92367,50264,1439.0,0.3955,T35,50264,92367,Out Of Orion (Ox3),Pitch Black,Electronic,Square Flare,Mandala,Hip-Hop,False,4
+home,154433,125818,1.0,0.1662,T36,154433,125818,Milton Arias,Poldoro,Jazz,Blue Dot Sessions,Lowbrow,Instrumental,False,4
+adventure,78100,19330,1723.0,0.3276,T37,78100,19330,Ash On Dust,Diaspora,Instrumental,Fabrizio Paterlini,Profondo Blu,Classical,True,4
+home,92367,14481,6.0,0.2554,T38,14481,92367,Out Of Orion (Ox3),Pitch Black,Electronic,Epoxia,Soberbia Espiritual (Remix),Electronic,True,4
+bridge,78100,86153,91.0,0.1549,T39,86153,78100,Ash On Dust,Diaspora,Instrumental,Moonove,Veeren,Electronic,False,4
+random,122729,1154,,,T40,122729,1154,The Four Harmony Kings,Goodnight Angeline,Old-Time / Historic,The Moonlighters,Hello Heartstring,Jazz,False,4
+home,129475,129486,3.0,0.2123,T41,129486,129475,The Defibulators,Hee-Haw In Heaven,Country,Alex Battles & the Engelberts,Half of What I Need,Country,False,4
+adventure,154433,4846,1414.0,0.4771,T42,4846,154433,Milton Arias,Poldoro,Jazz,Mamak Khadem,Bistoon,International,False,4

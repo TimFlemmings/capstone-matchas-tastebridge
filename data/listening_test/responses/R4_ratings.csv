@@ -1,0 +1,22 @@
+rater,pair_id,similarity_1_5,connects
+R4,P06,3,energy mood
+R4,P08,3,mood energy
+R4,P10,4,mood energy vocals production harmony
+R4,P15,2,mood
+R4,P20,2,mood
+R4,P22,3,mood energy
+R4,P25,2,mood timbre
+R4,P31,1,nothing
+R4,P34,2,
+R4,P47,3,mood energy timbre
+R4,P51,4,energy mood timbre rhythm harmony
+R4,P52,3,mood energy harmony rhythm timbre
+R4,P54,4,mood energy production
+R4,P56,3,mood energy production harmony
+R4,P59,4,instrumentation mood energy harmony timbre rhythm
+R4,P63,3,timbre mood harmony
+R4,P71,1,nothing
+R4,P72,1,harmony
+R4,P75,4,mood energy instrumentation production harmony rhythm
+R4,P76,2,mood energy
+R4,P79,1,nothing

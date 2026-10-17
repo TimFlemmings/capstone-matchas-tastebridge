@@ -1,0 +1,85 @@
+kind,seed,other,rank,band,pair_id,track_a,track_b,seed_artist,seed_title,seed_genre,other_artist,other_title,other_genre,in_core,round
+effnet_top,148032,52649,1.0,bridge,S01,52649,148032,BoyHoodBuchi,WitchCraft,Hip-Hop,Jason Shaw,The Big House,Electronic,False,3
+heard_top,42040,22091,5.0,bridge,S02,42040,22091,Coolzey,Enjoy Your Holiday,Hip-Hop,ETHX,Wondering Why (Featuring Nate Mezmer and Janice Bailon),Hip-Hop,False,3
+effnet_top,35734,132449,2.0,adventurous,S03,132449,35734,James Franc-Parler,Animateur commercial intime,Folk,Ava Zandieh,Not Quite There,Folk,False,3
+effnet_top,129374,85957,4.0,bridge,S04,85957,129374,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,Pete Galub,Waiting,Pop,False,3
+effnet_top,42040,119940,1.0,bridge,S05,42040,119940,Coolzey,Enjoy Your Holiday,Hip-Hop,J Mano,Be Yourself,Hip-Hop,False,3
+heard_top,148032,21657,4.0,bridge,S06,148032,21657,BoyHoodBuchi,WitchCraft,Hip-Hop,Volumina,Study For A Pop Band,Pop,False,3
+effnet_bridge,127212,125822,129.0,bridge,S07,127212,125822,Satori Ensemble,Una bella,Instrumental,Blue Dot Sessions,Slimm,Instrumental,False,3
+heard_top,128443,109686,2.0,adventurous,S08,109686,128443,Mitchmatic,a night lost,Hip-Hop,CM & Tha Silent Partner,What's It All For,Hip-Hop,False,3
+effnet_top,127212,125618,6.0,bridge,S09,125618,127212,Satori Ensemble,Una bella,Instrumental,Blue Dot Sessions,Flitless,Instrumental,False,3
+effnet_bridge,42040,64523,79.0,bridge,S10,64523,42040,Coolzey,Enjoy Your Holiday,Hip-Hop,Heavy Links,Vandalise,Hip-Hop,False,3
+effnet_top,129374,91228,3.0,bridge,S11,129374,91228,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,Lonely Faction,Softens The Blow,Folk,False,3
+effnet_adventurous,35734,107591,1581.0,adventurous,S12,35734,107591,James Franc-Parler,Animateur commercial intime,Folk,Kelly Latimore,Ode to the Beloved Basement Saints,Folk,False,3
+effnet_top,76069,91796,4.0,bridge,S13,76069,91796,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Three Jolly Rogues,Greenland Whale Fisheries,Folk,False,3
+heard_bridge,120518,4075,124.0,bridge,S14,4075,120518,Kotúče DM,Zaczek,Rock,Pistolera,Un Momento,International,False,3
+effnet_top,39605,67308,2.0,adventurous,S15,39605,67308,UltraCat,Disco High,Electronic,Super Flower,Camden Park,Electronic,True,3
+random,29351,98838,,adventurous,S16,98838,29351,danzante de tijeras,tipac tipac,International,Moonove,intense,Electronic,False,3
+random,35734,114399,,adventurous,S17,35734,114399,James Franc-Parler,Animateur commercial intime,Folk,Scott Holmes,Origin l,Rock,False,3
+effnet_adventurous,128443,129051,1004.0,adventurous,S18,129051,128443,Mitchmatic,a night lost,Hip-Hop,Total Unicorn,Whole Lot Of Louvre,Pop,False,3
+effnet_bridge,120518,121570,133.0,bridge,S19,121570,120518,Kotúče DM,Zaczek,Rock,Spider Bags,Japanese Vacation,Rock,False,3
+effnet_adventurous,39605,113024,1906.0,adventurous,S20,113024,39605,UltraCat,Disco High,Electronic,Malaventura,Soleares&beats,Pop,False,3
+effnet_top,8357,109963,4.0,adventurous,S21,109963,8357,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,Phemale,P.O.T.P.,Pop,False,3
+heard_adventurous,81895,37119,943.0,adventurous,S22,37119,81895,The Travelling Mongoose,Somewhere in Scotland,Experimental,Lee Rosevere,Dark Hallway,Instrumental,False,3
+effnet_top,8357,42119,3.0,adventurous,S23,42119,8357,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,The HATE Noise and Anonymous,Heavy Metal Attack Part 2,Experimental,False,3
+heard_top,81895,130693,1.0,adventurous,S24,130693,81895,The Travelling Mongoose,Somewhere in Scotland,Experimental,Cryosyncopy,Everlasting Rot,Rock,False,3
+effnet_top,120518,71371,2.0,bridge,S25,120518,71371,Kotúče DM,Zaczek,Rock,Black Bones,Good Times,Rock,False,3
+random,39605,126430,,adventurous,S26,39605,126430,UltraCat,Disco High,Electronic,Shy and the Fight,-,Pop,False,3
+effnet_bridge,148032,133436,86.0,bridge,S27,133436,148032,BoyHoodBuchi,WitchCraft,Hip-Hop,TRG Banks,New world,Instrumental,False,3
+heard_top,35734,137563,4.0,adventurous,S28,137563,35734,James Franc-Parler,Animateur commercial intime,Folk,Robert Kellough,Thunder 112915,Experimental,False,3
+effnet_top,76069,91791,6.0,bridge,S29,91791,76069,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Three Jolly Rogues,Good Old Colony Days,Folk,True,3
+heard_top,128443,74954,3.0,adventurous,S30,74954,128443,Mitchmatic,a night lost,Hip-Hop,C-Doc,(Robot) House Music,Hip-Hop,False,3
+effnet_top,127212,126014,2.0,bridge,S31,127212,126014,Satori Ensemble,Una bella,Instrumental,Blue Dot Sessions,Domina Transit,Instrumental,False,3
+random,148032,68683,,bridge,S32,68683,148032,BoyHoodBuchi,WitchCraft,Hip-Hop,Mean Moon,Counter-Earth,Electronic,True,3
+heard_adventurous,128443,48443,529.0,adventurous,S33,128443,48443,Mitchmatic,a night lost,Hip-Hop,Illocanblo,SmurfPulser,Electronic,False,3
+heard_top,81895,24912,4.0,adventurous,S34,81895,24912,The Travelling Mongoose,Somewhere in Scotland,Experimental,Sawako,lisbon-flute,Experimental,False,3
+heard_bridge,129374,93075,37.0,bridge,S35,93075,129374,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,Levi Weaver,Song In My Branches,Folk,False,3
+heard_top,29351,17631,3.0,adventurous,S36,17631,29351,danzante de tijeras,tipac tipac,International,Jalikebba Kuyateh and the Toubabs,Jaliya,International,True,3
+effnet_top,120518,71372,5.0,bridge,S37,71372,120518,Kotúče DM,Zaczek,Rock,Black Bones,Rock N Roll,Rock,False,3
+heard_top,129374,60074,1.0,bridge,S38,60074,129374,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,Rubber O Cement And James Twig Harper,Virtuoso Masterbattalion Of Perfected Sound Anticipation,Experimental,False,3
+effnet_bridge,129374,55436,92.0,bridge,S39,129374,55436,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,Bird Names,My Baby's A Lady,Pop,True,3
+effnet_adventurous,8357,67011,1499.0,adventurous,S40,8357,67011,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,Michael Chapman,She Moves Through the Fair,Folk,False,3
+heard_top,39605,14869,3.0,adventurous,S41,14869,39605,UltraCat,Disco High,Electronic,violett,ukelele,Electronic,False,3
+effnet_bridge,76069,37121,95.0,bridge,S42,76069,37121,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Jeffrey Letterly,The Story of the Stairs,Experimental,False,3
+effnet_top,42040,119578,5.0,bridge,S43,42040,119578,Coolzey,Enjoy Your Holiday,Hip-Hop,Nicholas Smith,A. Darkness... Smile / B. Commercial Break,Experimental,False,3
+random,76069,38966,,bridge,S44,76069,38966,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Talulah Lotus,Horrorphone,Experimental,False,3
+heard_top,42040,72058,3.0,bridge,S45,42040,72058,Coolzey,Enjoy Your Holiday,Hip-Hop,David Rovics,Glory And Fame (Edited),Folk,False,3
+effnet_adventurous,29351,56469,1180.0,adventurous,S46,29351,56469,danzante de tijeras,tipac tipac,International,Alash Ensemble,Yrlaazhyly,International,True,3
+heard_top,127212,73580,6.0,bridge,S47,73580,127212,Satori Ensemble,Una bella,Instrumental,James Beaudreau,Quiver,Folk,True,3
+random,128443,126900,,adventurous,S48,128443,126900,Mitchmatic,a night lost,Hip-Hop,SPCZ,Lesath,Electronic,False,3
+random,42040,73568,,bridge,S49,73568,42040,Coolzey,Enjoy Your Holiday,Hip-Hop,James Beaudreau,Reginald Earth,Folk,False,3
+heard_top,8357,11672,3.0,adventurous,S50,8357,11672,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,Cordero,(intro),International,False,3
+effnet_adventurous,81895,140258,616.0,adventurous,S51,140258,81895,The Travelling Mongoose,Somewhere in Scotland,Experimental,Illusory Scapes,Nature And God,Electronic,False,3
+effnet_top,128443,70654,2.0,adventurous,S52,128443,70654,Mitchmatic,a night lost,Hip-Hop,C-Doc,Far Gone (Featuring DJ Def Chad) (Vocal),Hip-Hop,False,3
+random,120518,60872,,bridge,S53,60872,120518,Kotúče DM,Zaczek,Rock,Eastern Watershed Klezmer Quartet,Introduction//Hora Mare,International,False,3
+heard_bridge,76069,18044,37.0,bridge,S54,76069,18044,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Nikolay Kolev,Title Unknown,International,False,3
+heard_top,120518,136709,1.0,bridge,S55,120518,136709,Kotúče DM,Zaczek,Rock,Tojamura 7,Surf Poem pt.2,Rock,False,3
+heard_adventurous,39605,114238,1570.0,adventurous,S56,114238,39605,UltraCat,Disco High,Electronic,Blue Dot Sessions,Grand Caravan,Instrumental,False,3
+effnet_top,29351,113699,1.0,adventurous,S57,29351,113699,danzante de tijeras,tipac tipac,International,La Tabù,¿Que? #1,International,False,3
+heard_top,29351,32433,1.0,adventurous,S58,29351,32433,danzante de tijeras,tipac tipac,International,Crazy Games,Wake Up,Electronic,False,3
+effnet_top,128443,112481,1.0,adventurous,S59,112481,128443,Mitchmatic,a night lost,Hip-Hop,The Impossebulls,Runnin' With The Bulls (Instrumental),Hip-Hop,False,3
+heard_top,129374,110736,4.0,bridge,S60,129374,110736,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,D3Zs,"Bloc Party 2 (Accapella) (Featuring CM aka Creative, C-Doc, The Honorable Sleaze, L-Mega & Pot-C)",Hip-Hop,False,3
+effnet_top,81895,34996,2.0,adventurous,S61,81895,34996,The Travelling Mongoose,Somewhere in Scotland,Experimental,Ambient Fabric,Ritual,Experimental,False,3
+heard_adventurous,8357,64338,1565.0,adventurous,S62,8357,64338,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,LOWdown,Ten Years Coming (Ninety-Four Drums of Death),Hip-Hop,False,3
+heard_bridge,127212,123763,64.0,bridge,S63,123763,127212,Satori Ensemble,Una bella,Instrumental,Hawkin,Week 3 - star,Instrumental,False,3
+heard_bridge,148032,75395,95.0,bridge,S64,148032,75395,BoyHoodBuchi,WitchCraft,Hip-Hop,Kellee Maize,Struggle (Remix),Hip-Hop,True,3
+heard_top,127212,133544,5.0,bridge,S65,133544,127212,Satori Ensemble,Una bella,Instrumental,David Szesztay,Eve,Instrumental,False,3
+heard_bridge,42040,108492,43.0,bridge,S66,108492,42040,Coolzey,Enjoy Your Holiday,Hip-Hop,Sun Sunych,43-13,Hip-Hop,False,3
+heard_adventurous,29351,80772,1518.0,adventurous,S67,80772,29351,danzante de tijeras,tipac tipac,International,Zlatni Makedoncinja,Svadba Golema,International,True,3
+effnet_top,39605,136323,5.0,adventurous,S68,39605,136323,UltraCat,Disco High,Electronic,D SMILEZ,We Did It! (Fulfillment Tune),Electronic,False,3
+heard_top,76069,14315,5.0,bridge,S69,14315,76069,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Black Sea Hotel,Dimjaninka,International,False,3
+effnet_top,148032,113564,3.0,bridge,S70,148032,113564,BoyHoodBuchi,WitchCraft,Hip-Hop,Bit Laden,"Danzad, Danzad, Malditos",Experimental,False,3
+heard_adventurous,35734,112484,552.0,adventurous,S71,112484,35734,James Franc-Parler,Animateur commercial intime,Folk,The Impossebulls,The Breath I Got Left (Instrumental),Hip-Hop,False,3
+heard_top,148032,142084,5.0,bridge,S72,142084,148032,BoyHoodBuchi,WitchCraft,Hip-Hop,SK,All of me,Hip-Hop,False,3
+heard_top,76069,108865,4.0,bridge,S73,108865,76069,Koliadnyky of Kryvorivnia,Still the River Flows (Rhyming Song),International,Black Sea Hotel,Mori Dobro Vecher,International,False,3
+random,127212,85956,,bridge,S74,85956,127212,Satori Ensemble,Una bella,Instrumental,Pete Galub,My Regeneration,Pop,False,3
+random,81895,814,,adventurous,S75,814,81895,The Travelling Mongoose,Somewhere in Scotland,Experimental,Hall Of Fame,Motion Passings,Folk,False,3
+effnet_top,35734,54156,4.0,adventurous,S76,35734,54156,James Franc-Parler,Animateur commercial intime,Folk,Mark Neil,08 Threshold,Instrumental,False,3
+heard_top,39605,36099,1.0,adventurous,S77,36099,39605,UltraCat,Disco High,Electronic,Exteenager,morpheus,Electronic,False,3
+heard_top,35734,64093,3.0,adventurous,S78,64093,35734,James Franc-Parler,Animateur commercial intime,Folk,Alcove,sweet talking,Experimental,False,3
+heard_top,8357,4233,2.0,adventurous,S79,8357,4233,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,The Sounds of Taraab,Interview,International,False,3
+random,129374,73585,,bridge,S80,129374,73585,Lonely Kid Quentin Ensemble,L'Universitaire,Pop,James Beaudreau,Stellar Rushes,Folk,False,3
+heard_top,120518,137720,4.0,bridge,S81,120518,137720,Kotúče DM,Zaczek,Rock,The Vivisectors,Road to Mexico,Rock,False,3
+effnet_top,29351,53578,3.0,adventurous,S82,29351,53578,danzante de tijeras,tipac tipac,International,Mary Lorson,I Don't Care,Folk,False,3
+effnet_top,81895,79977,1.0,adventurous,S83,81895,79977,The Travelling Mongoose,Somewhere in Scotland,Experimental,Emanuele Costantini,ITA Meda - Milano - Ambience Ext Italy Traffic Passing By Holcim,Experimental,False,3
+random,8357,110417,,adventurous,S84,110417,8357,Free Matter for the Blind,Promocja Belkot radio commercial,Experimental,Vows,The Great Show,Rock,False,3

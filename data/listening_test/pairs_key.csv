@@ -1,0 +1,81 @@
+kind,seed,other,rank,pair_id,track_a,track_b,seed_artist,seed_title,seed_genre,other_artist,other_title,other_genre,in_core
+model,123978,1069,1.0,P01,123978,1069,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Lucky Dragons,Un Lagrima en la Discoteca,Experimental,False
+model,140,44805,1.0,P02,140,44805,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Monk Turner + Fascinoma,Start Again,Pop,False
+model,68893,131796,3.0,P03,68893,131796,Broke For Free,Sidewalk Chalk,Electronic,Pranavibes,Tempête,Instrumental,False
+model,123978,115850,2.0,P04,115850,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Dead Peoples Records,11am,Experimental,False
+model,42234,44821,4.0,P05,44821,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Black Bear Combo,Otrov,International,False
+model,43883,38905,4.0,P06,38905,43883,Myo,crickets,Experimental,File Under Toner,si los curas,Experimental,False
+model,59876,35544,1.0,P07,59876,35544,Boy Friend,Lovedropper,Rock,Garmisch,Facing the Sea,Pop,False
+deep,43883,112734,50.0,P08,43883,112734,Myo,crickets,Experimental,Is,Summoning,Rock,True
+model,140,52953,5.0,P09,140,52953,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Marissa Nadler,Your Heart Is A Twisted Vine,Folk,False
+model,59876,36959,3.0,P10,36959,59876,Boy Friend,Lovedropper,Rock,Garmisch,Facing the Sea (Album Version),Pop,False
+model,17608,68841,5.0,P11,68841,17608,Alash Ensemble,Bai-Taiga,International,Howie Mitchell,Old Molly Hare,Folk,False
+model,123978,997,4.0,P12,123978,997,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Kevin Shields,Nothing's Ever Ending,Experimental,False
+deep,42234,37920,200.0,P13,37920,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Wizwars,8 Bit Raceway,Electronic,False
+model,149701,107048,1.0,P14,149701,107048,Sro,Answering M,Electronic,Elvin Brandhi,Mønstah,Pop,False
+deep,68893,54063,50.0,P15,68893,54063,Broke For Free,Sidewalk Chalk,Electronic,Yair Yona,Mad About You,Folk,False
+model,17608,43028,1.0,P16,17608,43028,Alash Ensemble,Bai-Taiga,International,Huun Huur Tu,Samagaldai,International,False
+deep,123978,11239,200.0,P17,11239,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Justice Yeldham,hamar 261005,Experimental,False
+deep,140,117161,200.0,P18,140,117161,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Blue Dot Sessions,Reptile Theme,Instrumental,False
+random,43883,131941,,P19,43883,131941,Myo,crickets,Experimental,Choban Elektrik,Unknown Cocek Tune,International,False
+model,63471,145199,1.0,P20,63471,145199,Mutilation Rites,Goliath,Rock,Conduit,Opening the Mouth/ Salt,Rock,True
+model,54033,134388,5.0,P21,134388,54033,alright lover,Snow Wave,Pop,Scott Holmes,Magical Moments,Pop,False
+deep,59876,56249,50.0,P22,56249,59876,Boy Friend,Lovedropper,Rock,Jiony,Woman Alone,Pop,False
+model,54033,145556,1.0,P23,145556,54033,alright lover,Snow Wave,Pop,This Mess is Mine,Roommates (Piano Version by AGPB),Folk,False
+model,17608,68840,3.0,P24,68840,17608,Alash Ensemble,Bai-Taiga,International,Howie Mitchell,John's Laughing Place,Folk,False
+model,123978,114279,5.0,P25,123978,114279,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Azureflux,Bipolar Bear,Electronic,True
+deep,54033,75607,50.0,P26,54033,75607,alright lover,Snow Wave,Pop,Rho,The Last Ocean,Instrumental,False
+model,63471,54942,3.0,P27,63471,54942,Mutilation Rites,Goliath,Rock,Dolorvotre,Brilliant Brightness,Rock,False
+random,68893,75782,,P28,75782,68893,Broke For Free,Sidewalk Chalk,Electronic,Square People,I'm Not Lazy,Rock,False
+model,42234,36273,2.0,P29,36273,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Demiran Ćerimović and His Orkestar,"Competition Rehearsal, Song 2",International,False
+model,149701,126773,5.0,P30,126773,149701,Sro,Answering M,Electronic,Gorowski,Emu In The Bass,Electronic,False
+random,123978,14538,,P31,14538,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Opio,Infrared Beams,Hip-Hop,False
+deep,17608,125618,200.0,P32,125618,17608,Alash Ensemble,Bai-Taiga,International,Blue Dot Sessions,Flitless,Instrumental,False
+model,54033,14571,3.0,P33,14571,54033,alright lover,Snow Wave,Pop,Ergo Phizmiz,Through the Doors of the Circus,Instrumental,False
+random,140,14661,,P34,14661,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Jonathan Coulton,Re: Your Brains,Folk,False
+random,42234,76437,,P35,42234,76437,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Misay Day,Southside,Folk,False
+model,42234,44820,5.0,P36,44820,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Black Bear Combo,Rhumbus,International,False
+deep,42234,10695,50.0,P37,42234,10695,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,BOPD,2.17.05,Hip-Hop,False
+model,43883,66482,1.0,P38,43883,66482,Myo,crickets,Experimental,Qkcofse,Phase a Couple Rooms,Experimental,False
+model,63471,3833,5.0,P39,3833,63471,Mutilation Rites,Goliath,Rock,Lightning Bolt,Track 01,Rock,False
+model,59876,64009,4.0,P40,59876,64009,Boy Friend,Lovedropper,Rock,Gosprom,Nevesta (Flayve Remix),Pop,False
+deep,63471,87151,50.0,P41,63471,87151,Mutilation Rites,Goliath,Rock,Still Pluto,Open up your eyes,Rock,False
+model,140,110451,4.0,P42,110451,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Papascandy,Linton,International,False
+model,42234,36277,3.0,P43,36277,42234,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Demiran Ćerimović and His Orkestar,"Restaurant Concert, Song 2",International,False
+model,149701,12690,4.0,P44,149701,12690,Sro,Answering M,Electronic,Bo Marley + Disrupt + Volfoniq,L'Anchoïade,International,False
+model,54033,114070,4.0,P45,114070,54033,alright lover,Snow Wave,Pop,Blue Dot Sessions,Grand Fell,Instrumental,False
+deep,59876,12692,200.0,P46,12692,59876,Boy Friend,Lovedropper,Rock,Bo Marley + Disrupt + Volfoniq,La Brandade,International,False
+model,54033,63456,2.0,P47,63456,54033,alright lover,Snow Wave,Pop,Big Blood,Away pt. II,Folk,True
+model,149701,130986,2.0,P48,149701,130986,Sro,Answering M,Electronic,Jaan Patterson,"Doctor, what has Cesuacantho to do with this?",Experimental,False
+deep,123978,29037,50.0,P49,123978,29037,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,Digi G'Alessio,raw instrumental pt.1,Electronic,False
+random,63471,41020,,P50,63471,41020,Mutilation Rites,Goliath,Rock,Garage firm,Digital system,International,False
+model,17608,116706,2.0,P51,17608,116706,Alash Ensemble,Bai-Taiga,International,Howie Mitchell,Henry Martin,Folk,False
+deep,17608,141143,50.0,P52,141143,17608,Alash Ensemble,Bai-Taiga,International,Michael Brückner,Flüchtig,Instrumental,False
+model,42234,136137,1.0,P53,42234,136137,Zlatne Uste Balkan Brass Band,Lacin Cocek,International,Philippa Dowding and Allister Thompson,Spring,Folk,False
+model,43883,38907,3.0,P54,38907,43883,Myo,crickets,Experimental,File Under Toner,take me to the movies,Experimental,False
+model,63471,86417,2.0,P55,86417,63471,Mutilation Rites,Goliath,Rock,One Master,The Destroyer (Parts 1 and 2),Rock,False
+model,43883,112668,2.0,P56,43883,112668,Myo,crickets,Experimental,ODOR BABY,45,Experimental,False
+model,17608,39663,4.0,P57,39663,17608,Alash Ensemble,Bai-Taiga,International,Quiet Hooves,Til It Stops Talkin,Pop,False
+model,68893,51301,5.0,P58,68893,51301,Broke For Free,Sidewalk Chalk,Electronic,John Badger & The Moustache Riders of Doom,Skeletons Fighting Over A Pickled Herring,Experimental,False
+model,63471,73521,4.0,P59,63471,73521,Mutilation Rites,Goliath,Rock,Hounds Of Hate,Brotherhood Of Night,Rock,True
+deep,63471,125001,200.0,P60,63471,125001,Mutilation Rites,Goliath,Rock,Let Me Crazy,899 Seconds,Rock,False
+random,149701,116759,,P61,149701,116759,Sro,Answering M,Electronic,Alex Mason,Raid On The Camp,Instrumental,False
+model,59876,141617,2.0,P62,59876,141617,Boy Friend,Lovedropper,Rock,Barbarix,The Secret Garden,Electronic,False
+model,123978,92283,3.0,P63,92283,123978,BenJamin Banger,"Fuck Yall, Im Goin Pop",Hip-Hop,DJ Spooky,Antarctic Dawn (Bonus Track),Electronic,False
+deep,149701,42018,200.0,P64,42018,149701,Sro,Answering M,Electronic,Electronischebasisgeluide,La boite a track (Spain),Electronic,False
+random,17608,15880,,P65,15880,17608,Alash Ensemble,Bai-Taiga,International,Kokusai Bunka Shinkokai,Taishikichô Chôshi,International,False
+deep,54033,3274,200.0,P66,3274,54033,alright lover,Snow Wave,Pop,Arborea,Forewarned,Folk,False
+deep,68893,27667,200.0,P67,27667,68893,Broke For Free,Sidewalk Chalk,Electronic,Gradient,Deep Performance,Electronic,False
+model,149701,29720,3.0,P68,149701,29720,Sro,Answering M,Electronic,Codex Machine,S.P.Y.,Hip-Hop,False
+model,43883,48368,5.0,P69,48368,43883,Myo,crickets,Experimental,Cloudkicker,A Hymn to the Projectile,Rock,False
+model,140,6803,2.0,P70,6803,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Watcha Clan,Balkan Qoulou,International,False
+random,59876,113265,,P71,113265,59876,Boy Friend,Lovedropper,Rock,Mc Norman,Why,International,True
+model,68893,72071,2.0,P72,72071,68893,Broke For Free,Sidewalk Chalk,Electronic,Decktonic,Spectrum,Electronic,True
+model,140,77564,3.0,P73,140,77564,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Bryyn,Abba Ingee,Pop,False
+model,68893,100552,4.0,P74,68893,100552,Broke For Free,Sidewalk Chalk,Electronic,Megatone,First Space Voyage,Electronic,False
+deep,149701,113035,50.0,P75,149701,113035,Sro,Answering M,Electronic,Tickle,The Drop (Thomas The Search Engine Version),Hip-Hop,True
+model,68893,133028,1.0,P76,68893,133028,Broke For Free,Sidewalk Chalk,Electronic,SPCZ,Eternal Glide,Electronic,True
+deep,140,85599,50.0,P77,85599,140,Alec K. Redfearn & the Eyesores,Queen Of The Wires,Folk,Garmisch,Native Son,Pop,False
+deep,43883,122088,200.0,P78,43883,122088,Myo,crickets,Experimental,Jahzzar,What?,Rock,False
+model,59876,44950,5.0,P79,44950,59876,Boy Friend,Lovedropper,Rock,SONGO 21,Amor Y Felicidad,International,False
+random,54033,124916,,P80,124916,54033,alright lover,Snow Wave,Pop,Six Umbrellas,Zombie Disco,Electronic,False
