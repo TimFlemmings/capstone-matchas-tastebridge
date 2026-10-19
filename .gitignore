@@ -165,3 +165,6 @@ data/fma_medium
 models/essentia/*.pb
 
 .DS_Store
+
+# Vite dependency cache
+.vite/
